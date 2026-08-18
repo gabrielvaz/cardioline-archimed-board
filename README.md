@@ -1,160 +1,113 @@
-# Cardioline 2028 — Product Vision
+# Cardioline Vision 2028
 
-Apresentação executiva de visão de produto, em HTML, navegável como slides.
-**Não é material institucional da Cardioline, não é oferta comercial e não tem
-backend.** Todos os pacientes, exames, medidas e traçados são sintéticos.
+Materiais de visão de produto sobre uma única tese:
 
-```
-/vision   os 22 slides
-/anchor   landing enxuta do Anchor (embutida no slide 14)
-```
+> O dispositivo é a **porta de entrada** de uma relação contínua com o software,
+> e não a conclusão da venda.
+
+Protótipo de Product Design para discussão interna. **Não é material oficial da
+Cardioline e não constitui oferta comercial.** Preços são ilustrativos. Todo
+paciente, exame, medida e traçado de ECG mostrado é sintético.
 
 ## Rodar
 
 ```bash
 pnpm install
-pnpm dev            # http://localhost:3000/vision
-pnpm build && pnpm start
-pnpm test           # lógica pura (Vitest)
+pnpm dev        # http://localhost:3000
+pnpm build
 pnpm lint
-pnpm build && pnpm verify   # harness visual (Puppeteer)
+pnpm test       # vitest
+pnpm verify     # harness Puppeteer do deck
 ```
 
-Na apresentação: `←` `→` navegam, `F` entra em fullscreen, `G` abre o mapa dos
-22 slides, `R` reinicia no slide 1, `Home`/`End` vão às pontas, e `#14` na URL
-abre direto num slide.
+## Rotas
 
-## Identidade: o que veio de fonte oficial
+Um único app Next.js hospeda todos os materiais, para que a navegação entre eles
+seja instantânea numa reunião. Cada versão da landing continua viva na `main` em
+vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 
-Nenhum valor foi estimado. Todos foram extraídos de `cardioline.com`.
+| Rota | O que é |
+|---|---|
+| `/` | Hub de navegação |
+| `/vision` | O deck de 22 slides |
+| `/anchor` | Tela do workspace usada como apoio no deck |
+| `/v2` | Landing atual: VIREO AM e o Anchor em destaque, com movimento na rolagem |
+| `/v1` | Landing anterior: reverência ao produto, uma ideia por viewport |
+| `/v0` | Primeiro rascunho, guardado como base de comparação |
 
-| Token | Valor | Origem |
-|---|---|---|
-| `--cl-orange` | `#F66201` | pixels do PNG do wordmark oficial |
-| `--cl-orange-ui` | `#EE5B00` | `--primary_color` do tema do site |
-| `--cl-ink` | `#071046` | `--awb-color6`, a cor dos H1/H2 do site |
-| `--cl-ink-deep` | `#040A2A` | `--awb-custom_color_1`, fundo dos slides escuros |
-| `--cl-tint` | `#FDEBE0` | `--awb-color4` |
-| Tipografia | **Inter** | `--awb-typography1..N` |
+## Três mundos de CSS num app
 
-O briefing sugeria `#F36C21`; o laranja real do logo é `#F66201` — mais saturado
-e mais vermelho.
+O deck e o hub usam **CSS Modules** sobre `styles/tokens.css`. As versões `v0` e
+`v1` foram construídas em **Tailwind** antes desta consolidação. Os três
+convivem porque o CSS é carregado por segmento de rota, não na raiz:
 
-### Três papéis para o laranja
+```
+app/globals.css          reset global, SEM tipografia de corpo
+styles/tokens.css        toda a identidade, nenhum hex fora daqui
+styles/deck.css          tipografia do deck        → app/(deck)/layout.tsx
+app/v1/v1.css            Tailwind + tokens da v1   → app/v1/layout.tsx
+app/v2/v2.css            CSS Modules da v2         → app/v2/layout.tsx
+```
 
-`#F66201` tem 3,19:1 sobre branco: passa como elemento gráfico (WCAG pede 3:1),
-reprova como texto (4,5:1). Mesma matiz e saturação, muda só o valor:
+**A armadilha que isso resolve:** regras sem cascade layer vencem qualquer coisa
+dentro de `@layer`. Como a base do Tailwind vive em `@layer base`, um
+`body { font-size }` na `globals.css` da raiz sobrescreve silenciosamente a
+tipografia das versões em Tailwind. Foi o que fez a headline da `/v1` colidir com
+o subtítulo na primeira tentativa de consolidação. Por isso a `globals.css` da
+raiz não declara `font-size`, `line-height` nem `font-weight`.
 
-- `--cl-orange` `#F66201` — grafismo: traçados, filetes, pontos, grid, réguas
-- `--cl-orange-strong` `#CA5001` — superfície preenchida com texto branco
-- `--cl-orange-ink` `#B84A01` — laranja como texto sobre fundo claro (5,26:1)
+O route group `app/(deck)/` não altera nenhuma URL: existe apenas para dar às
+rotas da apresentação um lugar onde carregar a tipografia delas.
 
-Convenção compartilhada com o protótipo irmão em `../../cardioline-anchor`, para
-os dois materiais não se contradizerem quando mostrados na mesma reunião.
-
-### Logo
-
-`public/brand/*.svg` foram produzidos **vetorizando os PNGs oficiais** — o site
-não distribui SVG. O logo não foi redesenhado nem remontado com texto.
-
-`scripts/trace-brand.py` é reproduzível. Duas armadilhas resolvidas por medição,
-não por palpite: o potracer preenche onde a máscara é **falsa** (traçar
-`alpha > 128` produz o negativo, IoU 0,0002), e o limiar 100 saiu de varredura
-(60→0,94 · 100→**0,99** · 128→0,95 · 160→0,94). O harness mede IoU contra os
-PNGs originais e exige ≥ 0,99.
-
-## Arquitetura
-
-Uma decisão explica quase tudo: **cada slide é desenhado num canvas fixo de
-1600×900 e escalado por `transform`.** Se o conteúdo coube ali, cabe em qualquer
-tela — overflow vira impossível por construção, e verificar uma vez vale para
-todas as resoluções.
-
-A escala é CSS puro: `tan(atan2(100vw, 1600px))` devolve a razão sem unidade que
-`scale()` precisa. Sem JS, sem flash na hidratação, reage a resize sozinho. Há
-fallback em JS para browsers sem suporte.
+## Estrutura
 
 ```
 app/
-  vision/     o deck            anchor/     a landing
+  layout.tsx  page.tsx  globals.css     hub e shell compartilhado
+  (deck)/     vision/  anchor/          a apresentação
+  v0/  v1/  v2/                         as landings, uma por versão
 components/
-  deck/       Deck · Slide · Stage · Reveal · ProgressRail · GridOverview
-  slides/     S01…S22
-  brand/      Logo · Symbol · AnchorWordmark
-  primitives/ Display · Kicker · Lede · Caption · Flow · Rule
-  product/    ExamViewer · PatientTimeline · ClinicalInsight · RiskTrend
-              ExamComparison · ReportComposer · DeviceSync · EcgTrace · Frames
-lib/          ecg.ts · synthetic.ts · slides.ts · contrast.ts
-styles/       tokens.css      scripts/    verify-slides.mjs · trace-brand.py
+  brand/  deck/  primitives/  product/  slides/     design system do deck
+  v1/                                   componentes da landing v1 e v0
+  v2/                                   componentes da landing v2
+lib/
+  contrast.ts  ecg.ts  slides.ts  synthetic.ts      libs do deck
+  v1/                                   libs da landing v1 e v0
+  v2/                                   libs da landing v2
+styles/tokens.css                       fonte única da identidade
+assets/
+  brand-source/                         PNG oficial do logo, fonte da vetorização
+  device-source/                        renders e fotos do VIREO AM
+public/
+  brand/  product/  devices/  device/   assets servidos
+scripts/                                vetorização de marca e verificação
+tests/                                  vitest
+docs/deck.md                            documentação da apresentação
 ```
 
-Reservado e ainda não implementado: `anchor/app`, `anchor/patient/[id]`,
-`anchor/exam/[id]`, `enterprise`.
+## Identidade
 
-### ECG sintético
+Todos os valores de marca vêm de fontes oficiais da Cardioline, não de
+estimativa. Ver o cabeçalho de `styles/tokens.css` para a procedência de cada um
+e os contrastes medidos.
 
-`lib/ecg.ts` emite polilinha a partir dos pontos de controle da batida
-(P-QRS-T), que é como um eletrocardiógrafo real desenha: path curto e com os
-ângulos vivos do traçado clínico, em vez de curva suavizada que pareceria
-decorativa. PRNG mulberry32 semeado — **nenhum `Math.random()` em render**, que
-quebraria a hidratação e deixaria o desenho animado instável.
+Três papéis para o laranja, mesma matiz e saturação, só o valor muda, porque o
+laranja oficial `#F66201` tem 3,19:1 sobre branco: serve para grafismo (WCAG pede
+3:1) mas não para texto nem para superfície com texto branco (4,5:1).
 
-O grid do visualizador é laranja porque é a cor do papel térmico impresso pelos
-próprios eletrocardiógrafos Cardioline.
-
-### Navegação
-
-O tween de scroll é próprio, em `requestAnimationFrame`. Medido: sob
-`scroll-snap` mandatório o Chrome **cancela** um smooth scroll re-alvejado antes
-de terminar — com setas a cada 120 ms, 21 avanços paravam no slide 20 em vez do
-22. O tween próprio continua da posição atual em vez de disputar com o anterior.
-Salto longo é instantâneo: animar 19 slides mostraria a apresentação num borrão.
-
-## Verificação
-
-`pnpm verify` sobe o build e falha o processo em qualquer violação. Ele foi
-verificado por injeção de violações propositais — um harness que nunca falhou
-não é evidência de nada.
-
-| Checagem | O que pega |
+| Token | Uso |
 |---|---|
-| Overflow da stage | conteúdo além de 1600×900 |
-| Transbordo de caixa | o que vaza para **cima**, que `scrollHeight` não vê |
-| Sobreposição de texto | dois blocos ocupando o mesmo lugar dentro da stage |
-| Tamanho de fonte | qualquer texto abaixo de 16 px |
-| Contraste | AA por tamanho, mais a regra de laranja da marca |
-| Viewports | 1920×1080, 1600×900, 1440×900: escala e centralização |
-| Teclado | 21 setas chegam em `#22`; `Home` volta; `#14` abre no 14 |
-| Restart | `R` recarrega e volta ao slide 1, com o scroll em zero |
-| Overview | `G` abre 22 tiles, `Esc` fecha |
-| Reduced motion | conteúdo visível sem animar, sem colisão |
-| Marca | IoU dos SVGs contra os PNGs oficiais |
-| Screenshots | os 22 slides em `artifacts/slides/` |
+| `--cl-orange` `#F66201` | grafismo: traçados, filetes, pontos, grid |
+| `--cl-orange-strong` `#CA5001` | superfície preenchida com texto branco |
+| `--cl-orange-ink` `#B84A01` | laranja como texto sobre fundo claro |
+| `--cl-ink` `#071046` | texto corrido; é a cor dos H1/H2 do site oficial |
 
-Camadas deliberadamente sobrepostas se declaram com `data-layer`, para o
-detector de colisão ter um escape hatch explícito em vez de uma regra frouxa.
+## Regra editorial
 
-Fullscreen (`F`) exige gesto do usuário e não roda em headless — foi testado à
-mão no Chrome.
+Toda a copy está no tempo verbal do começo (*starts, opens, included, extended*)
+e nunca no do encerramento (*already yours, nothing more to buy, free forever*).
+Sempre que o texto afirma o que está incluído, precisa deixar visível que existe
+um degrau acima. **Incluído não é o mesmo que completo.**
 
-## Escopo da narrativa
-
-O horizonte é **2028**. A apresentação não usa linha do tempo datada em nenhum
-slide, e não cita Holter nem ABPM.
-
-Um ponto de tese que o material não pode inverter: a Cardioline **sempre** fez
-hardware e software. O que muda em 2028 não é passar a fazer software, é para
-quem ele é feito — daí o eixo do slide 03 ser "software para o aparelho →
-para o exame → para o cardiologista", e não "ganhar software".
-
-## Fronteira comercial
-
-Tudo que a plataforma já entrega hoje permanece no **Anchor Free**. Nenhum
-recurso existente foi movido para trás de um pagamento: o Enterprise se
-diferencia por escala, administração centralizada, governança e serviço, nunca
-por bloqueio. Vale para o slide 13 e para `/anchor`.
-
-Sobre IA, a linguagem é sempre de observação — *surfaced for review*, *flagged
-for your attention*. Em nenhum ponto se promete diagnóstico automático ou
-substituição do cardiologista. Os slides 16 e 17 carregam a ressalva
-`Conceptual — not a clinical claim` na própria tela.
+Zero em-dashes e en-dashes em qualquer string visível: o travessão longo é a
+assinatura tipográfica mais reconhecível de texto gerado por máquina.

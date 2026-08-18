@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — Anchor by Cardioline
+ *
+ * Todos os valores de marca foram extraidos de fontes oficiais da Cardioline,
+ * nao estimados:
+ *   --brand-primary        tinta real do logo oficial (public/brand/*.png)
+ *   --brand-primary-hover  --awb-color5 do tema do cardioline.com
+ *   --brand-soft           --awb-color4 do tema do cardioline.com
+ *   --text-primary         --awb-color6 do tema (cor de todos os H1/H2 do site)
+ *   --surface-muted        --awb-color2 do tema
+ * Os neutros derivados (border, text-secondary) foram construidos sobre o
+ * matiz do navy da marca para manter a familia de cores coerente.
+ */
+:root {
+  /*
+   * Ponte de tipografia. O layout raiz declara a Inter em --cl-font-inter,
+   * seguindo a convenção de tokens do deck; o Tailwind desta versão foi escrito
+   * esperando --font-inter. Aliasar aqui evita instanciar a fonte duas vezes.
+   */
+  --font-inter: var(--cl-font-inter);
+  --font-mono-plex: var(--cl-font-mono);
+
+  /*
+   * Tres papeis para o laranja da marca, porque o valor oficial (#F66201) tem
+   * contraste 3,15:1 sobre branco — suficiente para elemento grafico (WCAG
+   * pede 3:1) mas nao para texto nem para superficie com texto branco (4,5:1).
+   * Matiz e saturacao sao identicos nos tres; muda apenas o valor.
+   *
+   *   --brand-primary  grafismo: pontos, bordas, filetes, grid de ECG, icones
+   *   --brand-strong   superficie preenchida que carrega texto branco (CTA)
+   *   --brand-ink      laranja usado como TEXTO sobre qualquer fundo claro
+   */
+  --brand-primary: #f66201;
+  --brand-primary-hover: #ee5b00;
+  --brand-strong: #ca5001;
+  --brand-strong-hover: #b04600;
+  --brand-ink: #b84a01;
+  --brand-soft: #fdebe0;
+  --brand-soft-strong: #fbd9c4;
+
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-muted: #f4f6fb;
+  --surface-sunken: #eef1f8;
+
+  --text-primary: #071046;
+  --text-secondary: #55607f;
+  /* #8A93AD reprovava (2,83:1 sobre surface-muted); este passa em 4,5:1 */
+  --text-tertiary: #6a7185;
+
+  --border: #e2e6f0;
+  --border-strong: #ccd3e3;
+
+  /* Superficies escuras — derivadas do navy da marca */
+  --navy: #071046;
+  --navy-raised: #101c58;
+  --navy-line: rgba(255, 255, 255, 0.14);
+  --navy-text-secondary: rgba(232, 236, 250, 0.72);
+
+  /* Estados clinicos do fluxo de exames */
+  /* Cor cheia para o marcador; variante -ink para o rotulo sobre o tint,
+     onde a cor cheia reprovava (ready 2,81:1, reported 3,71:1) */
+  --status-new: #2563c9;
+  --status-ready: #f66201;
+  --status-review: #8a5cd6;
+  --status-reported: #1a8f5f;
+  --status-priority: #d3342b;
+  --status-new-ink: #2563c9;
+  --status-ready-ink: #bc4b01;
+  --status-review-ink: #8357cc;
+  --status-reported-ink: #177f55;
+  --status-priority-ink: #cb3229;
+
+  --ecg-grid: #f66201;
+  --ecg-trace: #10163a;
+
+  --radius-card: 14px;
+  --radius-lg: 18px;
+}
+
+@theme inline {
+  --color-brand: var(--brand-primary);
+  --color-brand-hover: var(--brand-primary-hover);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-strong-hover: var(--brand-strong-hover);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-strong: var(--brand-soft-strong);
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-sunken: var(--surface-sunken);
+
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-ink-3: var(--text-tertiary);
+
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+
+  --color-navy: var(--navy);
+  --color-navy-raised: var(--navy-raised);
+
+  --color-status-new: var(--status-new);
+  --color-status-ready: var(--status-ready);
+  --color-status-review: var(--status-review);
+  --color-status-reported: var(--status-reported);
+  --color-status-priority: var(--status-priority);
+  --color-status-new-ink: var(--status-new-ink);
+  --color-status-ready-ink: var(--status-ready-ink);
+  --color-status-review-ink: var(--status-review-ink);
+  --color-status-reported-ink: var(--status-reported-ink);
+  --color-status-priority-ink: var(--status-priority-ink);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-mono-plex), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius-card: 14px;
+  --radius-panel: 18px;
+
+  /* Sombras muito sutis — nunca pesadas */
+  --shadow-subtle: 0 1px 2px rgba(7, 16, 70, 0.04);
+  --shadow-card: 0 1px 3px rgba(7, 16, 70, 0.05), 0 8px 24px -12px rgba(7, 16, 70, 0.1);
+  --shadow-panel: 0 2px 6px rgba(7, 16, 70, 0.05), 0 24px 60px -24px rgba(7, 16, 70, 0.18);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* compensa a navbar sticky ao navegar por anchors */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-weight: 450;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* nenhum overflow horizontal em nenhum breakpoint */
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.021em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--brand-soft-strong);
+    color: var(--text-primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Rotulos de secao e cabecalhos de tabela clinica */
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}

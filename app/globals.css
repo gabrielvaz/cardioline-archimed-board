@@ -1,4 +1,15 @@
-/* Reset mínimo. Todo valor vem de tokens.css. */
+/*
+ * Reset verdadeiramente global. Todo valor vem de tokens.css.
+ *
+ * Deliberadamente SEM tipografia de corpo (font-size, line-height, font-weight):
+ * este arquivo é carregado por todas as rotas, e cada material tem a sua própria
+ * escala. Regras sem cascade layer vencem qualquer coisa dentro de @layer, então
+ * um font-size aqui sobrescreveria silenciosamente a base do Tailwind das
+ * versões v0 e v1 — foi exatamente esse o bug que fez a headline da v1 colidir
+ * com o subtítulo. A tipografia de cada mundo vive no CSS do seu segmento:
+ * styles/deck.css, app/v1/v1.css, app/v2/v2.css.
+ */
+
 *,
 *::before,
 *::after {
@@ -9,54 +20,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
 }
 
 body {
   font-family: var(--cl-font);
-  font-size: var(--cl-fs-body);
-  line-height: var(--cl-lh-normal);
   color: var(--cl-ink);
   background: var(--cl-white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-h1,
-h2,
-h3,
-p,
-figure,
-blockquote {
-  margin: 0;
-}
-
-ul,
-ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
-
-button {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }
 
 /* Números em tabular para que colunas e contadores não dancem. */

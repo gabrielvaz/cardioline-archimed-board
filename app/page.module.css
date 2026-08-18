@@ -1,0 +1,115 @@
+/* Hub de navegação. Sem Tailwind: segue as convenções do deck. */
+
+.wrap {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: 96px 32px 80px;
+}
+
+.logo {
+  width: 148px;
+  height: auto;
+  display: block;
+}
+
+.title {
+  margin-top: 48px;
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: var(--cl-tracking-display);
+  color: var(--cl-ink);
+  max-width: 22ch;
+}
+
+.lede {
+  margin-top: 20px;
+  max-width: 60ch;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--cl-mute);
+}
+
+.list {
+  margin-top: 64px;
+  list-style: none;
+  padding: 0;
+}
+
+.item {
+  border-top: 1px solid var(--cl-line);
+}
+
+.link {
+  display: grid;
+  gap: 8px 40px;
+  padding: 28px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+@media (min-width: 720px) {
+  .link {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  }
+}
+
+.kicker {
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  margin-top: 10px;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  color: var(--cl-ink);
+}
+
+.link:hover .name {
+  color: var(--cl-orange-ink);
+}
+
+.body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--cl-mute);
+  margin: 0;
+}
+
+.go {
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cl-orange-ink);
+}
+
+.current {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--cl-tint);
+  color: var(--cl-orange-ink);
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: 3px;
+}
+
+.note {
+  margin-top: 64px;
+  padding-top: 28px;
+  border-top: 1px solid var(--cl-line);
+  max-width: 72ch;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--cl-mute);
+}
