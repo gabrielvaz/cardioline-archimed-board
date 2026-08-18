@@ -16,16 +16,66 @@ export function Deck({ children }: { children: ReactNode }) {
   const [overview, setOverview] = useState(false);
   const [idle, setIdle] = useState(false);
 
-  const goTo = useCallback((n: number) => {
+  // O alvo da navegação vive num ref, não no state: durante um scroll suave o
+  // `active` ainda mostra o slide antigo, e derivar o próximo dele faria o deck
+  // engasgar e perder teclas quando alguém avança rápido.
+  const target = useRef(1);
+  // Distingue scroll do usuário de scroll programático: só o primeiro pode
+  // redefinir o alvo, senão teclas rápidas se perdem no meio da animação.
+  const userScrolled = useRef(false);
+
+  const anim = useRef(0);
+
+  /**
+   * Animação própria em rAF em vez de scrollTo({behavior:"smooth"}).
+   *
+   * Medido: sob scroll-snap mandatório o Chrome cancela um smooth scroll quando
+   * ele é re-alvejado antes de terminar — com teclas a cada 120ms, 21 avanços
+   * chegavam ao slide 20 em vez do 22. O tween próprio é re-alvejável: cada
+   * chamada continua da posição atual em vez de disputar com a anterior.
+   */
+  const scrollToSlide = useCallback((slide: number) => {
     const el = scroller.current;
     if (!el) return;
-    const clamped = Math.min(TOTAL_SLIDES, Math.max(1, n));
-    el.scrollTo({ top: (clamped - 1) * el.clientHeight, behavior: "smooth" });
-    setOverview(false);
+    cancelAnimationFrame(anim.current);
+    const to = (slide - 1) * el.clientHeight;
+    const from = el.scrollTop;
+    const distance = to - from;
+    if (Math.abs(distance) < 1) return;
+
+    // Salto longo é instantâneo: atravessar 19 slides em animação mostraria a
+    // apresentação inteira num borrão.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || Math.abs(distance) > el.clientHeight * 1.5) {
+      el.scrollTop = to;
+      return;
+    }
+
+    const started = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - started) / 420);
+      el.scrollTop = from + distance * (1 - (1 - t) ** 3);
+      if (t < 1) anim.current = requestAnimationFrame(step);
+    };
+    anim.current = requestAnimationFrame(step);
   }, []);
 
-  const next = useCallback(() => goTo(active + 1), [active, goTo]);
-  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
+  const goTo = useCallback(
+    (n: number) => {
+      const clamped = Math.min(TOTAL_SLIDES, Math.max(1, n));
+      target.current = clamped;
+      userScrolled.current = false;
+      setActive(clamped);
+      scrollToSlide(clamped);
+      setOverview(false);
+    },
+    [scrollToSlide],
+  );
+
+  useEffect(() => () => cancelAnimationFrame(anim.current), []);
+
+  const next = useCallback(() => goTo(target.current + 1), [goTo]);
+  const prev = useCallback(() => goTo(target.current - 1), [goTo]);
 
   // Slide ativo vem da posição de scroll: cada slide tem exatamente 100vh e o
   // snap garante alinhamento, então a divisão é exata e mais barata que um
@@ -34,32 +84,69 @@ export function Deck({ children }: { children: ReactNode }) {
     const el = scroller.current;
     if (!el) return;
     let frame = 0;
+    let settle: ReturnType<typeof setTimeout>;
+    const current = () =>
+      Math.min(TOTAL_SLIDES, Math.max(1, Math.round(el.scrollTop / el.clientHeight) + 1));
     const onScroll = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const n = Math.round(el.scrollTop / el.clientHeight) + 1;
-        setActive(Math.min(TOTAL_SLIDES, Math.max(1, n)));
-      });
+      frame = requestAnimationFrame(() => setActive(current()));
+      // Só depois que o scroll para é que a posição real vira o novo alvo —
+      // durante um scroll programático ela é apenas um estado intermediário.
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        if (userScrolled.current) {
+          target.current = current();
+          userScrolled.current = false;
+        }
+      }, 150);
+    };
+    const onUser = () => {
+      userScrolled.current = true;
     };
     el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("wheel", onUser, { passive: true });
+    el.addEventListener("touchmove", onUser, { passive: true });
     return () => {
       el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("wheel", onUser);
+      el.removeEventListener("touchmove", onUser);
       cancelAnimationFrame(frame);
+      clearTimeout(settle);
     };
   }, []);
 
-  // Deep-link: entra no slide do hash, e mantém o hash em dia ao navegar.
+  // Deep-link. Roda num rAF para o contêiner já ter altura, e levanta uma
+  // trava: enquanto ele não terminar, a sincronização de hash fica quieta —
+  // senão o primeiro render escreveria #01 por cima do #14 pedido na URL.
+  const linked = useRef(false);
   useEffect(() => {
     const el = scroller.current;
     if (!el) return;
-    const n = Number(window.location.hash.replace("#", ""));
-    if (Number.isInteger(n) && n >= 1 && n <= TOTAL_SLIDES) {
-      el.scrollTo({ top: (n - 1) * el.clientHeight, behavior: "auto" });
-      setActive(n);
-    }
+    const raf = requestAnimationFrame(() => {
+      const n = Number(window.location.hash.replace("#", ""));
+      if (Number.isInteger(n) && n >= 1 && n <= TOTAL_SLIDES) {
+        target.current = n;
+        setActive(n);
+        el.scrollTop = (n - 1) * el.clientHeight;
+      }
+      linked.current = true;
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   useEffect(() => {
+    const onHash = () => {
+      const n = Number(window.location.hash.replace("#", ""));
+      if (Number.isInteger(n) && n >= 1 && n <= TOTAL_SLIDES && n !== target.current) {
+        goTo(n);
+      }
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, [goTo]);
+
+  useEffect(() => {
+    if (!linked.current) return;
     const hash = slideHash(active);
     if (window.location.hash !== hash) {
       window.history.replaceState(null, "", hash);

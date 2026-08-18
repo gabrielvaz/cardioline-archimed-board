@@ -62,7 +62,6 @@ describe("tokens da marca", () => {
   it("não tem nenhum tamanho de fonte abaixo de 16px na escala", () => {
     const sizes = [...css.matchAll(/--cl-fs-[a-z]+:\s*(\d+)px/g)].map((m) => Number(m[1]));
     expect(sizes.length).toBeGreaterThan(0);
-    expect(Math.min(...sizes)).toBeGreaterThanOrEqual(13); // kicker é o piso, e é uppercase tracked
-    expect(sizes.filter((s) => s < 16)).toEqual([13]);
+    expect(sizes.filter((s) => s < 16)).toEqual([]);
   });
 });
