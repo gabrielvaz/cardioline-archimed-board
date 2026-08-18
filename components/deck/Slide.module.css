@@ -1,0 +1,21 @@
+.slide {
+  height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* O letterbox em telas 16:10 é o fundo do próprio slide, então lê como
+   margem em vez de barra preta. */
+.slide[data-theme="white"] {
+  background: var(--cl-white);
+  color: var(--cl-ink);
+}
+
+.slide[data-theme="ink"] {
+  background: var(--cl-ink);
+  color: var(--cl-white);
+}

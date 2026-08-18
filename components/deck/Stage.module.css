@@ -1,0 +1,24 @@
+/**
+ * A stage é um canvas fixo de 1600x900 escalado por transform.
+ *
+ * Consequência que motiva a escolha: overflow vira impossível por construção.
+ * Se o conteúdo coube aqui, cabe em qualquer tela — verifica-se uma vez em vez
+ * de caçar overflow slide a slide em cada breakpoint.
+ */
+.stage {
+  position: relative;
+  flex: none;
+  width: var(--stage-w);
+  height: var(--stage-h);
+  transform: scale(var(--stage-scale, 1));
+  transform-origin: center center;
+}
+
+/* O padding lateral padrão dos slides, para o conteúdo não colar na borda. */
+.pad {
+  position: absolute;
+  inset: 0;
+  padding: var(--cl-space-6) var(--cl-gutter);
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,92 @@
+.deck {
+  /* Escala da stage em CSS puro: tan(atan2(len, len)) devolve a razão sem
+     unidade, que é o que scale() precisa. Sem JS, sem flash na hidratação,
+     e reage a resize sozinho. O Deck instala um fallback em JS caso o browser
+     não suporte. */
+  --stage-scale: min(
+    tan(atan2(100vw, var(--stage-w))),
+    tan(atan2(100vh, var(--stage-h)))
+  );
+
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+
+.deck::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Controles discretos ---- */
+
+.chrome {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 400ms var(--cl-ease);
+}
+
+.chromeIdle {
+  opacity: 0;
+}
+
+.rail {
+  position: absolute;
+  top: 50%;
+  right: 28px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  pointer-events: auto;
+}
+
+.tick {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.22;
+  transition:
+    opacity 240ms var(--cl-ease),
+    width 240ms var(--cl-ease),
+    background 240ms var(--cl-ease);
+}
+
+.tickActive {
+  width: 26px;
+  opacity: 1;
+  background: var(--cl-orange);
+}
+
+.counter {
+  position: absolute;
+  right: 28px;
+  bottom: 22px;
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-medium);
+  letter-spacing: 0.06em;
+  opacity: 0.45;
+}
+
+.hint {
+  position: absolute;
+  left: 28px;
+  bottom: 22px;
+  font-size: var(--cl-fs-caption);
+  letter-spacing: 0.04em;
+  opacity: 0.35;
+}
+
+/* Cores do chrome seguem o tema do slide ativo. */
+.chrome[data-theme="white"] {
+  color: var(--cl-ink);
+}
+
+.chrome[data-theme="ink"] {
+  color: var(--cl-white);
+}

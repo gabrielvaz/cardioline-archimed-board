@@ -1,0 +1,93 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--cl-ink) 96%, transparent);
+  color: var(--cl-white);
+  padding: 56px 64px;
+  overflow-y: auto;
+  animation: fade 200ms var(--cl-ease);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+.tile {
+  text-align: left;
+  border: var(--cl-hairline) solid rgb(255 255 255 / 0.16);
+  border-radius: var(--cl-radius-node);
+  padding: 18px 18px 20px;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition:
+    border-color 200ms var(--cl-ease),
+    background 200ms var(--cl-ease);
+}
+
+.tile:hover {
+  border-color: var(--cl-orange);
+  background: rgb(255 255 255 / 0.04);
+}
+
+.tileActive {
+  border-color: var(--cl-orange);
+  background: rgb(246 98 1 / 0.1);
+}
+
+.num {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+.tileActive .num {
+  color: var(--cl-orange);
+  opacity: 1;
+}
+
+.name {
+  font-size: 19px;
+  font-weight: var(--cl-weight-medium);
+  line-height: var(--cl-lh-snug);
+  letter-spacing: -0.01em;
+}
+
+/* Os três slides navy ficam reconhecíveis no mapa. */
+.swatch {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--cl-white);
+  opacity: 0.8;
+}
+
+.swatchInk {
+  background: var(--cl-orange);
+}
