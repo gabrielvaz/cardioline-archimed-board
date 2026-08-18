@@ -1,0 +1,59 @@
+/*
+ * Tipografia da v2.
+ *
+ * Carregada no layout do segmento, não na raiz: as versões v0 e v1 usam Tailwind
+ * e o deck usa 22px para projetor. Cada mundo declara a sua própria escala. Ver
+ * o cabeçalho de app/globals.css para o porquê.
+ *
+ * Nenhum hex aqui: tudo vem de styles/tokens.css.
+ */
+
+.v2 {
+  --v2-measure: 62ch;
+  --v2-gutter: 24px;
+  --v2-max: 1280px;
+
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--cl-ink);
+  background: var(--cl-white);
+}
+
+@media (min-width: 1024px) {
+  .v2 {
+    --v2-gutter: 48px;
+  }
+}
+
+.v2 h1,
+.v2 h2,
+.v2 h3 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: var(--cl-tracking-display);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.v2 p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.v2 ul,
+.v2 ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v2 img,
+.v2 svg {
+  display: block;
+  max-width: 100%;
+}
+
+.v2 a {
+  color: inherit;
+  text-decoration: none;
+}

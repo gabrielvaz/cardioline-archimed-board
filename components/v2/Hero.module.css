@@ -1,0 +1,224 @@
+/*
+ * Hero da v2. O software é o assunto; o aparelho e o telefone são as duas outras
+ * superfícies onde ele aparece.
+ *
+ * A seção é fixada e a rolagem monta a composição: o workspace começa em
+ * perspectiva e se endireita, o VIREO AM sobe, o telefone entra. O estado
+ * INICIAL vive aqui em CSS, não em JS, para que o servidor e o cliente rendam a
+ * mesma coisa e não haja divergência de hidratação. O GSAP só assume a partir daí.
+ */
+
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  overflow: clip;
+}
+
+.inner {
+  max-width: var(--v2-max);
+  margin-inline: auto;
+  padding: 96px var(--v2-gutter) 64px;
+  display: grid;
+  gap: 40px;
+}
+
+@media (min-width: 1100px) {
+  .inner {
+    min-height: 100dvh;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    align-items: center;
+    gap: 48px;
+    padding-block: 88px;
+  }
+}
+
+/* ---- Coluna de texto ---- */
+
+.kicker {
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.title {
+  margin-top: 20px;
+  font-size: clamp(38px, 5.2vw, 64px);
+  letter-spacing: -0.038em;
+  line-height: 1;
+  max-width: 13ch;
+}
+
+.lede {
+  margin-top: 22px;
+  max-width: 44ch;
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.6;
+  color: var(--cl-mute);
+}
+
+.actions {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 22px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  padding-inline: 24px;
+  background: var(--cl-orange-strong);
+  color: var(--cl-white);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 160ms ease;
+}
+
+.cta:hover {
+  background: var(--cl-orange-ink);
+}
+
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: var(--cl-orange-ink);
+}
+
+.textLink:hover {
+  opacity: 0.72;
+}
+
+/* ---- Palco 3D ---- */
+
+.stage {
+  position: relative;
+  /* A perspectiva vive no pai: é ela que faz a rotação do filho parecer
+     profundidade em vez de distorção plana. */
+  perspective: 1900px;
+  perspective-origin: 62% 45%;
+  min-height: 460px;
+}
+
+@media (min-width: 1100px) {
+  .stage {
+    min-height: 620px;
+  }
+}
+
+/*
+ * Estado inicial do workspace: inclinado, levemente afastado e deslocado para a
+ * direita. É daqui que a rolagem parte.
+ */
+/*
+ * O ExamViewer distribui as derivações com flex: 1 1 0, o que exige um pai de
+ * altura definida. No deck ele vive num Slide de altura fixa; aqui a altura
+ * precisa ser declarada, senão o flex colapsa e os traçados viram uma fatia.
+ */
+.viewerBox {
+  display: flex;
+  height: 356px;
+}
+
+.viewerBox > * {
+  flex: 1;
+  min-height: 0;
+}
+
+.workspace {
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+  transform: translateX(4%) rotateY(-17deg) rotateX(8deg) scale(0.9);
+  box-shadow:
+    0 2px 8px color-mix(in srgb, var(--cl-ink) 8%, transparent),
+    0 40px 90px -40px color-mix(in srgb, var(--cl-ink) 30%, transparent);
+}
+
+/* Sombra de contato do palco, desenhada em CSS: os recortes do aparelho já
+   trazem a sombra do render, mas o workspace precisa da sua. */
+.workspace::after {
+  content: "";
+  position: absolute;
+  inset-inline: 6%;
+  bottom: -34px;
+  height: 34px;
+  background: radial-gradient(
+    50% 100% at 50% 0%,
+    color-mix(in srgb, var(--cl-ink) 16%, transparent),
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+/* ---- VIREO AM ---- */
+
+.device {
+  position: absolute;
+  z-index: 2;
+  left: -6%;
+  bottom: -23%;
+  width: 32%;
+  max-width: 252px;
+  transform: translateY(8%) rotate(-3deg);
+  filter: drop-shadow(0 26px 40px color-mix(in srgb, var(--cl-ink) 22%, transparent));
+}
+
+.deviceImg {
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 1100px) {
+  .device {
+    left: -13%;
+    width: 29%;
+  }
+}
+
+/* ---- Telefone ---- */
+
+.phone {
+  position: absolute;
+  z-index: 3;
+  right: -4%;
+  bottom: -12%;
+  width: 25%;
+  max-width: 208px;
+  aspect-ratio: 208 / 424;
+  transform: translateY(12%) rotate(2.5deg);
+  filter: drop-shadow(0 30px 50px color-mix(in srgb, var(--cl-ink) 26%, transparent));
+}
+
+@media (min-width: 1100px) {
+  .phone {
+    right: -11%;
+    width: 23%;
+  }
+}
+
+.phoneFrame {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Sem movimento: quem pediu para reduzir animação recebe a composição já montada,
+ * e o palco deixa de ser fixado.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .workspace {
+    transform: none;
+  }
+  .device {
+    transform: none;
+  }
+  .phone {
+    transform: none;
+  }
+}

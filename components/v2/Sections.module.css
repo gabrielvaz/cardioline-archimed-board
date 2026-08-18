@@ -1,0 +1,361 @@
+/* Seções da v2. Fios e vazio no lugar de cards. */
+
+.section {
+  max-width: var(--v2-max);
+  margin-inline: auto;
+  padding: 104px var(--v2-gutter);
+}
+
+.head {
+  max-width: 26ch;
+}
+
+.h2 {
+  font-size: clamp(28px, 4vw, 48px);
+  letter-spacing: -0.034em;
+}
+
+.lede {
+  margin-top: 18px;
+  max-width: 52ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--cl-mute);
+}
+
+.kicker {
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+  margin-bottom: 18px;
+}
+
+/* ---- Superfícies ---- */
+
+.surfaces {
+  margin-top: 64px;
+  display: grid;
+  gap: 48px;
+}
+
+@media (min-width: 900px) {
+  .surfaces {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+}
+
+.surface {
+  border-top: 1px solid var(--cl-line);
+  padding-top: 20px;
+}
+
+.surfaceLabel {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--cl-ink);
+}
+
+.surfaceBody {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--cl-mute);
+}
+
+/* ---- Aparelho em destaque ---- */
+
+.deviceRow {
+  margin-top: 88px;
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .deviceRow {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 64px;
+  }
+}
+
+.deviceShot {
+  position: relative;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 340px;
+}
+
+.deviceShot img {
+  width: 100%;
+  height: auto;
+}
+
+.specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 32px;
+}
+
+.spec {
+  border-top: 1px solid var(--cl-line);
+  padding-top: 12px;
+}
+
+.specK {
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.specV {
+  margin-top: 5px;
+  font-size: 15px;
+  color: var(--cl-ink);
+}
+
+/* ---- Escada ---- */
+
+.ladder {
+  margin-top: 64px;
+  display: grid;
+  gap: 48px;
+}
+
+.rung {
+  display: grid;
+  gap: 12px 48px;
+}
+
+@media (min-width: 900px) {
+  .rung {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
+    align-items: end;
+  }
+}
+
+.mark {
+  display: block;
+  width: 40px;
+  height: 2px;
+  margin-bottom: 18px;
+}
+
+.markFree {
+  background: var(--cl-line);
+}
+.markPro {
+  background: var(--cl-orange);
+}
+.markEnterprise {
+  background: var(--cl-ink);
+}
+
+.when {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cl-mute);
+}
+
+.plan {
+  margin-top: 4px;
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--cl-ink);
+}
+
+.rungBody {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--cl-mute);
+  max-width: 46ch;
+}
+
+/* ---- Comparação ---- */
+
+.compare {
+  margin-top: 56px;
+  display: grid;
+  gap: 32px;
+}
+
+@media (min-width: 900px) {
+  .compare {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 48px;
+  }
+}
+
+.strip {
+  border-top: 1px solid var(--cl-line);
+  padding-top: 12px;
+  margin-bottom: 28px;
+}
+
+.stripHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.stripNow {
+  color: var(--cl-orange-ink);
+  font-weight: 600;
+}
+
+.stripBox {
+  position: relative;
+  height: 96px;
+  margin-top: 10px;
+  border: 1px solid var(--cl-line);
+  overflow: hidden;
+}
+
+.paper {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right, color-mix(in srgb, var(--cl-orange) 26%, transparent) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--cl-orange) 26%, transparent) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(to right, color-mix(in srgb, var(--cl-orange) 11%, transparent) 0 1px, transparent 1px 3.2px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--cl-orange) 11%, transparent) 0 1px, transparent 1px 3.2px);
+}
+
+.stripSvg {
+  position: absolute;
+  inset: 0;
+}
+
+.dim {
+  opacity: 0.5;
+}
+
+.deltas {
+  border-top: 1px solid var(--cl-orange);
+  padding-top: 14px;
+}
+
+.deltaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cl-line);
+  font-size: 15px;
+}
+
+.deltaRow:last-child {
+  border-bottom: 0;
+}
+
+.deltaK {
+  color: var(--cl-mute);
+}
+
+.deltaV {
+  font-family: var(--cl-font-mono), monospace;
+  font-weight: 600;
+  color: var(--cl-orange-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  margin-top: 44px;
+  max-width: 68ch;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--cl-mute);
+}
+
+/* ---- Fechamento ---- */
+
+.close {
+  max-width: var(--v2-max);
+  margin-inline: auto;
+  padding: 120px var(--v2-gutter) 96px;
+  text-align: center;
+}
+
+.closeTitle {
+  margin-inline: auto;
+  max-width: 20ch;
+  font-size: clamp(32px, 5.2vw, 60px);
+  letter-spacing: -0.038em;
+  line-height: 1;
+}
+
+.closeActions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 24px;
+}
+
+.footer {
+  border-top: 1px solid var(--cl-line);
+  max-width: var(--v2-max);
+  margin-inline: auto;
+  padding: 40px var(--v2-gutter) 64px;
+}
+
+.footerNote {
+  max-width: 76ch;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--cl-mute);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  padding-inline: 24px;
+  background: var(--cl-orange-strong);
+  color: var(--cl-white);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 160ms ease;
+}
+
+.cta:hover {
+  background: var(--cl-orange-ink);
+}
+
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: var(--cl-orange-ink);
+}
+
+.h3 {
+  font-size: clamp(24px, 3vw, 34px);
+  letter-spacing: -0.03em;
+}
+
+.specs {
+  margin-top: 32px;
+}
+
+.deltaHead {
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+  margin-bottom: 8px;
+}

@@ -35,6 +35,50 @@ vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 | `/v1` | Landing anterior: reverência ao produto, uma ideia por viewport |
 | `/v0` | Primeiro rascunho, guardado como base de comparação |
 
+## A v2
+
+O software em primeiro plano, em perspectiva, e a rolagem montando a composição.
+
+**Coreografia.** A seção do hero é fixada (`pin`) e a rolagem é o parâmetro da
+animação (`scrub`). O workspace parte inclinado em 3D e se endireita até encarar
+o leitor; o VIREO AM sobe à frente; o telefone entra por último. É a sequência "o
+aparelho adquire, o navegador lê, o bolso assina" contada como gesto, não como
+lista. GSAP porque pin com scrub é justamente o que keyframes de CSS não fazem.
+
+O estado **inicial** vive em CSS, não em JS, para que servidor e cliente rendam a
+mesma coisa e não haja divergência de hidratação; o GSAP assume a partir dali.
+Sob `prefers-reduced-motion` a composição aparece montada e o pin não acontece.
+
+**As três superfícies mostram o mesmo exame.** Mesmo paciente, mesmos valores
+medidos no navegador e no telefone. Números divergentes entre telas destroem a
+credibilidade de um material clínico mais rápido do que qualquer detalhe visual.
+
+**Reuso do design system do deck.** `BrowserFrame`, `DeviceFrame`, `ExamViewer` e
+`EcgTrace` já existiam em `components/product/`, em CSS Modules sobre os tokens.
+A v2 não reconstruiu nada disso. Uma armadilha encontrada no caminho: o
+`ExamViewer` distribui as derivações com `flex: 1 1 0`, o que exige um pai de
+altura definida — no deck ele vive num Slide de altura fixa, e sem declarar altura
+aqui os traçados colapsavam numa fatia de poucos pixels.
+
+### Imagens do dispositivo
+
+Os renders oficiais do VIREO AM entram recortados por
+`scripts/cutout-device.py`: flood fill a partir da borda, erosão de 1 px e
+recorte para o conteúdo. **Os pixels do aparelho são os do render oficial** — o
+hardware não foi redesenhado nem regerado.
+
+Por que não geração de imagem para o aparelho: o `gpt-image` só gera a partir de
+texto, não edita. Um "VIREO AM" descrito em prompt seria um aparelho inventado,
+com proporções e conectores que não existem, o que contraria a regra de preservar
+a aparência dos produtos Cardioline.
+
+Detalhe do algoritmo: a carcaça do aparelho também é branca, então um threshold
+global de branco comeria o corpo do produto. O fundo é a região branca
+**conectada à borda**, e é só ela que sai. Os cabos de derivação são brancos sobre
+branco e não sobrevivem à erosão que limpa a franja da carcaça, por isso são
+cortados: `crop_to_body` detecta a primeira linha cuja faixa opaca cobre parte
+significativa da largura do objeto.
+
 ## Três mundos de CSS num app
 
 O deck e o hub usam **CSS Modules** sobre `styles/tokens.css`. As versões `v0` e
