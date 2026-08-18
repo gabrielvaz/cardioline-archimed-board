@@ -1,0 +1,28 @@
+{
+  "count": 106,
+  "width": 1000,
+  "height": 1250,
+  "stages": [
+    {
+      "name": "hold",
+      "frames": 6
+    },
+    {
+      "name": "undock",
+      "frames": 26
+    },
+    {
+      "name": "rotate",
+      "frames": 34
+    },
+    {
+      "name": "dock",
+      "frames": 26
+    },
+    {
+      "name": "power",
+      "frames": 14
+    }
+  ],
+  "pattern": "/vireo-am-scroll/desktop/frame-{n}.webp"
+}

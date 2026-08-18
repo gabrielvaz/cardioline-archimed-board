@@ -124,12 +124,81 @@ Só a amostragem de pixel na captura revelou o problema: os seletores do probe d
 DOM erravam o elemento, e a inspeção visual não distingue "token não resolveu" de
 "outra regra ganhou".
 
+## Showcase do VIREO AM
+
+Seção em `/v2` (`#device`) com uma transformação contínua do produto conduzida
+pela rolagem, em cinco etapas: montado → o módulo de cabo se solta → o aparelho
+gira e mostra a traseira → o módulo Air acopla → a tela acende.
+
+**Não é vídeo.** É uma sequência de 106 imagens desenhada em canvas, com o índice
+do frame amarrado à posição da rolagem por ScrollTrigger em `scrub`. Rolar para
+cima desmonta o aparelho na ordem inversa. Verificado por medição: assinatura de
+frame idêntica na ida e na volta (`reversível: SIM` em
+`scratchpad/showcase.mjs`).
+
+Canvas e não uma pilha de `<img>`: 106 elementos alternando opacidade obrigam o
+compositor a recalcular camadas a cada frame; um canvas faz um `drawImage` e não
+toca no layout.
+
+### Onde mexer
+
+| Quero | Onde |
+|---|---|
+| trocar um frame | substituir o `.webp` em `public/vireo-am-scroll/` |
+| mudar nº de frames ou duração de uma etapa | `STAGES` em `scripts/build-vireo-frames.py`, e rodar de novo |
+| mudar a distância total de rolagem | `SCROLL_LENGTH` em `lib/v2/showcase.ts` |
+| mudar legendas e em que etapa aparecem | `STAGE_CAPTIONS` em `lib/v2/showcase.ts` |
+| mudar o limiar mobile | `MOBILE_BREAKPOINT` em `lib/v2/showcase.ts` |
+
+```bash
+python3 scripts/build-vireo-frames.py            # 106 frames, 1000x1250, 1.5 MB
+python3 scripts/build-vireo-frames.py --mobile    # 620x775, 0.8 MB
+```
+
+O componente lê `manifest.json` gerado pelo script, então etapa e duração ficam
+definidas num lugar só e não podem divergir. Média de 14 KB por frame, preload em
+duas ondas (o primeiro sozinho, o resto em paralelo), caixa reservada por
+`aspect-ratio` para não haver layout shift.
+
+### Como os frames foram feitos, e por que não com geração de imagem
+
+Todo pixel do produto vem de **render oficial**. As camadas em
+`assets/vireo-layers/` foram recortadas dos renders CAD do PDF da Cardioline
+(`assets/device-source/VIREO-AM-renders-1.pdf`, 5 páginas, 92 imagens embutidas)
+e `scripts/build-vireo-frames.py` apenas as compõe e move.
+
+Um gerador texto-para-imagem não recebe o produto como referência: cada chamada
+devolve um aparelho diferente, com proporções, conectores e encaixes que mudam de
+frame para frame. Isso falharia justamente no critério principal, que é parecer
+UM único VIREO AM em movimento. Compondo, a geometria é literalmente idêntica em
+todos os frames.
+
+A área da tela é **medida** na camada frontal por perfis de linha e coluna, e não
+fixada em frações: se a camada for substituída, o conteúdo aceso continua no
+lugar. O conteúdo aceso vem de uma foto real do aparelho ligado, porque a vista
+frontal oficial tem a tela apagada.
+
+### O que a rotação é, e o que falta para ser um turntable
+
+Os renders oficiais têm frente, traseira e 3/4, mas **não têm as laterais em 90
+graus**. Então a etapa 3 é uma revelação da traseira e volta, no registro de um
+cartão girando (compressão horizontal entre ângulos reais, com espessura mínima
+de 18% porque um slab visto de perfil não desaparece), e não um turntable
+fotorreal de 360 graus.
+
+Para virar um 360 de verdade é só substituir a lista `key` em
+`build-vireo-frames.py` por uma sequência de turntable. A fonte precisa vir da
+Cardioline: export de turntable do CAD, ou o próprio modelo. Gerar os ângulos
+faltantes por IA não serve, pelo motivo acima.
+
 ### Pendente
 
-As imagens geradas por `gpt-image` **não foram feitas**: a cota do plano Plus está
-esgotada (`HTTP 429 usage_limit_reached`, reset em 20/08). O que falta são plates
-de ambiente para compor atrás do aparelho; o aparelho em si não deve ser gerado,
-pelo motivo acima.
+Nada foi gerado por `gpt-image`: a cota do plano Plus está esgotada
+(`HTTP 429 usage_limit_reached`, reset em 20/08 às 06:35). Testado três vezes.
+
+O que a geração de imagem ainda pode agregar, quando a cota voltar, são **plates
+de ambiente** para compor atrás do aparelho. O produto em si não deve ser gerado,
+e os ângulos faltantes da rotação também não.
 
 ## Três mundos de CSS num app
 

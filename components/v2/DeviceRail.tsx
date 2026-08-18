@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SCROLL_LENGTH } from "@/lib/v2/showcase";
 import styles from "./DeviceRail.module.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -60,6 +61,32 @@ export function DeviceRail() {
 
       // 0.34 ao fim — recua de escala e acompanha a leitura.
       tl.to(group.current, { scale: 0.56, duration: 0.3, ease: "power1.out" }, 0.34);
+
+      /*
+       * O trilho desaparece enquanto o showcase está em cena. Dois VIREO AM na
+       * mesma tela, um deles se transformando, destruiria a leitura de que existe
+       * um único aparelho. Gatilho próprio, amarrado à seção do showcase.
+       */
+      const showcase = document.getElementById("device");
+      if (showcase) {
+        ScrollTrigger.create({
+          trigger: showcase,
+          start: "top 70%",
+          // A mesma distância que o showcase consome fixado. Usar "bottom 30%"
+          // encerrava o gatilho no meio da rolagem fixada, e o trilho voltava a
+          // aparecer antes do produto terminar de se montar.
+          end: () => `+=${window.innerHeight * (SCROLL_LENGTH + 1)}`,
+          // onToggle explícito em vez de toggleActions: o showcase é fixado, e
+          // com pin as âncoras de toggleActions ficam ambíguas.
+          onToggle: (self) => {
+            gsap.to(rail.current, {
+              autoAlpha: self.isActive ? 0 : 1,
+              duration: 0.35,
+              ease: "power1.out",
+            });
+          },
+        });
+      }
     }, rail);
 
     return () => ctx.revert();

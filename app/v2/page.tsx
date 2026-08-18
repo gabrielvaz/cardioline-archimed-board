@@ -2,6 +2,7 @@ import { DeviceRail } from "@/components/v2/DeviceRail";
 import { Hero } from "@/components/v2/Hero";
 import { SiteHeader } from "@/components/v2/SiteHeader";
 import { Close, Comparison, Ladder, Surfaces } from "@/components/v2/Sections";
+import { VireoShowcase } from "@/components/v2/VireoShowcase";
 
 export const metadata = {
   title: "Anchor",
@@ -26,6 +27,7 @@ export default function V2() {
       <SiteHeader />
       <main>
         <Hero />
+        <VireoShowcase />
         <Surfaces />
         <Ladder />
         <Comparison />
