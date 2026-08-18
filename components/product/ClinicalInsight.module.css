@@ -1,0 +1,62 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 24px;
+  border-radius: var(--cl-radius-node);
+  background: var(--cl-white);
+  border: var(--cl-hairline) solid var(--cl-line);
+  max-width: 460px;
+}
+
+[data-theme="ink"] .card {
+  background: rgb(255 255 255 / 0.05);
+  border-color: rgb(255 255 255 / 0.16);
+}
+
+.attention {
+  border-left: 3px solid var(--cl-orange);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cl-orange);
+  flex: none;
+}
+
+.label {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .label {
+  color: rgb(255 255 255 / 0.72);
+}
+
+.title {
+  font-size: 26px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.018em;
+  line-height: var(--cl-lh-snug);
+}
+
+.body {
+  font-size: var(--cl-fs-body);
+  line-height: 1.45;
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .body {
+  color: rgb(255 255 255 / 0.66);
+}

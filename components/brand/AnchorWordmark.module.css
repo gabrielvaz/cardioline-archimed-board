@@ -1,0 +1,23 @@
+.wrap {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.name {
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--cl-orange);
+}
+
+.by {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--cl-fs-caption);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  opacity: 0.6;
+}

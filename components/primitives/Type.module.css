@@ -1,0 +1,114 @@
+.kicker {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Laranja reprova AA em texto pequeno (3.45:1 sobre branco) e opacidade 0.5
+   sobre ink dá 3.71:1 — também reprova. Então o kicker usa cor sólida legível,
+   e o laranja entra como régua gráfica, onde não há requisito de contraste
+   de texto. A marca aparece sem custar legibilidade. */
+.kickerWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.accentRule {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--cl-orange);
+  flex: none;
+}
+
+.kickerText {
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .kickerText {
+  color: rgb(255 255 255 / 0.72);
+}
+
+.display {
+  font-weight: var(--cl-weight-semibold);
+  line-height: var(--cl-lh-tight);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.hero {
+  font-size: var(--cl-fs-hero);
+  letter-spacing: var(--cl-tracking-hero);
+}
+
+.displaySize {
+  font-size: var(--cl-fs-display);
+  letter-spacing: var(--cl-tracking-display);
+}
+
+.headline {
+  font-size: var(--cl-fs-headline);
+  letter-spacing: var(--cl-tracking-headline);
+}
+
+.subhead {
+  font-size: var(--cl-fs-subhead);
+  letter-spacing: var(--cl-tracking-subhead);
+  line-height: var(--cl-lh-snug);
+}
+
+/* Laranja só é permitido nesses tamanhos — abaixo de 32px reprova AA
+   sobre fundo claro. Ver a regra em tokens.css. */
+.accent {
+  color: var(--cl-orange-ui);
+}
+
+[data-theme="ink"] .accent {
+  color: var(--cl-orange);
+}
+
+.lede {
+  font-size: var(--cl-fs-lede);
+  line-height: var(--cl-lh-snug);
+  letter-spacing: var(--cl-tracking-lede);
+  font-weight: var(--cl-weight-regular);
+  max-width: 30ch;
+  text-wrap: pretty;
+}
+
+.body {
+  font-size: var(--cl-fs-body);
+  line-height: var(--cl-lh-normal);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.mute {
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .mute {
+  color: rgb(255 255 255 / 0.52);
+}
+
+.caption {
+  font-size: var(--cl-fs-caption);
+  line-height: 1.4;
+  color: var(--cl-mute);
+  letter-spacing: 0.01em;
+}
+
+[data-theme="ink"] .caption {
+  color: rgb(255 255 255 / 0.52);
+}
+
+.bigNumber {
+  font-size: 200px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.04em;
+  line-height: 0.86;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,19 @@
+.rule {
+  border: 0;
+  height: var(--cl-hairline);
+  width: 100%;
+  background: var(--cl-line);
+  margin: 0;
+}
+
+[data-theme="ink"] .rule {
+  background: rgb(255 255 255 / 0.18);
+}
+
+.orange {
+  background: var(--cl-orange);
+}
+
+[data-theme="ink"] .orange {
+  background: var(--cl-orange);
+}

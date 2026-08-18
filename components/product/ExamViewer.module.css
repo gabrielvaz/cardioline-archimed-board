@@ -1,0 +1,178 @@
+.viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--cl-white);
+  color: var(--cl-ink);
+}
+
+.head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 22px 26px 18px;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+}
+
+/* Em telas estreitas a tag não cabe ao lado do nome — some, e a nota de dado
+   sintético fica por conta da legenda do slide. */
+.compact .head {
+  padding: 16px 18px 14px;
+}
+
+.compact .name {
+  font-size: 20px;
+}
+
+.compact .leads,
+.compact .measures .measure {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.compact .measureValue {
+  font-size: 24px;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.name {
+  white-space: nowrap;
+  font-size: 26px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.018em;
+  line-height: 1.1;
+}
+
+.meta {
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
+  letter-spacing: 0.01em;
+}
+
+/* Texto em ink, não em laranja: laranja sobre o tint dá 2.98:1 e reprova.
+   O ponto laranja carrega a marca sem custar legibilidade. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-ink);
+  background: var(--cl-tint);
+  border-radius: var(--cl-radius-chip);
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.tagDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cl-orange);
+  flex: none;
+}
+
+/* ---- Tiras ---- */
+
+.leads {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 8px 26px;
+  overflow: hidden;
+}
+
+/* Papel milimetrado de ECG: uso funcional do laranja, na intensidade mais baixa
+   da paleta — dá escala ao traçado sem competir com ele. */
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--cl-tint) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cl-tint) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.lead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.leadTrace {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.leadName {
+  flex: none;
+  width: 34px;
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  color: var(--cl-mute);
+  letter-spacing: 0.06em;
+}
+
+/* ---- Medidas ---- */
+
+.measures {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+}
+
+.measure {
+  flex: 1;
+  padding: 16px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.measure + .measure {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+}
+
+.measureLabel {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.measureValue {
+  font-size: 30px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.unit {
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
+  font-weight: var(--cl-weight-regular);
+  margin-left: 5px;
+  letter-spacing: 0;
+}

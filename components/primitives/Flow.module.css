@@ -1,0 +1,90 @@
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.column {
+  flex-direction: column;
+}
+
+/* ---- Conector: o "trace" na função de ligação ---- */
+
+.link {
+  flex: 1;
+  position: relative;
+  background: var(--cl-line);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 520ms var(--cl-ease);
+  transition-delay: var(--link-delay, 0ms);
+}
+
+[data-theme="ink"] .link {
+  background: rgb(255 255 255 / 0.24);
+}
+
+.linkRow {
+  height: var(--cl-hairline);
+  min-width: 40px;
+}
+
+.linkColumn {
+  width: var(--cl-hairline);
+  min-height: 40px;
+  transform-origin: center top;
+  transform: scaleY(0);
+}
+
+.linkOn {
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+    transform: scale(1);
+  }
+}
+
+/* ---- Nós ---- */
+
+.node {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: var(--cl-radius-node);
+  padding: 14px 22px;
+  font-size: var(--cl-fs-body);
+  font-weight: var(--cl-weight-medium);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+.outline {
+  border: var(--cl-hairline) solid var(--cl-line);
+}
+
+[data-theme="ink"] .outline {
+  border-color: rgb(255 255 255 / 0.24);
+}
+
+/* Texto em ink sobre o laranja, não branco: branco sobre #F66201 dá 3.15:1 e
+   reprova AA em texto normal; ink dá 6.09:1. Também fica mais nítido. */
+.solid {
+  background: var(--cl-orange);
+  color: var(--cl-ink);
+  border: var(--cl-hairline) solid var(--cl-orange);
+  font-weight: var(--cl-weight-semibold);
+}
+
+.tinted {
+  background: var(--cl-tint);
+  border: var(--cl-hairline) solid transparent;
+}
+
+.plain {
+  padding: 0;
+}

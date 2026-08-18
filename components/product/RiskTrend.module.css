@@ -1,0 +1,84 @@
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.past {
+  fill: none;
+  stroke: var(--cl-ink);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+[data-theme="ink"] .past {
+  stroke: var(--cl-white);
+}
+
+.cone {
+  fill: var(--cl-orange);
+  opacity: 0;
+  transition: opacity 700ms var(--cl-ease) 700ms;
+}
+
+.coneOn {
+  opacity: 0.09;
+}
+
+.future {
+  fill: none;
+  stroke: var(--cl-orange);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 6;
+  stroke-linecap: round;
+  opacity: 0;
+  transform: translateX(-14px);
+  transition:
+    opacity 620ms var(--cl-ease),
+    transform 620ms var(--cl-ease);
+  transition-delay: var(--f-delay, 0ms);
+}
+
+.futureOn {
+  opacity: var(--f-opacity, 1);
+  transform: none;
+}
+
+.marker {
+  stroke: var(--cl-line);
+  stroke-width: 1;
+}
+
+[data-theme="ink"] .marker {
+  stroke: rgb(255 255 255 / 0.28);
+}
+
+.dot {
+  fill: var(--cl-orange);
+}
+
+.tick {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  fill: var(--cl-mute);
+}
+
+[data-theme="ink"] .tick {
+  fill: rgb(255 255 255 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cone,
+  .future {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  .cone {
+    opacity: 0.09;
+  }
+}

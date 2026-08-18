@@ -1,0 +1,37 @@
+.svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Preenche a linha disponível em vez de impor altura fixa — é o que impede a
+   última derivação de ser cortada quando o painel encolhe. */
+.fluid {
+  width: 100%;
+  height: 100%;
+}
+
+.path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* O desenho da linha é a única animação que não é fade nem translate — e é
+   narrativa, não decoração: o traçado nasce sob os olhos de quem assiste. */
+.draw {
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset var(--draw-duration, 2200ms) var(--cl-ease);
+  transition-delay: var(--draw-delay, 0ms);
+}
+
+.drawOn {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draw {
+    transition: none;
+    stroke-dashoffset: 0;
+  }
+}

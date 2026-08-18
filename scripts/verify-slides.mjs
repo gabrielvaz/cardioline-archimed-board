@@ -50,8 +50,15 @@ async function startServer() {
 
 /* ------------------------------------------------- checagens dentro da page */
 
-/** Overflow, tamanho de fonte e contraste, medidos no DOM real. */
-const auditPage = ({ stageW, stageH, minFont, orangeMinPx }) => {
+/**
+ * Overflow, tamanho de fonte e contraste, medidos no DOM real.
+ *
+ * Roda tanto por slide quanto numa página inteira: os componentes de produto
+ * moram fora do deck e precisam obedecer às mesmas regras. Foi exatamente por
+ * não auditar a galeria que um kicker laranja de 16px (3.45:1) e uma tag
+ * "Synthetic" sobre tint (2.98:1) passaram despercebidos.
+ */
+const auditPage = ({ stageW, stageH, minFont, orangeMinPx, regionSelector }) => {
   const out = { overflow: [], small: [], contrast: [] };
 
   const parseColor = (c) => {
@@ -87,18 +94,23 @@ const auditPage = ({ stageW, stageH, minFont, orangeMinPx }) => {
 
   const isOrange = ({ r, g, b }) => r > 200 && g > 60 && g < 140 && b < 60;
 
-  for (const section of document.querySelectorAll("section[data-slide]")) {
-    const n = section.dataset.slide;
+  const regions = regionSelector
+    ? [...document.querySelectorAll(regionSelector)]
+    : [document.body];
+
+  for (const section of regions) {
+    const n = section.dataset?.slide ?? "page";
     const stage = section.querySelector("[class*='stage']");
-    if (!stage) {
+    if (stage) {
+      if (stage.scrollWidth > stageW + 1 || stage.scrollHeight > stageH + 1) {
+        out.overflow.push({
+          n,
+          msg: `stage ${stage.scrollWidth}x${stage.scrollHeight} excede ${stageW}x${stageH}`,
+        });
+      }
+    } else if (regionSelector) {
       out.overflow.push({ n, msg: "stage não encontrada" });
       continue;
-    }
-    if (stage.scrollWidth > stageW + 1 || stage.scrollHeight > stageH + 1) {
-      out.overflow.push({
-        n,
-        msg: `stage ${stage.scrollWidth}x${stage.scrollHeight} excede ${stageW}x${stageH}`,
-      });
     }
 
     for (const el of section.querySelectorAll("*")) {
@@ -202,6 +214,7 @@ async function main() {
         stageH: STAGE_H,
         minFont: MIN_FONT_PX,
         orangeMinPx: ORANGE_MIN_PX,
+        regionSelector: "section[data-slide]",
       });
 
       for (const o of audit.overflow) fail(`${vp.name} slide ${o.n}`, o.msg);
@@ -234,6 +247,31 @@ async function main() {
         fail(vp.name, `escala ${geo.scale.toFixed(3)} != esperada ${expected.toFixed(3)}`);
       }
       log(`  ${vp.name} · escala ${geo.scale.toFixed(3)} · ok`);
+    }
+
+    /* ---- demais rotas: mesmas regras de fonte e contraste ---- */
+    const EXTRA_ROUTES = ["/anchor", "/gallery"];
+    await page.setViewport({ width: 1600, height: 1000, deviceScaleFactor: 1 });
+    for (const route of EXTRA_ROUTES) {
+      const res = await page.goto(`${BASE}${route}`, { waitUntil: "networkidle0" });
+      if (!res || res.status() === 404) {
+        log(`  ${route} · ainda não existe, pulando`);
+        continue;
+      }
+      await page.evaluate(() => document.fonts.ready);
+      await sleep(400);
+      const a = await page.evaluate(auditPage, {
+        stageW: STAGE_W,
+        stageH: STAGE_H,
+        minFont: MIN_FONT_PX,
+        orangeMinPx: ORANGE_MIN_PX,
+        regionSelector: null,
+      });
+      for (const x of a.small) fail(route, `fonte ${x.size}px < ${MIN_FONT_PX}px em "${x.text}"`);
+      for (const c of a.contrast) {
+        fail(route, `contraste ${c.ratio} (exige ${c.required}) em ${c.size}px "${c.text}"`);
+      }
+      if (!a.small.length && !a.contrast.length) log(`  ${route} · ok`);
     }
 
     /* ---- navegação por teclado ---- */
