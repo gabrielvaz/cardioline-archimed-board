@@ -39,11 +39,21 @@ vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 
 O software em primeiro plano, em perspectiva, e a rolagem montando a composição.
 
-**Coreografia.** A seção do hero é fixada (`pin`) e a rolagem é o parâmetro da
-animação (`scrub`). O workspace parte inclinado em 3D e se endireita até encarar
-o leitor; o VIREO AM sobe à frente; o telefone entra por último. É a sequência "o
-aparelho adquire, o navegador lê, o bolso assina" contada como gesto, não como
-lista. GSAP porque pin com scrub é justamente o que keyframes de CSS não fazem.
+**Coreografia.** GSAP na página inteira, com a rolagem como parâmetro (`scrub`):
+
+- o workspace parte inclinado em 3D e se endireita até encarar o leitor;
+- o telefone entra depois, quando já há o que ler nele;
+- o **VIREO AM acompanha a rolagem toda**, fixo numa faixa reservada à direita, e
+  o **módulo Air sobe da base e encaixa** entre 16% e 34% do percurso;
+- cada seção revela os próprios blocos em sequência ao entrar no viewport.
+
+**Sem pin.** Um pin cria pin-spacer e muda a altura do documento, obrigando os
+outros triggers a recalcularem sobre um layout móvel. Com scrub puro há uma só
+origem de verdade, a rolagem real.
+
+A docagem é medida, não presumida: `scratchpad/railcheck.mjs` lê a folga vertical
+entre a base do corpo e o topo do módulo ao longo do percurso. Resultado atual
+**+67 px solto → -17 px encaixado** (o negativo é a sobreposição do conector).
 
 O estado **inicial** vive em CSS, não em JS, para que servidor e cliente rendam a
 mesma coisa e não haja divergência de hidratação; o GSAP assume a partir dali.
@@ -53,12 +63,16 @@ Sob `prefers-reduced-motion` a composição aparece montada e o pin não acontec
 medidos no navegador e no telefone. Números divergentes entre telas destroem a
 credibilidade de um material clínico mais rápido do que qualquer detalhe visual.
 
-**Reuso do design system do deck.** `BrowserFrame`, `DeviceFrame`, `ExamViewer` e
-`EcgTrace` já existiam em `components/product/`, em CSS Modules sobre os tokens.
-A v2 não reconstruiu nada disso. Uma armadilha encontrada no caminho: o
-`ExamViewer` distribui as derivações com `flex: 1 1 0`, o que exige um pai de
-altura definida — no deck ele vive num Slide de altura fixa, e sem declarar altura
-aqui os traçados colapsavam numa fatia de poucos pixels.
+**Mockups.** `BrowserFrame`, `DeviceFrame` e `EcgTrace` vêm do design system do
+deck. O workspace, porém, é um componente próprio da v2
+(`components/v2/AnchorWorkspace.tsx`): a densidade pedida aqui é outra, com mais
+respiro e tipo menor, e alterar o `ExamViewer` do deck regrediria a apresentação,
+que é calibrada para projetor.
+
+**Disciplina de cor herdada da v1.** O traçado é navy sobre grid laranja, como o
+papel térmico que o aparelho imprime. O laranja fica para o grid, o marcador de
+estado, o degrau do Pro e os CTAs. Traçado laranja deixava a tela laranja demais.
+O logo oficial da Cardioline aparece no cabeçalho e dentro do próprio mockup.
 
 ### Imagens do dispositivo
 
@@ -78,6 +92,18 @@ global de branco comeria o corpo do produto. O fundo é a região branca
 branco e não sobrevivem à erosão que limpa a franja da carcaça, por isso são
 cortados: `crop_to_body` detecta a primeira linha cuja faixa opaca cobre parte
 significativa da largura do objeto.
+
+`split_module` separa o corpo do módulo Air achando a única faixa de linhas
+totalmente transparentes entre os dois objetos no render oficial. São as duas
+peças que a animação de encaixe move, e as abas do conector caem na base porque
+ambas mantêm a proporção original.
+
+### Pendente
+
+As imagens geradas por `gpt-image` **não foram feitas**: a cota do plano Plus está
+esgotada (`HTTP 429 usage_limit_reached`, reset em 20/08). O que falta são plates
+de ambiente para compor atrás do aparelho; o aparelho em si não deve ser gerado,
+pelo motivo acima.
 
 ## Três mundos de CSS num app
 

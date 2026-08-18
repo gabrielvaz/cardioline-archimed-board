@@ -81,8 +81,8 @@ export function Thesis() {
       <Enter delay={0.32} className="mt-14 sm:mt-20">
         <Stage wide>
           <DeviceSculpture
-            src="/devices/ecg200l-cover-02.png"
-            alt="Cardioline ECG200L electrocardiograph"
+            src="/device/vireo-am.png"
+            alt="Cardioline VIREO AM handheld electrocardiograph"
             priority
           />
         </Stage>
@@ -479,13 +479,15 @@ export function Close() {
           </div>
         </Reveal>
         <Reveal delay={0.12}>
-          <div className="mx-auto mt-20 max-w-[880px]">
+          <div className="mx-auto mt-20 max-w-[420px]">
+            {/* O render com o módulo Air destacado: fecha a página mostrando
+                que o aparelho é modular. */}
             <Image
-              src="/devices/walk200b-cover.png"
-              alt="Cardioline walk200b ambulatory blood pressure monitor"
-              width={1200}
-              height={900}
-              className="h-auto w-full"
+              src="/device/vireo-am-air.png"
+              alt="Cardioline VIREO AM with the Air module detached"
+              width={468}
+              height={1065}
+              className="mx-auto h-auto w-full max-w-[360px]"
             />
           </div>
         </Reveal>

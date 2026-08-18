@@ -12,6 +12,8 @@
   --v2-measure: 62ch;
   --v2-gutter: 24px;
   --v2-max: 1280px;
+  /* Faixa reservada ao trilho fixo do dispositivo. Ver DeviceRail.module.css. */
+  --rail-w: 0px;
 
   font-size: 17px;
   line-height: 1.65;
@@ -22,6 +24,24 @@
 @media (min-width: 1024px) {
   .v2 {
     --v2-gutter: 48px;
+  }
+}
+
+/*
+ * A partir de 1100px o dispositivo ocupa uma faixa fixa na direita e todo o
+ * conteúdo recua para não passar por baixo dele. Abaixo disso o trilho não
+ * existe e a faixa é zero.
+ */
+@media (min-width: 1100px) {
+  .v2 {
+    --rail-w: 248px;
+    padding-inline-end: calc(var(--rail-w) + 3vw);
+  }
+}
+
+@media (min-width: 1400px) {
+  .v2 {
+    --rail-w: 288px;
   }
 }
 

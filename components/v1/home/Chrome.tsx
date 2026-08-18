@@ -128,11 +128,17 @@ export function DeviceSculpture({
   alt,
   className,
   priority = false,
+  /**
+   * Proporção da caixa. O VIREO AM é um aparelho de mão em retrato: numa caixa
+   * 4/3 ele apareceria pequeno no meio de vazio lateral.
+   */
+  ratio = "portrait",
 }: {
   src: string;
   alt: string;
   className?: string;
   priority?: boolean;
+  ratio?: "portrait" | "landscape";
 }) {
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -144,7 +150,8 @@ export function DeviceSculpture({
     <motion.div
       style={reduce || !hydrated ? undefined : { scale }}
       className={cn(
-        "relative mx-auto aspect-[4/3] w-full max-w-[860px]",
+        "relative mx-auto w-full",
+        ratio === "portrait" ? "aspect-[3/4] max-w-[400px]" : "aspect-[4/3] max-w-[860px]",
         className,
       )}
     >
@@ -152,7 +159,7 @@ export function DeviceSculpture({
         src={src}
         alt={alt}
         fill
-        sizes="(max-width: 900px) 100vw, 860px"
+        sizes="(max-width: 900px) 80vw, 400px"
         priority={priority}
         className="object-contain"
       />

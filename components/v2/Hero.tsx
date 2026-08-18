@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BrowserFrame, DeviceFrame } from "@/components/product/Frames";
-import { ExamViewer } from "@/components/product/ExamViewer";
-import { PATIENTS } from "@/lib/synthetic";
 import { HERO } from "@/lib/v2/copy";
+import { AnchorWorkspace } from "./AnchorWorkspace";
 import { AnchorMobile } from "./AnchorMobile";
 import styles from "./Hero.module.css";
 
@@ -20,11 +18,16 @@ gsap.registerPlugin(ScrollTrigger);
  * perspectiva, como um objeto visto de lado, e se endireita até encarar o
  * leitor; o VIREO AM sobe para a frente; o telefone entra por último. É a
  * sequência "o aparelho adquire, o navegador lê, o bolso assina" contada como
- * gesto em vez de como lista.
+ * gesto em vez de como lista. O aparelho em si vive no DeviceRail, que o mantém
+ * visível durante a página inteira.
  *
  * Por que GSAP e não CSS puro: a rolagem precisa ser o parâmetro da animação
- * (scrub), com a seção fixada durante a montagem. É pin mais scrub, que é
- * exatamente o que ScrollTrigger faz e o que keyframes de CSS não fazem.
+ * (scrub), o que keyframes de CSS não fazem.
+ *
+ * Sem pin: um pin cria pin-spacer e muda a altura do documento, o que obriga os
+ * outros triggers da página, inclusive o do trilho do dispositivo, a
+ * recalcularem em cima de um layout móvel. Com scrub puro há uma origem de
+ * verdade só, a rolagem real.
  *
  * Regras respeitadas: nenhum listener de scroll manual, cleanup por
  * gsap.context().revert(), e colapso total sob prefers-reduced-motion.
@@ -32,7 +35,6 @@ gsap.registerPlugin(ScrollTrigger);
 export function Hero() {
   const root = useRef<HTMLElement>(null);
   const workspace = useRef<HTMLDivElement>(null);
-  const device = useRef<HTMLDivElement>(null);
   const phone = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,23 +48,20 @@ export function Hero() {
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: "+=180%",
-          pin: true,
+          end: "bottom 30%",
           scrub: 1,
           invalidateOnRefresh: true,
         },
       });
 
-      // Fase 1: o workspace se endireita e cresce.
+      // O workspace se endireita e cresce enquanto o hero sai de cena.
       tl.to(
         workspace.current,
         { rotationY: 0, rotationX: 0, scale: 1, xPercent: 0, ease: "none" },
         0,
       )
-        // O aparelho sobe junto, um pouco mais devagar, criando profundidade.
-        .to(device.current, { yPercent: -6, rotation: -1, ease: "none" }, 0)
-        // Fase 2: o telefone entra depois, quando já há o que ler nele.
-        .to(phone.current, { yPercent: 0, rotation: 0, ease: "none" }, 0.35);
+        // O telefone entra depois, quando já há o que ler nele.
+        .to(phone.current, { yPercent: 0, rotation: 0, ease: "none" }, 0.3);
     }, root);
 
     return () => ctx.revert();
@@ -88,27 +87,8 @@ export function Hero() {
         <div className={styles.stage}>
           <div ref={workspace} className={styles.workspace}>
             <BrowserFrame url="anchor.cardioline.com/exams/EX-48213">
-              <div className={styles.viewerBox}>
-                <ExamViewer
-                  patient={PATIENTS[0]}
-                  seed={4211}
-                  kind="12-lead resting ECG"
-                  date="Today, 09:14"
-                  anomalyAt={4}
-                />
-              </div>
+              <AnchorWorkspace />
             </BrowserFrame>
-          </div>
-
-          <div ref={device} className={styles.device}>
-            <Image
-              src="/device/vireo-am.png"
-              alt="Cardioline VIREO AM handheld electrocardiograph"
-              width={465}
-              height={936}
-              priority
-              className={styles.deviceImg}
-            />
           </div>
 
           <div ref={phone} className={styles.phone}>

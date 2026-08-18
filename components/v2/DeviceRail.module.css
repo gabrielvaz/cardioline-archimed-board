@@ -1,0 +1,99 @@
+/*
+ * O VIREO AM acompanha a rolagem inteira.
+ *
+ * Fixo na direita: o aparelho é a porta de entrada da tese, então fica presente
+ * do começo ao fim em vez de aparecer só no hero. Todo o conteúdo da v2 reserva
+ * essa faixa (padding-inline-end em .v2), por isso o trilho nunca cobre texto.
+ *
+ * Abaixo de 1100px o trilho sai: um objeto fixo numa tela estreita atrapalha a
+ * leitura. Nessa largura a história do módulo é contada pela foto estática do
+ * render com o Air destacado, na seção de superfícies.
+ */
+
+.rail {
+  position: fixed;
+  top: 50%;
+  right: clamp(12px, 3vw, 52px);
+  z-index: 20;
+  width: var(--rail-w);
+  translate: 0 -50%;
+  pointer-events: none;
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .rail {
+    display: block;
+  }
+}
+
+/* O grupo é o que o GSAP escala e move; os filhos cuidam do encaixe. */
+.group {
+  position: relative;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.body {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 30px 44px color-mix(in srgb, var(--cl-ink) 24%, transparent));
+}
+
+/*
+ * O módulo Air. Largura proporcional ao corpo, medida no render original
+ * (407 de 452 px), para que as abas do conector caiam exatamente na base.
+ */
+/*
+ * Ancorado à BASE do corpo, não ao seu interior: no render original o módulo
+ * acopla por baixo, e as abas do conector é que entram. Os 22 px negativos são
+ * essa sobreposição do conector. Ancorar em bottom: 0 fazia o estado "encaixado"
+ * cobrir o corpo pela altura inteira do módulo.
+ */
+.module {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: calc(100% - 22px);
+  width: 90.04%;
+  height: auto;
+  translate: -50% 0;
+  will-change: transform;
+  filter: drop-shadow(0 16px 24px color-mix(in srgb, var(--cl-ink) 20%, transparent));
+}
+
+/* Rótulo do encaixe, aceso apenas durante a docagem. */
+/* Centralizado sob o módulo: alinhado à direita, o rótulo saía pela borda. */
+.hint {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  bottom: -52px;
+  text-align: center;
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cl-orange-ink);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+/*
+ * Sem movimento: o aparelho aparece já montado, em escala de acompanhamento, e
+ * nada se move com a rolagem.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .group {
+    transform: scale(0.7);
+  }
+  .module {
+    translate: -50% 0;
+  }
+  .hint {
+    opacity: 0;
+  }
+}

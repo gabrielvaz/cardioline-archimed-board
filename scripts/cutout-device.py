@@ -136,3 +136,47 @@ if __name__ == "__main__":
     if len(args) < 2:
         raise SystemExit(__doc__)
     cutout(args[0], args[1], drop_cables="--drop-cables" in flags)
+
+
+def split_module(src_path: str, body_out: str, module_out: str, min_gap: int = 4) -> None:
+    """Separa o corpo do aparelho do módulo Air, para animar o encaixe.
+
+    O render oficial com o módulo destacado tem os dois objetos separados por uma
+    faixa de linhas completamente transparentes. Achar essa faixa e cortar nela
+    dá dois PNGs alinhados, sem redesenhar nada: o corpo do VIREO AM e o módulo
+    Air, cada um com os pixels do render.
+
+    Sem isso, o encaixe teria de ser desenhado à mão ou gerado, e aí não seria
+    mais o produto real.
+    """
+    im = Image.open(src_path).convert("RGBA")
+    alpha = im.getchannel("A")
+    w, h = im.size
+    px = alpha.load()
+
+    rows = [sum(1 for x in range(w) if px[x, y] > 24) for y in range(h)]
+    gaps: list[tuple[int, int]] = []
+    start: int | None = None
+    for y, filled in enumerate(rows):
+        if filled == 0:
+            if start is None:
+                start = y
+        else:
+            if start is not None and y - start >= min_gap:
+                gaps.append((start, y - 1))
+            start = None
+
+    if not gaps:
+        raise SystemExit("nenhuma faixa transparente encontrada: os objetos não estão separados")
+
+    # A maior faixa é a separação entre os dois corpos.
+    top, bottom = max(gaps, key=lambda g: g[1] - g[0])
+
+    body = im.crop((0, 0, w, top))
+    module = im.crop((0, bottom + 1, w, h))
+    for img, out in ((body, body_out), (module, module_out)):
+        box = img.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
+        if box:
+            img = img.crop(box)
+        img.save(out, "PNG", optimize=True)
+        print(f"{out}  {img.size[0]}x{img.size[1]}")

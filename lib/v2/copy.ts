@@ -14,7 +14,7 @@ export const DEVICE = {
   /** Módulo destacável de transmissão sem fio, visível no render oficial. */
   module: "Air",
   blurb:
-    "Doze derivações na mão, com o posicionamento dos eletrodos na própria tela e transmissão sem fio pelo módulo Air.",
+    "Twelve leads in the hand, with electrode placement shown on the device screen and wireless transmission through the Air module.",
 } as const;
 
 export const HERO = {
@@ -24,6 +24,26 @@ export const HERO = {
     "Every exam the VIREO AM acquires opens in Anchor, on any screen. Included with the Cardioline devices you already own.",
   primary: "Get Anchor",
   secondary: "See how it works",
+} as const;
+
+/**
+ * Um único exame, mostrado em todas as superfícies. Paciente e medidas iguais no
+ * navegador e no telefone: números divergentes entre telas destroem a
+ * credibilidade de um material clínico mais rápido que qualquer detalhe visual.
+ */
+export const EXAM = {
+  patient: "M. Ferrero",
+  meta: "PT-100482 · M 64 · 12-lead resting ECG · Today, 09:14 · VIREO AM",
+  metaShort: "M 64 · VIREO AM",
+  synthetic: "Synthetic data. Not a recording from any patient.",
+  measures: [
+    { k: "HR", v: "68", unit: "bpm", flag: false },
+    { k: "PR", v: "156", unit: "ms", flag: false },
+    { k: "QRS", v: "94", unit: "ms", flag: false },
+    { k: "QT", v: "398", unit: "ms", flag: false },
+    { k: "QTc", v: "412", unit: "ms", flag: true },
+    { k: "Axis", v: "41°", unit: "", flag: false },
+  ],
 } as const;
 
 export const SURFACES = [

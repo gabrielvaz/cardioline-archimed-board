@@ -1,4 +1,6 @@
+import { DeviceRail } from "@/components/v2/DeviceRail";
 import { Hero } from "@/components/v2/Hero";
+import { SiteHeader } from "@/components/v2/SiteHeader";
 import { Close, Comparison, Ladder, Surfaces } from "@/components/v2/Sections";
 
 export const metadata = {
@@ -17,6 +19,11 @@ export const metadata = {
 export default function V2() {
   return (
     <div className="v2">
+      {/* Dentro de .v2 de propósito: o trilho lê --rail-w, que é declarada ali.
+          Como irmão, a variável não resolvia e a imagem caía na largura
+          intrínseca de 452 px, cobrindo o workspace. */}
+      <DeviceRail />
+      <SiteHeader />
       <main>
         <Hero />
         <Surfaces />

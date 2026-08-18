@@ -1,0 +1,65 @@
+/* Cabeçalho da v2. O logo oficial da Cardioline volta ao topo da página. */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--cl-white) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease;
+}
+
+.solid {
+  border-bottom-color: var(--cl-line);
+}
+
+.inner {
+  max-width: var(--v2-max);
+  margin-inline: auto;
+  padding-inline: var(--v2-gutter);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.logo {
+  width: 128px;
+  height: auto;
+}
+
+.nav {
+  display: none;
+  gap: 26px;
+  margin-inline: auto;
+}
+
+@media (min-width: 760px) {
+  .nav {
+    display: flex;
+  }
+}
+
+.link {
+  font-size: 13.5px;
+  color: var(--cl-mute);
+  transition: color 140ms ease;
+}
+
+.link:hover {
+  color: var(--cl-ink);
+}
+
+.cta {
+  margin-left: auto;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--cl-orange-ink);
+}
+
+@media (min-width: 760px) {
+  .cta {
+    margin-left: 0;
+  }
+}

@@ -1,5 +1,5 @@
 import { EcgTrace } from "@/components/product/EcgTrace";
-import { PATIENTS } from "@/lib/synthetic";
+import { EXAM } from "@/lib/v2/copy";
 import styles from "./AnchorMobile.module.css";
 
 /**
@@ -21,11 +21,9 @@ export function AnchorMobile() {
       </div>
 
       <div className={styles.head}>
-        {/* Mesmo paciente do workspace: a tese é um registro só, em três telas. */}
-        <p className={styles.patient}>{PATIENTS[0].name}</p>
-        <p className={styles.meta}>
-          {PATIENTS[0].sex} {PATIENTS[0].age} · VIREO AM
-        </p>
+        {/* Mesmo exame do workspace: a tese é um registro só, em três telas. */}
+        <p className={styles.patient}>{EXAM.patient}</p>
+        <p className={styles.meta}>{EXAM.metaShort}</p>
         <span className={styles.status}>
           <span className={styles.dot} />
           Ready to review
@@ -50,17 +48,13 @@ export function AnchorMobile() {
 
       <div className={styles.grid}>
         {/* Mesmos valores do workspace: é o mesmo exame visto noutra tela. */}
-        {[
-          ["HR", "68 bpm", false],
-          ["QTc", "412 ms", true],
-          ["QRS", "94 ms", false],
-          ["PR", "156 ms", false],
-          ["Axis", "41°", false],
-          ["Leads", "12", false],
-        ].map(([k, v, alert]) => (
-          <div key={k as string} className={styles.cell}>
-            <p className={styles.k}>{k}</p>
-            <p className={`${styles.v} ${alert ? styles.alert : ""}`}>{v}</p>
+        {EXAM.measures.slice(0, 6).map((m) => (
+          <div key={m.k} className={styles.cell}>
+            <p className={styles.k}>{m.k}</p>
+            <p className={`${styles.v} ${m.flag ? styles.alert : ""}`}>
+              {m.v}
+              {m.unit ? <span className={styles.unit}>{m.unit}</span> : null}
+            </p>
           </div>
         ))}
       </div>
