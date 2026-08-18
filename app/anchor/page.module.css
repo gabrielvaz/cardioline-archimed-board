@@ -1,0 +1,145 @@
+.page {
+  min-height: 100vh;
+  background: var(--cl-white);
+  color: var(--cl-ink);
+}
+
+.container {
+  width: min(1180px, 100% - 96px);
+  margin-inline: auto;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 0;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+}
+
+.back {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.back:hover {
+  color: var(--cl-orange-ink);
+}
+
+.hero {
+  padding: 108px 0 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.heroClaim {
+  max-width: 17ch;
+}
+
+.heroNote {
+  max-width: 52ch;
+}
+
+.section {
+  padding: 88px 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.layers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+.layer {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 30px 44px 0 0;
+}
+
+.layer + .layer {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 44px;
+}
+
+.layerRule {
+  width: 100%;
+  background: var(--cl-orange);
+}
+
+.layerRole {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-orange-ink);
+}
+
+.layerName {
+  font-size: 34px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+}
+
+.layerWhat {
+  font-size: var(--cl-fs-body);
+  line-height: 1.45;
+  color: var(--cl-mute);
+}
+
+.preview {
+  height: 520px;
+}
+
+.footer {
+  padding: 56px 0 72px;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.disclaimer {
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
+  max-width: 62ch;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .container {
+    width: min(1180px, 100% - 48px);
+  }
+
+  .layers {
+    grid-template-columns: 1fr;
+  }
+
+  .layer + .layer {
+    border-left: 0;
+    border-top: var(--cl-hairline) solid var(--cl-line);
+    padding-left: 0;
+    margin-top: 30px;
+  }
+
+  .preview {
+    height: 420px;
+  }
+}

@@ -1,0 +1,42 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 30px;
+  min-height: 0;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 80px;
+}
+
+.note {
+  flex: none;
+  width: 520px;
+}
+
+.chart {
+  flex: none;
+  width: 1360px;
+}
+
+.terms {
+  display: flex;
+  gap: 0;
+}
+
+.term {
+  flex: 1;
+  padding-top: 18px;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+  font-size: 21px;
+  color: var(--cl-mute);
+}
+
+.term + .term {
+  margin-left: 24px;
+}

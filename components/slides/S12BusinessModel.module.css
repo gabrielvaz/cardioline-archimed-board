@@ -1,0 +1,106 @@
+.body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  min-height: 0;
+}
+
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.wheelWrap {
+  flex: none;
+  width: 640px;
+}
+
+.wheel {
+  display: block;
+  width: 640px;
+  height: 540px;
+  overflow: visible;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--cl-line);
+  stroke-width: 1.5;
+}
+
+.hubMark {
+  opacity: 0.16;
+}
+
+.arc {
+  fill: none;
+  stroke: var(--cl-orange);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: var(--arc-len);
+  stroke-dashoffset: var(--arc-len);
+  transition: stroke-dashoffset 1600ms var(--cl-ease) 400ms;
+}
+
+.arcOn {
+  stroke-dashoffset: 0;
+}
+
+.head {
+  fill: var(--cl-orange);
+  opacity: 0;
+  transition: opacity 300ms var(--cl-ease) 1900ms;
+}
+
+.headOn {
+  opacity: 1;
+}
+
+.node {
+  fill: var(--cl-white);
+  stroke: var(--cl-line);
+  stroke-width: 2.5;
+}
+
+.nodeKey {
+  fill: var(--cl-orange);
+  stroke: var(--cl-orange);
+}
+
+.label {
+  font-size: 19px;
+  font-weight: var(--cl-weight-medium);
+  fill: var(--cl-ink);
+  letter-spacing: -0.005em;
+}
+
+.labelKey {
+  font-weight: var(--cl-weight-semibold);
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.bar {
+  width: 56px;
+  height: 3px;
+  background: var(--cl-orange);
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc {
+    transition: none;
+    stroke-dashoffset: 0;
+  }
+  .head {
+    transition: none;
+    opacity: 1;
+  }
+}

@@ -1,0 +1,31 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 70px;
+  min-height: 0;
+}
+
+.claim {
+  max-width: 16ch;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.bar {
+  width: 56px;
+  height: 3px;
+  background: var(--cl-orange);
+  flex: none;
+}

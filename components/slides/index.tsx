@@ -7,6 +7,15 @@ import { S05Ambition } from "./S05Ambition";
 import { S06ProductQuality } from "./S06ProductQuality";
 import { S07InTheirHands } from "./S07InTheirHands";
 import { S08InTheirMinds } from "./S08InTheirMinds";
+import { S09DigitalLayer } from "./S09DigitalLayer";
+import { S10Anchor } from "./S10Anchor";
+import { S11Free } from "./S11Free";
+import { S12BusinessModel } from "./S12BusinessModel";
+import { S13ThreeLayers } from "./S13ThreeLayers";
+import { S14Reveal } from "./S14Reveal";
+import { S15Intelligence } from "./S15Intelligence";
+import { S16Depth } from "./S16Depth";
+import { S17Prediction } from "./S17Prediction";
 
 /** Slides implementados, por id do registry. Os que faltam caem no stub. */
 export const SLIDE_COMPONENTS: Record<string, ComponentType> = {
@@ -18,4 +27,13 @@ export const SLIDE_COMPONENTS: Record<string, ComponentType> = {
   "product-quality": S06ProductQuality,
   "in-their-hands": S07InTheirHands,
   "in-their-minds": S08InTheirMinds,
+  "digital-layer": S09DigitalLayer,
+  anchor: S10Anchor,
+  "free-changes-everything": S11Free,
+  "business-model": S12BusinessModel,
+  "three-layers": S13ThreeLayers,
+  "prototype-reveal": S14Reveal,
+  intelligence: S15Intelligence,
+  depth: S16Depth,
+  prediction: S17Prediction,
 };

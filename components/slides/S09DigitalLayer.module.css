@@ -1,0 +1,52 @@
+.body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 110px;
+  min-height: 0;
+}
+
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.chain {
+  flex: none;
+  width: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.device {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.photo {
+  width: 430px;
+  height: auto;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  border-radius: var(--cl-radius-node);
+  border: var(--cl-hairline) solid var(--cl-line);
+  font-size: 24px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+}
+
+.anchor {
+  background: var(--cl-orange);
+  border-color: var(--cl-orange);
+  color: var(--cl-ink);
+}
