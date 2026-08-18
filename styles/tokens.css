@@ -1,0 +1,89 @@
+/**
+ * Design tokens Cardioline.
+ *
+ * Cores extraídas da identidade real em cardioline.com (2026-08-18):
+ * o laranja do wordmark vem dos pixels do logo oficial, o laranja de UI e o
+ * navy vêm das custom properties do tema. O fallback #F36C21 do briefing NÃO
+ * é usado — o laranja real é mais saturado e mais vermelho.
+ *
+ * Nenhum hex literal deve existir fora deste arquivo.
+ */
+:root {
+  /* ---- Marca ---- */
+  --cl-orange: #f66201;      /* wordmark, símbolo, traçados ECG, marcas gráficas */
+  --cl-orange-ui: #ee5b00;   /* texto e UI em laranja sobre fundo claro */
+  --cl-ink: #040a2a;         /* texto corrido; fundo dos slides escuros */
+  --cl-navy: #071046;        /* superfícies escuras secundárias */
+  --cl-tint: #fdebe0;        /* preenchimento laranja de baixa intensidade */
+  --cl-paper: #fafaf9;
+  --cl-line: #e6e6e6;        /* hairlines e divisores */
+  --cl-mute: #747474;        /* texto secundário */
+  --cl-white: #ffffff;
+
+  /* Contraste medido (WCAG 2.1):
+     ink/branco 18.9:1 · branco/ink 19.4:1 · orange/ink 6.09:1
+     orange/branco 3.19:1 · orange-ui/branco 3.45:1 · mute/branco 4.83:1
+     REGRA: laranja nunca em texto < 32px sobre fundo claro. */
+  --cl-orange-min-size: 32px;
+
+  /* ---- Stage ----
+     Todo slide é desenhado neste canvas e escalado por transform.
+     Overflow é impossível por construção: se coube aqui, cabe em qualquer tela. */
+  --stage-w: 1600px;
+  --stage-h: 900px;
+  --stage-scale: 1;
+
+  /* ---- Tipografia ----
+     Inter é a fonte do site oficial. A escala parte do wordmark: uppercase,
+     peso 600, tracking largo é a assinatura da marca — herdada pelo kicker. */
+  --cl-font: var(--cl-font-inter), "Inter", system-ui, -apple-system, sans-serif;
+
+  --cl-fs-hero: 128px;
+  --cl-fs-display: 96px;
+  --cl-fs-headline: 72px;
+  --cl-fs-subhead: 56px;
+  --cl-fs-lede: 32px;
+  --cl-fs-body: 22px;
+  --cl-fs-caption: 16px;
+  --cl-fs-kicker: 13px;
+
+  --cl-tracking-hero: -0.035em;
+  --cl-tracking-display: -0.032em;
+  --cl-tracking-headline: -0.028em;
+  --cl-tracking-subhead: -0.022em;
+  --cl-tracking-lede: -0.01em;
+  --cl-tracking-body: 0;
+  --cl-tracking-kicker: 0.18em;
+
+  --cl-lh-tight: 1.04;
+  --cl-lh-snug: 1.16;
+  --cl-lh-normal: 1.5;
+
+  --cl-weight-regular: 400;
+  --cl-weight-medium: 500;
+  --cl-weight-semibold: 600;
+
+  /* ---- Espaço ---- */
+  --cl-gutter: 120px;   /* margem lateral da stage */
+  --cl-space-1: 8px;
+  --cl-space-2: 16px;
+  --cl-space-3: 24px;
+  --cl-space-4: 40px;
+  --cl-space-5: 64px;
+  --cl-space-6: 96px;
+
+  /* ---- Forma ----
+     O símbolo da marca é um "C" dentro de um squircle. O retângulo arredondado
+     é o contêiner canônico do sistema: chips, nós, frames. */
+  --cl-radius-chip: 10px;
+  --cl-radius-node: 14px;
+  --cl-radius-frame: 20px;
+  --cl-hairline: 1px;
+
+  /* ---- Movimento ----
+     Só opacity e transform. Nada decorativo. */
+  --cl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cl-duration: 480ms;
+  --cl-stagger: 100ms;
+  --cl-rise: 12px;
+}
