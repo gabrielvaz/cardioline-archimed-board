@@ -1,0 +1,55 @@
+/* Layout compartilhado dos slides. A stage já aplica 96px vertical e 120px
+   lateral, então a área útil é 1360 x 708. */
+
+.full {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.center {
+  justify-content: center;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  font-weight: var(--cl-weight-semibold);
+}
+
+[data-theme="ink"] .footer {
+  color: rgb(255 255 255 / 0.55);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.grow {
+  flex: 1;
+  min-height: 0;
+}

@@ -1,0 +1,60 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 56px;
+  min-height: 0;
+}
+
+.columns {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-right: 72px;
+}
+
+.col + .col {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 72px;
+  padding-right: 0;
+}
+
+/* A forma carrega o argumento: a coluna do legado é apertada, pequena e cinza;
+   a nossa é arejada, grande e escura. Não é uma lista de bullets contra outra. */
+.old {
+  gap: 6px;
+}
+
+.oldItem {
+  font-size: var(--cl-fs-body);
+  color: var(--cl-mute);
+  line-height: 1.25;
+}
+
+.newItem {
+  font-size: 34px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.bar {
+  width: 56px;
+  height: 3px;
+  background: var(--cl-orange);
+  flex: none;
+}

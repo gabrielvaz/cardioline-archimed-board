@@ -1,0 +1,21 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 44px;
+  min-height: 0;
+}
+
+.negation {
+  max-width: 20ch;
+}
+
+.payoff {
+  color: var(--cl-orange-ui);
+}
+
+.trace {
+  flex: none;
+  margin-top: 8px;
+}

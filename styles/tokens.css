@@ -10,10 +10,17 @@
  */
 :root {
   /* ---- Marca ---- */
-  --cl-orange: #f66201;      /* wordmark, símbolo, traçados ECG, marcas gráficas */
-  --cl-orange-ui: #ee5b00;   /* texto e UI em laranja sobre fundo claro */
-  --cl-ink: #040a2a;         /* texto corrido; fundo dos slides escuros */
-  --cl-navy: #071046;        /* superfícies escuras secundárias */
+  /* Três papéis para o laranja — mesma matiz e saturação, só o valor muda.
+     Convenção herdada do protótipo irmão do Anchor (dev-apps/cardioline-anchor)
+     para os dois materiais não se contradizerem quando mostrados juntos. */
+  --cl-orange: #f66201;        /* grafismo: traçados, filetes, pontos, grid */
+  --cl-orange-strong: #ca5001; /* superfície preenchida com texto branco (4.51:1) */
+  --cl-orange-ink: #b84a01;    /* laranja como TEXTO sobre fundo claro (5.26:1) */
+  --cl-orange-ui: #ee5b00;     /* --primary_color do tema; só em display >= 32px */
+
+  --cl-ink: #071046;         /* texto corrido — é a cor dos H1/H2 do site oficial */
+  --cl-ink-deep: #040a2a;    /* fundo dos slides escuros, mais profundo */
+  --cl-navy: #071046;
   --cl-tint: #fdebe0;        /* preenchimento laranja de baixa intensidade */
   --cl-paper: #fafaf9;
   --cl-line: #e6e6e6;        /* hairlines e divisores */
@@ -21,9 +28,11 @@
   --cl-white: #ffffff;
 
   /* Contraste medido (WCAG 2.1):
-     ink/branco 18.9:1 · branco/ink 19.4:1 · orange/ink 6.09:1
+     ink/branco 17.9:1 · branco/ink-deep 19.4:1 · orange/ink-deep 6.09:1
      orange/branco 3.19:1 · orange-ui/branco 3.45:1 · mute/branco 4.83:1
-     REGRA: laranja nunca em texto < 32px sobre fundo claro. */
+     orange-ink/branco 5.26:1 · branco/orange-strong 4.51:1
+     REGRA: em fundo claro, laranja como TEXTO usa --cl-orange-ink; o
+     --cl-orange puro fica para grafismo e para display >= 32px. */
   --cl-orange-min-size: 32px;
 
   /* ---- Stage ----

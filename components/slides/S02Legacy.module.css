@@ -1,0 +1,72 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 72px;
+  min-height: 0;
+}
+
+.era {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.segment {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 40px;
+  position: relative;
+}
+
+.segment + .segment {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 40px;
+}
+
+.traceBox {
+  height: 96px;
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.when {
+  font-size: 34px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.022em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.what {
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  font-weight: var(--cl-weight-semibold);
+}
+
+.markers {
+  position: absolute;
+  inset: 0 40px auto 40px;
+  top: 34px;
+  display: flex;
+  justify-content: space-around;
+  pointer-events: none;
+}
+
+.marker {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cl-orange);
+}

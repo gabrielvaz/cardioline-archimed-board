@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--cl-ink) 96%, transparent);
+  background: color-mix(in srgb, var(--cl-ink-deep) 96%, transparent);
   color: var(--cl-white);
   padding: 56px 64px;
   overflow-y: auto;

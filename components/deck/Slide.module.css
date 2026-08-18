@@ -16,6 +16,6 @@
 }
 
 .slide[data-theme="ink"] {
-  background: var(--cl-ink);
+  background: var(--cl-ink-deep);
   color: var(--cl-white);
 }

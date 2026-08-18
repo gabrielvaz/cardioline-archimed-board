@@ -59,7 +59,7 @@ async function startServer() {
  * "Synthetic" sobre tint (2.98:1) passaram despercebidos.
  */
 const auditPage = ({ stageW, stageH, minFont, orangeMinPx, regionSelector }) => {
-  const out = { overflow: [], small: [], contrast: [] };
+  const out = { overflow: [], small: [], contrast: [], outside: [], collide: [] };
 
   const parseColor = (c) => {
     const m = c.match(/rgba?\(([^)]+)\)/);
@@ -111,6 +111,76 @@ const auditPage = ({ stageW, stageH, minFont, orangeMinPx, regionSelector }) => 
     } else if (regionSelector) {
       out.overflow.push({ n, msg: "stage não encontrada" });
       continue;
+    }
+
+    // scrollHeight só enxerga o que vaza para baixo e para a direita. Conteúdo
+    // que transborda para CIMA não mexe nele — e é assim que dois elementos
+    // acabam sobrepostos sem nenhum alarme. Comparar caixas resolve.
+    if (stage) {
+      const box = stage.getBoundingClientRect();
+      const scale = box.width / stageW || 1;
+      for (const el of stage.querySelectorAll("*")) {
+        const cs = getComputedStyle(el);
+        if (cs.visibility === "hidden" || cs.display === "none" || cs.opacity === "0") continue;
+        if (cs.position === "fixed") continue;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        const over = Math.max(
+          (box.top - r.top) / scale,
+          (r.bottom - box.bottom) / scale,
+          (box.left - r.left) / scale,
+          (r.right - box.right) / scale,
+        );
+        if (over > 2) {
+          out.outside.push({
+            n,
+            over: Math.round(over),
+            tag: el.tagName.toLowerCase(),
+            text: (el.textContent || "").trim().slice(0, 36),
+          });
+          break; // um por slide basta para apontar o problema
+        }
+      }
+    }
+
+    // Texto sobre texto é inequivocamente errado, e nem scrollHeight nem os
+    // limites da stage enxergam isso: um bloco centrado que cresce demais
+    // invade o vizinho sem sair da caixa do slide.
+    if (stage) {
+      const scale = stage.getBoundingClientRect().width / stageW || 1;
+      const painted = [];
+      for (const el of stage.querySelectorAll("*")) {
+        const cs = getComputedStyle(el);
+        if (cs.visibility === "hidden" || cs.display === "none" || cs.opacity === "0") continue;
+        // Elementos posicionados podem se sobrepor de propósito.
+        if (cs.position !== "static" && cs.position !== "relative") continue;
+        const own = [...el.childNodes]
+          .filter((c) => c.nodeType === 3)
+          .map((c) => c.textContent.trim())
+          .join("");
+        if (!own) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width < 2 || r.height < 2) continue;
+        painted.push({ el, r, own });
+      }
+      outer: for (let i = 0; i < painted.length; i++) {
+        for (let j = i + 1; j < painted.length; j++) {
+          const a = painted[i];
+          const b = painted[j];
+          if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+          const dx = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
+          const dy = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
+          if (dx > 2 * scale && dy > 2 * scale) {
+            out.collide.push({
+              n,
+              overlap: Math.round(Math.min(dx, dy) / scale),
+              a: a.own.slice(0, 28),
+              b: b.own.slice(0, 28),
+            });
+            break outer;
+          }
+        }
+      }
     }
 
     for (const el of section.querySelectorAll("*")) {
@@ -218,6 +288,18 @@ async function main() {
       });
 
       for (const o of audit.overflow) fail(`${vp.name} slide ${o.n}`, o.msg);
+      for (const c of audit.collide) {
+        fail(
+          `${vp.name} slide ${c.n}`,
+          `textos sobrepostos em ${c.overlap}px — "${c.a}" e "${c.b}"`,
+        );
+      }
+      for (const o of audit.outside) {
+        fail(
+          `${vp.name} slide ${o.n}`,
+          `<${o.tag}> escapa ${o.over}px da stage — "${o.text}"`,
+        );
+      }
       for (const s of audit.small) {
         fail(`${vp.name} slide ${s.n}`, `fonte ${s.size}px < ${MIN_FONT_PX}px em "${s.text}"`);
       }
@@ -318,7 +400,9 @@ async function main() {
         const deck = document.querySelector("[data-deck]");
         deck.scrollTo({ top: (i - 1) * deck.clientHeight, behavior: "auto" });
       }, n);
-      await sleep(700);
+      // Espera o reveal mais lento terminar (o desenho do ECG leva 400+2600ms).
+      // Fotografar antes disso faria a revisão visual julgar um meio-termo.
+      await sleep(3200);
       await page.screenshot({ path: `${OUT}/${String(n).padStart(2, "0")}.png` });
     }
     log(`  22 screenshots em ${OUT}/`);

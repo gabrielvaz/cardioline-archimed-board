@@ -36,6 +36,14 @@ describe("tokens da marca", () => {
     expect(contrastRatio(token("ink"), "#FFFFFF")).toBeGreaterThanOrEqual(7);
   });
 
+  it("o laranja de texto passa AA sobre branco, sem sair da matiz da marca", () => {
+    expect(contrastRatio(token("orange-ink"), "#FFFFFF")).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("o laranja de superfície comporta texto branco", () => {
+    expect(contrastRatio("#FFFFFF", token("orange-strong"))).toBeGreaterThanOrEqual(4.5);
+  });
+
   it("branco sobre ink passa AAA", () => {
     expect(contrastRatio("#FFFFFF", token("ink"))).toBeGreaterThanOrEqual(7);
   });
