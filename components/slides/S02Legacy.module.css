@@ -27,10 +27,69 @@
   padding-left: 40px;
 }
 
+/* Faixa fixa acima do traçado: reservada em todos os segmentos para que os
+   três fiquem alinhados, mesmo só o terceiro tendo marcação. */
+.flagRow {
+  height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-ink);
+  background: var(--cl-tint);
+  border-radius: var(--cl-radius-chip);
+  padding: 6px 12px;
+}
+
+.flagDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cl-orange);
+  flex: none;
+}
+
 .traceBox {
+  position: relative;
   height: 96px;
   display: flex;
   align-items: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.band {
+  fill: var(--cl-orange);
+  opacity: 0.1;
+}
+
+.leader {
+  stroke: var(--cl-orange);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.ringOuter {
+  fill: var(--cl-white);
+  stroke: var(--cl-orange);
+  stroke-width: 2;
+}
+
+.ringInner {
+  fill: var(--cl-orange);
 }
 
 .label {
@@ -55,18 +114,9 @@
   font-weight: var(--cl-weight-semibold);
 }
 
-.markers {
+.analysed {
   position: absolute;
-  inset: 0 40px auto 40px;
-  top: 34px;
-  display: flex;
-  justify-content: space-around;
-  pointer-events: none;
-}
-
-.marker {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--cl-orange);
+  inset: auto 0 -22px 0;
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
 }

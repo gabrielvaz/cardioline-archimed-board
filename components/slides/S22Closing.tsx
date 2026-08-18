@@ -48,7 +48,7 @@ export function S22Closing() {
       </div>
 
       <div className={shared.footer}>
-        <span>Cardioline 2031</span>
+        <span>Cardioline 2028</span>
       </div>
     </div>
   );

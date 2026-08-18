@@ -31,7 +31,7 @@ export default function AnchorPage() {
           <div className={styles.bar}>
             <Logo width={132} />
             <Link href="/vision" className={styles.back}>
-              ← 2031 Product Vision
+              ← 2028 Product Vision
             </Link>
           </div>
 

@@ -18,7 +18,7 @@ export function S05Ambition() {
       <div className={styles.body}>
         <Reveal>
           <Display size="subhead" className={styles.lead}>
-            In five years,
+            By 2028,
           </Display>
         </Reveal>
         <Reveal delay={320}>

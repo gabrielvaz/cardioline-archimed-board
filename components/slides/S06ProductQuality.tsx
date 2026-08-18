@@ -40,7 +40,7 @@ export function S06ProductQuality() {
           </Reveal>
 
           <Reveal delay={520} className={styles.col}>
-            <Kicker accent>Cardioline 2031</Kicker>
+            <Kicker accent>Cardioline 2028</Kicker>
             {NEW.map((t) => (
               <span key={t} className={styles.newItem}>
                 {t}

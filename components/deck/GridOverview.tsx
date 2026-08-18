@@ -25,7 +25,7 @@ export function GridOverview({ active, onPick, onClose }: Props) {
   return (
     <div className={styles.overlay} role="dialog" aria-label="All slides">
       <div className={styles.head}>
-        <span className={styles.title}>Cardioline 2031 — 22 slides</span>
+        <span className={styles.title}>Cardioline 2028 — 22 slides</span>
         <span className={styles.title}>G or Esc to close</span>
       </div>
       <div className={styles.grid}>

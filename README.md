@@ -1,4 +1,4 @@
-# Cardioline 2031 — Product Vision
+# Cardioline 2028 — Product Vision
 
 Apresentação executiva de visão de produto, em HTML, navegável como slides.
 **Não é material institucional da Cardioline, não é oferta comercial e não tem
@@ -21,7 +21,8 @@ pnpm build && pnpm verify   # harness visual (Puppeteer)
 ```
 
 Na apresentação: `←` `→` navegam, `F` entra em fullscreen, `G` abre o mapa dos
-22 slides, `Home`/`End` vão às pontas, e `#14` na URL abre direto num slide.
+22 slides, `R` reinicia no slide 1, `Home`/`End` vão às pontas, e `#14` na URL
+abre direto num slide.
 
 ## Identidade: o que veio de fonte oficial
 
@@ -124,6 +125,7 @@ não é evidência de nada.
 | Contraste | AA por tamanho, mais a regra de laranja da marca |
 | Viewports | 1920×1080, 1600×900, 1440×900: escala e centralização |
 | Teclado | 21 setas chegam em `#22`; `Home` volta; `#14` abre no 14 |
+| Restart | `R` recarrega e volta ao slide 1, com o scroll em zero |
 | Overview | `G` abre 22 tiles, `Esc` fecha |
 | Reduced motion | conteúdo visível sem animar, sem colisão |
 | Marca | IoU dos SVGs contra os PNGs oficiais |
@@ -134,6 +136,16 @@ detector de colisão ter um escape hatch explícito em vez de uma regra frouxa.
 
 Fullscreen (`F`) exige gesto do usuário e não roda em headless — foi testado à
 mão no Chrome.
+
+## Escopo da narrativa
+
+O horizonte é **2028**. A apresentação não usa linha do tempo datada em nenhum
+slide, e não cita Holter nem ABPM.
+
+Um ponto de tese que o material não pode inverter: a Cardioline **sempre** fez
+hardware e software. O que muda em 2028 não é passar a fazer software, é para
+quem ele é feito — daí o eixo do slide 03 ser "software para o aparelho →
+para o exame → para o cardiologista", e não "ganhar software".
 
 ## Fronteira comercial
 

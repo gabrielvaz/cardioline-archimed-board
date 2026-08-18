@@ -22,22 +22,26 @@ export const PATIENTS: readonly Patient[] = [
   { id: "p-novak", name: "S. Novak", age: 69, sex: "M", synthetic: true },
 ] as const;
 
-export type ExamKind = "ECG" | "Holter" | "ABPM" | "Stress";
-
+/**
+ * Sequência de exames do mesmo paciente.
+ *
+ * Sem datas de propósito: a apresentação não põe linha do tempo em lugar nenhum,
+ * e o argumento é a acumulação de registros, não o calendário.
+ */
 export type ExamRef = {
-  year: number;
-  kind: ExamKind;
-  /** Rótulo curto, ilustrativo — nunca uma conclusão diagnóstica. */
+  /** Posição na sequência, do mais antigo ao mais recente. */
+  index: number;
+  seed: number;
+  /** Rótulo curto e ilustrativo — nunca uma conclusão diagnóstica. */
   note?: string;
 };
 
-/** Histórico longitudinal do slide 15. */
-export const LONGITUDINAL: readonly ExamRef[] = [
-  { year: 2027, kind: "ECG" },
-  { year: 2028, kind: "ECG", note: "axis shift" },
-  { year: 2029, kind: "Holter" },
-  { year: 2030, kind: "ABPM" },
-  { year: 2031, kind: "ECG", note: "T-wave change" },
+export const EXAM_SEQUENCE: readonly ExamRef[] = [
+  { index: 0, seed: 311 },
+  { index: 1, seed: 417 },
+  { index: 2, seed: 523 },
+  { index: 3, seed: 629 },
+  { index: 4, seed: 735, note: "Change detected" },
 ] as const;
 
 export const SYNTHETIC_NOTE = "Illustrative — synthetic data";

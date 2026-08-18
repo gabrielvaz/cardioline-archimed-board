@@ -49,7 +49,7 @@ export function S01Opening() {
       </div>
 
       <div className={shared.footer}>
-        <span>Cardioline — 2031 Product Vision</span>
+        <span>Cardioline — 2028 Product Vision</span>
       </div>
     </div>
   );

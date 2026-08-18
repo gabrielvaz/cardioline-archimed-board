@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cardioline 2031 — Product Vision",
+  title: "Cardioline 2028 — Product Vision",
   description:
     "The future of cardiology is not another device. It's intelligence.",
 };

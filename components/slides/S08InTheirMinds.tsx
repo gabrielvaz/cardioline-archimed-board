@@ -8,7 +8,7 @@ import { Display, Kicker } from "@/components/primitives/Type";
 import shared from "./slides.module.css";
 import styles from "./S08InTheirMinds.module.css";
 
-const TERMS = ["ECG", "Holter", "Cardiac monitoring", "Clinical intelligence"];
+const TERMS = ["ECG", "Cardiac monitoring", "Cardiology software", "Clinical intelligence"];
 
 /**
  * Na cabeça deles.

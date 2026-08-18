@@ -36,12 +36,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 72px;
+  height: 76px;
+  padding: 0 32px;
   border-radius: var(--cl-radius-node);
   border: var(--cl-hairline) solid var(--cl-line);
   font-size: 24px;
   font-weight: var(--cl-weight-semibold);
+  /* O tracking largo acrescenta um espaço depois da última letra; o indent
+     compensa para o texto ficar opticamente centrado, não deslocado. */
   letter-spacing: var(--cl-tracking-kicker);
+  text-indent: var(--cl-tracking-kicker);
   text-transform: uppercase;
 }
 

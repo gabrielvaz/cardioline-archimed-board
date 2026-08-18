@@ -24,6 +24,14 @@ export function Deck({ children }: { children: ReactNode }) {
   // redefinir o alvo, senão teclas rápidas se perdem no meio da animação.
   const userScrolled = useRef(false);
 
+  // Sem isto o Chrome restaura a posição de scroll ao recarregar, e o R não
+  // voltaria ao primeiro slide.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
   const anim = useRef(0);
 
   /**
@@ -212,6 +220,14 @@ export function Deck({ children }: { children: ReactNode }) {
           e.preventDefault();
           setOverview((v) => !v);
           break;
+        case "r":
+        case "R":
+          // Recomeça a apresentação: tira o hash e recarrega, para voltar ao
+          // slide 1 com todas as animações no estado inicial.
+          e.preventDefault();
+          window.history.replaceState(null, "", window.location.pathname);
+          window.location.reload();
+          break;
         default:
       }
     };
@@ -255,7 +271,7 @@ export function Deck({ children }: { children: ReactNode }) {
         data-theme={theme}
       >
         <ProgressRail active={active} onPick={goTo} />
-        <span className={styles.hint}>← → navigate · F fullscreen · G overview</span>
+        <span className={styles.hint}>← → navigate · F fullscreen · G overview · R restart</span>
         <span className={styles.counter} data-numeric data-testid="counter">
           {String(active).padStart(2, "0")} / {TOTAL_SLIDES}
         </span>

@@ -1,7 +1,7 @@
 import { Reveal } from "@/components/deck/Reveal";
 import { Caption, Display, Kicker } from "@/components/primitives/Type";
-import { PatientTimeline } from "@/components/product/PatientTimeline";
-import { LONGITUDINAL } from "@/lib/synthetic";
+import { EcgTrace } from "@/components/product/EcgTrace";
+import { EXAM_SEQUENCE } from "@/lib/synthetic";
 import shared from "./slides.module.css";
 import styles from "./S15Intelligence.module.css";
 
@@ -10,9 +10,12 @@ const OUTPUTS = ["Change", "Trend", "Risk", "Context", "Prediction"];
 /**
  * Inteligência.
  *
- * O histórico inteiro converge num único ponto e volta a se abrir como
- * entendimento. É o mesmo movimento do slide 04, agora aplicado ao paciente em
- * vez da empresa — a repetição da forma é proposital.
+ * Sem linha do tempo: o histórico é mostrado pelos próprios registros
+ * acumulados, e o argumento é a acumulação, não o calendário. Só o último
+ * traçado é marcado, porque é onde a diferença aparece.
+ *
+ * O movimento repete o do slide 04 de propósito — tudo converge num centro e
+ * volta a se abrir —, agora aplicado ao paciente em vez da empresa.
  */
 export function S15Intelligence() {
   return (
@@ -31,19 +34,38 @@ export function S15Intelligence() {
             </Display>
           </Reveal>
           <Reveal delay={280} className={styles.shift}>
-            <span className={styles.was}>Single exam</span>
+            <span className={styles.was}>One exam</span>
             <span className={styles.arrow} aria-hidden>
-              →
+              &rarr;
             </span>
-            <span className={styles.is}>Longitudinal understanding</span>
+            <span className={styles.is}>Every exam of the same patient</span>
           </Reveal>
         </div>
 
-        <Reveal delay={400}>
-          <PatientTimeline entries={LONGITUDINAL} />
-        </Reveal>
+        <div className={styles.records}>
+          {EXAM_SEQUENCE.map((e, i) => (
+            <Reveal
+              key={e.index}
+              delay={420 + i * 120}
+              className={`${styles.record} ${e.note ? styles.recordMarked : ""}`}
+            >
+              <EcgTrace
+                width={240}
+                height={58}
+                beats={4}
+                seed={e.seed}
+                amplitude={0.7}
+                noise={0.12}
+                anomalyAt={e.note ? 2 : undefined}
+                strokeWidth={1.6}
+                stroke={e.note ? "var(--cl-orange)" : "var(--cl-mute)"}
+              />
+              {e.note && <span className={styles.recordNote}>{e.note}</span>}
+            </Reveal>
+          ))}
+        </div>
 
-        <Reveal delay={900}>
+        <Reveal delay={1000}>
           <svg className={styles.funnel} viewBox="0 0 1360 44" aria-hidden>
             {[136, 408, 680, 952, 1224].map((x) => (
               <path
@@ -55,13 +77,13 @@ export function S15Intelligence() {
           </svg>
         </Reveal>
 
-        <Reveal delay={1000}>
+        <Reveal delay={1100}>
           <div className={styles.engine}>Cardioline Intelligence</div>
         </Reveal>
 
         <div className={styles.outputs}>
           {OUTPUTS.map((o, i) => (
-            <Reveal key={o} delay={1200 + i * 110} className={styles.output}>
+            <Reveal key={o} delay={1300 + i * 110} className={styles.output}>
               {o}
             </Reveal>
           ))}

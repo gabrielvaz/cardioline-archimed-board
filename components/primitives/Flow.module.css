@@ -6,6 +6,9 @@
 
 .column {
   flex-direction: column;
+  /* Em coluna, o center herdado encolhe cada nó à largura do conteúdo, que é o
+     que fazia as caixas parecerem espremidas em torno da palavra. */
+  align-items: stretch;
 }
 
 /* ---- Conector: o "trace" na função de ligação ---- */
@@ -32,6 +35,7 @@
 .linkColumn {
   width: var(--cl-hairline);
   min-height: 40px;
+  align-self: center;
   transform-origin: center top;
   transform: scaleY(0);
 }

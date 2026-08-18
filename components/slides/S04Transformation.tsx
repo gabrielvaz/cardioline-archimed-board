@@ -8,7 +8,7 @@ import { Display, Kicker, Lede } from "@/components/primitives/Type";
 import shared from "./slides.module.css";
 import styles from "./S04Transformation.module.css";
 
-const INPUTS = ["ECG", "Holter", "ABPM", "Stress ECG"];
+const INPUTS = ["Resting ECG", "Stress ECG", "Continuous monitoring"];
 const OUTPUTS = ["Patients", "Exams", "History", "Reports", "Data", "Intelligence"];
 
 const W = 1360;

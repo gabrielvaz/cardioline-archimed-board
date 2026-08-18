@@ -381,6 +381,29 @@ async function main() {
     const counter = await page.$eval('[data-testid="counter"]', (e) => e.textContent.trim());
     if (!counter.startsWith("14")) fail("deep-link", `#14 abriu no contador "${counter}"`);
 
+    /* ---- R reinicia a apresentação ---- */
+    await page.goto(`${BASE}/vision`, { waitUntil: "networkidle0" });
+    await sleep(400);
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press("ArrowRight");
+      await sleep(140);
+    }
+    await sleep(600);
+    const beforeRestart = await page.evaluate(() => location.hash);
+    await page.keyboard.press("r");
+    await page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {});
+    await sleep(700);
+    const after = await page.evaluate(() => {
+      const deck = document.querySelector("[data-deck]");
+      return { hash: location.hash, top: deck ? deck.scrollTop : -1 };
+    });
+    if (beforeRestart === "#01") fail("restart", "as setas não saíram do slide 1");
+    if (after.hash !== "" && after.hash !== "#01") {
+      fail("restart", `R deixou o hash em ${after.hash}, esperado vazio ou #01`);
+    }
+    if (after.top !== 0) fail("restart", `R deixou o scroll em ${after.top}, esperado 0`);
+    if (after.top === 0) log(`  R reinicia · ${beforeRestart} -> slide 1 · ok`);
+
     /* ---- grid overview ---- */
     await page.goto(`${BASE}/vision`, { waitUntil: "networkidle0" });
     await sleep(400);

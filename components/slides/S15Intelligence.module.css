@@ -43,6 +43,35 @@
   font-weight: var(--cl-weight-semibold);
 }
 
+.records {
+  display: flex;
+  gap: 20px;
+}
+
+.record {
+  flex: 1;
+  position: relative;
+  border: var(--cl-hairline) solid var(--cl-line);
+  border-radius: var(--cl-radius-node);
+  padding: 14px 16px 16px;
+  background: var(--cl-white);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recordMarked {
+  border-color: var(--cl-orange);
+}
+
+.recordNote {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-orange-ink);
+}
+
 .funnel {
   display: block;
   width: 100%;

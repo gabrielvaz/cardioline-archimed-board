@@ -1,10 +1,10 @@
 import { Reveal } from "@/components/deck/Reveal";
 import { Body, Caption, Display, Kicker } from "@/components/primitives/Type";
 import { ExamViewer } from "@/components/product/ExamViewer";
-import { PatientTimeline } from "@/components/product/PatientTimeline";
 import { ClinicalInsight } from "@/components/product/ClinicalInsight";
+import { DeviceSync } from "@/components/product/Panels";
 import { DeviceFrame } from "@/components/product/Frames";
-import { LONGITUDINAL, PATIENTS } from "@/lib/synthetic";
+import { PATIENTS } from "@/lib/synthetic";
 import shared from "./slides.module.css";
 import styles from "./S07InTheirHands.module.css";
 
@@ -49,12 +49,13 @@ export function S07InTheirHands() {
                   height: "100%",
                 }}
               >
-                <PatientTimeline entries={LONGITUDINAL.slice(0, 3)} />
                 <ClinicalInsight
-                  label="Trend"
-                  title="Stable across four recordings"
-                  body="No change in axis or intervals since 2027."
+                  label="For review"
+                  title="Change since the last recording"
+                  body="Lead V2 differs from the three previous exams."
+                  tone="attention"
                 />
+                <DeviceSync device="ECG100L · Room 4" />
               </div>
             </DeviceFrame>
           </Reveal>

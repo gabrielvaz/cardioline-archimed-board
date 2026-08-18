@@ -35,7 +35,7 @@ const DEFAULT_MEASURES: Measure[] = [
 export function ExamViewer({
   patient,
   seed,
-  date = "14 Mar 2031 · 09:12",
+  date = "14 Mar 2028 · 09:12",
   kind = "12-lead ECG",
   leads = ["II", "V2", "V5"],
   measures = DEFAULT_MEASURES,

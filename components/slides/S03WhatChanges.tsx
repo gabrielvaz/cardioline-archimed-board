@@ -4,19 +4,16 @@ import { FlowNode } from "@/components/primitives/Flow";
 import shared from "./slides.module.css";
 import styles from "./S03WhatChanges.module.css";
 
-const STATES = [
-  { when: "Yesterday", parts: ["Devices"] },
-  { when: "Today", parts: ["Devices", "Software"] },
-  { when: "Tomorrow", parts: ["Devices", "Software", "Intelligence"] },
-];
-
 /**
- * O que muda.
- *
- * Os três estados acumulam em vez de se substituírem: a leitura de cima para
- * baixo mostra que nada é descartado, só somado. O último termo é o único em
- * laranja, porque é o único novo.
+ * O eixo NÃO é "a empresa ganha software" — ela sempre teve. O eixo é para quem
+ * o software é feito: primeiro para o aparelho, depois para o exame, agora para
+ * o profissional. É o que torna a virada user-centered em vez de tecnológica.
  */
+const STATES = [
+  { when: "Yesterday", what: "Software that ran the device" },
+  { when: "Today", what: "Software that records the exam" },
+  { when: "Tomorrow", what: "Software built around the cardiologist" },
+];
 export function S03WhatChanges() {
   return (
     <div className={shared.full}>
@@ -35,14 +32,9 @@ export function S03WhatChanges() {
           >
             <span className={styles.when}>{s.when}</span>
             <span className={styles.parts}>
-              {s.parts.map((p) => (
-                <FlowNode
-                  key={p}
-                  variant={p === "Intelligence" ? "solid" : "outline"}
-                >
-                  {p}
-                </FlowNode>
-              ))}
+              <FlowNode variant={i === STATES.length - 1 ? "solid" : "outline"}>
+                {s.what}
+              </FlowNode>
             </span>
           </Reveal>
         ))}

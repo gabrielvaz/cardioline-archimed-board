@@ -4,12 +4,24 @@ import { EcgTrace } from "@/components/product/EcgTrace";
 import shared from "./slides.module.css";
 import styles from "./S02Legacy.module.css";
 
+const TRACE_W = 380;
+const BOX_H = 96;
+const BEATS = 6;
+const BEAT_W = TRACE_W / BEATS;
+const FLAGGED_BEAT = 3;
+/** Posição da onda T da batida marcada — 0.55 do ciclo, onde o gerador altera. */
+const MARK_X = BEAT_W * (FLAGGED_BEAT + 0.55);
+const MARK_Y = BOX_H / 2 + 4;
+
 /**
  * Legado.
  *
- * Sem timeline detalhada: o mesmo traçado muda de caráter da esquerda para a
- * direita — analógico e ruidoso, depois limpo, depois lido por inteligência.
- * A evolução é mostrada no próprio sinal, não numa régua de datas.
+ * O mesmo traçado muda de caráter da esquerda para a direita: analógico e
+ * ruidoso, depois limpo, depois lido por inteligência. A evolução aparece no
+ * próprio sinal, não numa régua de datas.
+ *
+ * O fecho é deliberado: a Cardioline nunca deixou de fazer software. O que muda
+ * em 2028 não é passar a fazê-lo, é para quem ele é feito.
  */
 export function S02Legacy() {
   return (
@@ -28,6 +40,7 @@ export function S02Legacy() {
         <Reveal delay={300}>
           <div className={styles.era}>
             <div className={styles.segment}>
+              <div className={styles.flagRow} />
               <div className={styles.traceBox}>
                 <EcgTrace
                   width={380}
@@ -47,6 +60,7 @@ export function S02Legacy() {
             </div>
 
             <div className={styles.segment}>
+              <div className={styles.flagRow} />
               <div className={styles.traceBox}>
                 <EcgTrace
                   width={380}
@@ -65,11 +79,12 @@ export function S02Legacy() {
             </div>
 
             <div className={styles.segment}>
-              <span className={styles.markers} aria-hidden>
-                <span className={styles.marker} />
-                <span className={styles.marker} />
-                <span className={styles.marker} />
-              </span>
+              <div className={styles.flagRow}>
+                <span className={styles.flag}>
+                  <span className={styles.flagDot} aria-hidden />
+                  Change detected
+                </span>
+              </div>
               <div className={styles.traceBox}>
                 <EcgTrace
                   width={380}
@@ -78,12 +93,38 @@ export function S02Legacy() {
                   seed={2031}
                   amplitude={0.76}
                   noise={0.06}
-                  anomalyAt={3}
+                  anomalyAt={FLAGGED_BEAT}
                   strokeWidth={1.8}
                 />
+                {/* A marcação é geométrica, derivada da mesma batida que o
+                    gerador alterou — não é um enfeite posto por cima. */}
+                <svg
+                  className={styles.overlay}
+                  viewBox={`0 0 ${TRACE_W} ${BOX_H}`}
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <rect
+                    className={styles.band}
+                    x={BEAT_W * FLAGGED_BEAT}
+                    y={0}
+                    width={BEAT_W}
+                    height={BOX_H}
+                    rx={6}
+                  />
+                  <line
+                    className={styles.leader}
+                    x1={MARK_X}
+                    y1={0}
+                    x2={MARK_X}
+                    y2={MARK_Y - 11}
+                  />
+                  <circle className={styles.ringOuter} cx={MARK_X} cy={MARK_Y} r={9} />
+                  <circle className={styles.ringInner} cx={MARK_X} cy={MARK_Y} r={3.5} />
+                </svg>
               </div>
               <span className={styles.label}>
-                <span className={styles.when}>2031</span>
+                <span className={styles.when}>2028</span>
                 <span className={styles.what}>Understood signal</span>
               </span>
             </div>
@@ -92,7 +133,10 @@ export function S02Legacy() {
       </div>
 
       <Reveal delay={800}>
-        <Lede mute>Six decades of cardiac diagnosis. Now it becomes software.</Lede>
+        <Lede mute>
+          Six decades of hardware and software. What changes is who they are
+          built around.
+        </Lede>
       </Reveal>
     </div>
   );
