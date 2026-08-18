@@ -15,6 +15,27 @@
   /* Faixa reservada ao trilho fixo do dispositivo. Ver DeviceRail.module.css. */
   --rail-w: 0px;
 
+  /*
+   * ACENTO DA MARCA NA V2
+   *
+   * Aqui o laranja é o OFICIAL (#F66201, a tinta do logo), tanto em superfície
+   * preenchida quanto em texto. É uma decisão de fidelidade de marca do dono do
+   * produto, e uma exceção consciente à regra geral de styles/tokens.css, que
+   * manda usar as variantes escurecidas quando o laranja carrega texto.
+   *
+   * Consequência medida, para ficar registrado e não ser descoberta depois:
+   *   rótulo branco sobre #F66201 ......... 3,15:1  (AA só para texto grande)
+   *   texto #F66201 sobre branco .......... 3,15:1  (AA só para texto grande)
+   *   grafismo #F66201 sobre branco ....... 3,15:1  (PASSA: grafismo pede 3:1)
+   *
+   * Se a prioridade mudar para conformidade AA sem perder a matiz, há duas saídas
+   * de uma linha cada: apontar --v2-accent-on para --cl-ink (navy sobre laranja
+   * oficial dá 5,69:1) ou apontar --v2-accent para --cl-orange-strong.
+   */
+  --v2-accent: var(--cl-orange);
+  --v2-accent-hover: var(--cl-orange-ui);
+  --v2-accent-on: var(--cl-white);
+
   font-size: 17px;
   line-height: 1.65;
   color: var(--cl-ink);
@@ -45,9 +66,17 @@
   }
 }
 
-.v2 h1,
-.v2 h2,
-.v2 h3 {
+/*
+ * Reset de elemento dentro de :where() de propósito.
+ *
+ * :where() tem especificidade ZERO, então estas regras funcionam como reset e
+ * qualquer classe de componente as vence. Escritas como ".v2 a", a
+ * especificidade seria (0,1,1) e derrotaria uma classe como .cta (0,1,0): foi
+ * exatamente isso que fez o "color: inherit" pintar de navy o rótulo de todos os
+ * botões e links da v2, enquanto pills e valores (span e p) saíam laranja. O
+ * sintoma parecia um token de cor que não resolvia; a causa era cascata.
+ */
+.v2 :where(h1, h2, h3) {
   margin: 0;
   font-weight: 600;
   letter-spacing: var(--cl-tracking-display);
@@ -55,25 +84,23 @@
   text-wrap: balance;
 }
 
-.v2 p {
+.v2 :where(p) {
   margin: 0;
   text-wrap: pretty;
 }
 
-.v2 ul,
-.v2 ol {
+.v2 :where(ul, ol) {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.v2 img,
-.v2 svg {
+.v2 :where(img, svg) {
   display: block;
   max-width: 100%;
 }
 
-.v2 a {
+.v2 :where(a) {
   color: inherit;
   text-decoration: none;
 }

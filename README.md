@@ -69,10 +69,23 @@ deck. O workspace, porém, é um componente próprio da v2
 respiro e tipo menor, e alterar o `ExamViewer` do deck regrediria a apresentação,
 que é calibrada para projetor.
 
-**Disciplina de cor herdada da v1.** O traçado é navy sobre grid laranja, como o
-papel térmico que o aparelho imprime. O laranja fica para o grid, o marcador de
-estado, o degrau do Pro e os CTAs. Traçado laranja deixava a tela laranja demais.
-O logo oficial da Cardioline aparece no cabeçalho e dentro do próprio mockup.
+**Disciplina de cor.** O traçado é navy sobre grid laranja, como o papel térmico
+que o aparelho imprime. O logo oficial aparece no cabeçalho e dentro do mockup.
+
+O laranja da v2 é o **oficial `#F66201`**, a tinta do logo, tanto em superfície
+preenchida quanto em texto. É uma exceção consciente à regra de
+`styles/tokens.css`, que manda usar variantes escurecidas quando o laranja carrega
+texto, e está registrada com os números medidos no topo de `app/v2/v2.css`:
+
+| Uso | Contraste | AA |
+|---|---|---|
+| rótulo branco sobre `#F66201` | 3,15:1 | só texto grande |
+| texto `#F66201` sobre branco | 3,15:1 | só texto grande |
+| grafismo `#F66201` sobre branco | 3,15:1 | passa (grafismo pede 3:1) |
+
+Duas saídas de uma linha, se a prioridade virar conformidade sem perder a matiz:
+apontar `--v2-accent-on` para `--cl-ink` (navy sobre o laranja oficial dá
+**5,69:1**) ou `--v2-accent` para `--cl-orange-strong`.
 
 ### Imagens do dispositivo
 
@@ -97,6 +110,19 @@ significativa da largura do objeto.
 totalmente transparentes entre os dois objetos no render oficial. São as duas
 peças que a animação de encaixe move, e as abas do conector caem na base porque
 ambas mantêm a proporção original.
+
+### A armadilha de cascata no reset da v2
+
+O reset de elemento da v2 vive dentro de `:where()`, que tem especificidade zero.
+Escrito como `.v2 a`, o seletor teria especificidade (0,1,1) e venceria uma classe
+de componente como `.cta` (0,1,0). Foi exatamente isso que fez `color: inherit`
+pintar de navy o rótulo de todos os botões e links, enquanto pills e valores
+(`span` e `p`) saíam laranja corretamente. O sintoma parecia um token de cor que
+não resolvia; a causa era cascata.
+
+Só a amostragem de pixel na captura revelou o problema: os seletores do probe de
+DOM erravam o elemento, e a inspeção visual não distingue "token não resolveu" de
+"outra regra ganhou".
 
 ### Pendente
 

@@ -228,7 +228,7 @@
 }
 
 .stripNow {
-  color: var(--cl-orange-ink);
+  color: var(--v2-accent);
   font-weight: 600;
 }
 
@@ -285,7 +285,7 @@
 .deltaV {
   font-family: var(--cl-font-mono), monospace;
   font-weight: 600;
-  color: var(--cl-orange-ink);
+  color: var(--v2-accent);
   font-variant-numeric: tabular-nums;
 }
 
@@ -339,17 +339,17 @@
 .cta {
   display: inline-flex;
   align-items: center;
-  height: 46px;
-  padding-inline: 24px;
-  background: var(--cl-orange-strong);
-  color: var(--cl-white);
-  font-size: 15px;
+  height: 48px;
+  padding-inline: 26px;
+  background: var(--v2-accent);
+  color: var(--v2-accent-on);
+  font-size: 16px;
   font-weight: 600;
   transition: background 160ms ease;
 }
 
 .cta:hover {
-  background: var(--cl-orange-ink);
+  background: var(--v2-accent-hover);
 }
 
 .textLink {
@@ -357,7 +357,7 @@
   align-items: center;
   gap: 6px;
   font-size: 15px;
-  color: var(--cl-orange-ink);
+  color: var(--v2-accent);
 }
 
 .h3 {

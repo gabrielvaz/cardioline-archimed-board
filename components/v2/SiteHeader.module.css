@@ -55,7 +55,7 @@
   margin-left: auto;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--cl-orange-ink);
+  color: var(--v2-accent);
 }
 
 @media (min-width: 760px) {
