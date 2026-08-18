@@ -58,8 +58,10 @@ describe("tokens da marca", () => {
     expect(r).toBeLessThan(4.5);
   });
 
-  it("mute sobre branco passa AA para texto normal", () => {
+  it("mute passa AA sobre branco E sobre paper", () => {
     expect(contrastRatio(token("mute"), "#FFFFFF")).toBeGreaterThanOrEqual(4.5);
+    // O paper é quase branco, mas o suficiente para derrubar um cinza limítrofe.
+    expect(contrastRatio(token("mute"), token("paper"))).toBeGreaterThanOrEqual(4.5);
   });
 
   it("define a stage em exatamente 1600x900", () => {

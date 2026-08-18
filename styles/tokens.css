@@ -24,13 +24,13 @@
   --cl-tint: #fdebe0;        /* preenchimento laranja de baixa intensidade */
   --cl-paper: #fafaf9;
   --cl-line: #e6e6e6;        /* hairlines e divisores */
-  --cl-mute: #747474;        /* texto secundário */
+  --cl-mute: #6e6e6e;        /* texto secundário — 5.10:1 no branco, 4.88:1 no paper */
   --cl-white: #ffffff;
 
   /* Contraste medido (WCAG 2.1):
      ink/branco 17.9:1 · branco/ink-deep 19.4:1 · orange/ink-deep 6.09:1
      orange/branco 3.19:1 · orange-ui/branco 3.45:1 · mute/branco 4.83:1
-     orange-ink/branco 5.26:1 · branco/orange-strong 4.51:1
+     orange-ink/branco 5.26:1 · branco/orange-strong 4.51:1 · mute/paper 4.88:1
      REGRA: em fundo claro, laranja como TEXTO usa --cl-orange-ink; o
      --cl-orange puro fica para grafismo e para display >= 32px. */
   --cl-orange-min-size: 32px;

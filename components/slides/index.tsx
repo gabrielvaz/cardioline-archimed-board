@@ -16,6 +16,11 @@ import { S14Reveal } from "./S14Reveal";
 import { S15Intelligence } from "./S15Intelligence";
 import { S16Depth } from "./S16Depth";
 import { S17Prediction } from "./S17Prediction";
+import { S18Speed } from "./S18Speed";
+import { S19Invisible } from "./S19Invisible";
+import { S20Standard } from "./S20Standard";
+import { S21MustBeTrue } from "./S21MustBeTrue";
+import { S22Closing } from "./S22Closing";
 
 /** Slides implementados, por id do registry. Os que faltam caem no stub. */
 export const SLIDE_COMPONENTS: Record<string, ComponentType> = {
@@ -36,4 +41,9 @@ export const SLIDE_COMPONENTS: Record<string, ComponentType> = {
   intelligence: S15Intelligence,
   depth: S16Depth,
   prediction: S17Prediction,
+  speed: S18Speed,
+  "invisible-complexity": S19Invisible,
+  "the-standard": S20Standard,
+  "what-must-be-true": S21MustBeTrue,
+  closing: S22Closing,
 };

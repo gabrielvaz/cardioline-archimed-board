@@ -1,0 +1,44 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 34px;
+  min-height: 0;
+}
+
+.quote {
+  max-width: 20ch;
+}
+
+.earn {
+  font-size: 30px;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.nots {
+  display: flex;
+  gap: 46px;
+  margin-top: 14px;
+}
+
+.not {
+  font-size: 24px;
+  color: rgb(255 255 255 / 0.42);
+}
+
+.because {
+  max-width: 46ch;
+  font-size: 27px;
+  line-height: 1.45;
+  color: var(--cl-white);
+  margin-top: 6px;
+}
+
+.rule {
+  width: 64px;
+  height: 3px;
+  background: var(--cl-orange);
+}

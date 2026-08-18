@@ -1,0 +1,127 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+  min-height: 0;
+}
+
+.split {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 64px;
+}
+
+.side + .side {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 64px;
+  padding-right: 0;
+}
+
+/* O amontoado é o argumento: doze janelas desalinhadas contra uma só. */
+.mess {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Branco sobre branco não lê como amontoado. Fundo paper e borda mais firme
+   dão a massa que o argumento precisa. */
+.win {
+  position: absolute;
+  width: 258px;
+  height: 156px;
+  border-radius: 8px;
+  border: var(--cl-hairline) solid #d8d8d8;
+  background: var(--cl-paper);
+  box-shadow: 0 2px 6px -2px rgb(7 16 70 / 0.1);
+}
+
+.winBar {
+  height: 20px;
+  border-bottom: var(--cl-hairline) solid #d8d8d8;
+  background: #eeeeee;
+  border-radius: 8px 8px 0 0;
+}
+
+.legend {
+  font-size: var(--cl-fs-body);
+  color: var(--cl-mute);
+  line-height: 1.5;
+}
+
+.one {
+  position: relative;
+  height: 300px;
+  display: flex;
+  align-items: center;
+}
+
+.oneFrame {
+  width: 100%;
+  height: 220px;
+  border-radius: var(--cl-radius-frame);
+  border: var(--cl-hairline) solid var(--cl-line);
+  background: var(--cl-white);
+  box-shadow: 0 24px 60px -24px rgb(7 16 70 / 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.oneBar {
+  height: 40px;
+  flex: none;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+  background: var(--cl-paper);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: var(--cl-fs-caption);
+  color: var(--cl-mute);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  font-weight: var(--cl-weight-semibold);
+}
+
+.oneSteps {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 26px;
+  gap: 10px;
+}
+
+.step {
+  font-size: 21px;
+  font-weight: var(--cl-weight-medium);
+  white-space: nowrap;
+}
+
+.sep {
+  color: var(--cl-orange-ink);
+  font-size: 19px;
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.bar {
+  width: 56px;
+  height: 3px;
+  background: var(--cl-orange);
+  flex: none;
+}

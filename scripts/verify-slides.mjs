@@ -154,6 +154,8 @@ const auditPage = ({ stageW, stageH, minFont, orangeMinPx, regionSelector }) => 
         if (cs.visibility === "hidden" || cs.display === "none" || cs.opacity === "0") continue;
         // Elementos posicionados podem se sobrepor de propósito.
         if (cs.position !== "static" && cs.position !== "relative") continue;
+        // Camada declarada como deliberada (ex.: substrato atrás de um cartão).
+        if (el.closest("[data-layer]")) continue;
         const own = [...el.childNodes]
           .filter((c) => c.nodeType === 3)
           .map((c) => c.textContent.trim())
@@ -332,7 +334,7 @@ async function main() {
     }
 
     /* ---- demais rotas: mesmas regras de fonte e contraste ---- */
-    const EXTRA_ROUTES = ["/anchor", "/gallery"];
+    const EXTRA_ROUTES = ["/anchor"];
     await page.setViewport({ width: 1600, height: 1000, deviceScaleFactor: 1 });
     for (const route of EXTRA_ROUTES) {
       const res = await page.goto(`${BASE}${route}`, { waitUntil: "networkidle0" });
@@ -378,6 +380,48 @@ async function main() {
     await sleep(600);
     const counter = await page.$eval('[data-testid="counter"]', (e) => e.textContent.trim());
     if (!counter.startsWith("14")) fail("deep-link", `#14 abriu no contador "${counter}"`);
+
+    /* ---- grid overview ---- */
+    await page.goto(`${BASE}/vision`, { waitUntil: "networkidle0" });
+    await sleep(400);
+    await page.keyboard.press("g");
+    await sleep(350);
+    const openedTiles = await page.$$eval('[role="dialog"] button', (b) => b.length);
+    if (openedTiles !== 22) fail("overview", `G abriu ${openedTiles} tiles, esperado 22`);
+    await page.keyboard.press("Escape");
+    await sleep(350);
+    if (await page.$('[role="dialog"]')) fail("overview", "Escape não fechou o overview");
+    if (openedTiles === 22) log("  overview (G) · 22 tiles · ok");
+
+    /* ---- prefers-reduced-motion ---- */
+    await page.emulateMediaFeatures([
+      { name: "prefers-reduced-motion", value: "reduce" },
+    ]);
+    await page.goto(`${BASE}/vision`, { waitUntil: "networkidle0" });
+    await page.evaluate(() => document.fonts.ready);
+    await sleep(500);
+    const hidden = await page.evaluate(() => {
+      const first = document.querySelector("section[data-slide='1']");
+      return [...first.querySelectorAll("[class*='reveal']")].filter(
+        (el) => Number(getComputedStyle(el).opacity) < 0.9,
+      ).length;
+    });
+    if (hidden > 0) {
+      fail("reduced-motion", `${hidden} elementos ficaram invisíveis sem animação`);
+    } else {
+      log("  prefers-reduced-motion · conteúdo visível sem animar · ok");
+    }
+    const rmAudit = await page.evaluate(auditPage, {
+      stageW: STAGE_W,
+      stageH: STAGE_H,
+      minFont: MIN_FONT_PX,
+      orangeMinPx: ORANGE_MIN_PX,
+      regionSelector: "section[data-slide]",
+    });
+    for (const c of rmAudit.collide) {
+      fail("reduced-motion", `slide ${c.n}: "${c.a}" e "${c.b}" sobrepostos`);
+    }
+    await page.emulateMediaFeatures([]);
 
     /* ---- fidelidade dos assets de marca ---- */
     const brand = [

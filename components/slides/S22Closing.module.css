@@ -1,0 +1,24 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 46px;
+  min-height: 0;
+}
+
+.claim {
+  max-width: 22ch;
+}
+
+.build {
+  color: var(--cl-orange-ui);
+}
+
+.trace {
+  flex: none;
+  display: flex;
+  justify-content: center;
+}

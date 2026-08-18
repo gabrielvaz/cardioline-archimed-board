@@ -1,6 +1,3 @@
-"use client";
-
-import { useSlideActive } from "@/components/deck/DeckContext";
 import { Reveal } from "@/components/deck/Reveal";
 import { Caption, Display, Kicker } from "@/components/primitives/Type";
 import { EcgTrace } from "@/components/product/EcgTrace";
@@ -29,8 +26,6 @@ const MID = TRACE_TOP + TRACE_H / 2;
  * nomeiam o tipo de leitura que o sistema faz e entrega ao profissional.
  */
 export function S16Depth() {
-  const active = useSlideActive();
-
   return (
     <div className={shared.full}>
       <div className={shared.top}>

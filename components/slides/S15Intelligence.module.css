@@ -7,18 +7,25 @@
   min-height: 0;
 }
 
+/* A frase de deslocamento embaixo da headline, não ao lado: ao lado ela
+   competia com a terceira linha do título e parecia colisão. */
 .head {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 70px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.claim {
+  max-width: 24ch;
 }
 
 .shift {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   flex: none;
+  padding: 10px 0 0;
 }
 
 .was {

@@ -1,0 +1,129 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 36px;
+  min-height: 0;
+}
+
+.heads {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.second {
+  color: var(--cl-orange-ink);
+}
+
+.scene {
+  position: relative;
+  height: 360px;
+  display: grid;
+  place-items: center;
+}
+
+/* O substrato aparece e recua: a complexidade existe, mas não é o que a pessoa
+   vê. O movimento é o próprio argumento do slide. */
+.substrate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 12px 20px;
+  padding: 0 40px;
+  opacity: 0;
+  transition: opacity 900ms var(--cl-ease);
+}
+
+/* Duas classes ao mesmo tempo não produzem dois estados — o CSS aplica só o
+   último. Sobe-e-recua precisa de keyframes. */
+.substrateOn {
+  animation: surface 3200ms var(--cl-ease) forwards;
+}
+
+@keyframes surface {
+  0% {
+    opacity: 0;
+  }
+  28% {
+    opacity: 0.55;
+  }
+  55% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.chip {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-ink);
+  border: var(--cl-hairline) solid var(--cl-line);
+  border-radius: var(--cl-radius-chip);
+  padding: 9px 14px;
+  background: var(--cl-white);
+}
+
+.card {
+  position: relative;
+  width: 560px;
+  border-radius: var(--cl-radius-frame);
+  background: var(--cl-white);
+  border: var(--cl-hairline) solid var(--cl-line);
+  box-shadow: 0 30px 70px -26px rgb(7 16 70 / 0.26);
+  padding: 34px 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardLabel {
+  font-size: var(--cl-fs-caption);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.cardText {
+  font-size: 32px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--cl-mute);
+  font-size: var(--cl-fs-body);
+}
+
+.cardNumber {
+  font-size: 44px;
+  font-weight: var(--cl-weight-semibold);
+  color: var(--cl-ink);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .substrate {
+    transition: none;
+    opacity: 0.2;
+  }
+
+  .substrateOn {
+    animation: none;
+    opacity: 0.2;
+  }
+}

@@ -26,7 +26,7 @@ export function S15Intelligence() {
       <div className={styles.body}>
         <div className={styles.head}>
           <Reveal delay={100}>
-            <Display size="headline">
+            <Display size="headline" className={styles.claim}>
               From displaying exams to understanding patients.
             </Display>
           </Reveal>
@@ -49,7 +49,7 @@ export function S15Intelligence() {
               <path
                 key={x}
                 className={styles.wire}
-                d={`M${x} 0C${x} 24 680 18 680 44`}
+                d={`M${x} 0C${x} 26 680 20 680 44`}
               />
             ))}
           </svg>
