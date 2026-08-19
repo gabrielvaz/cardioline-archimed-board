@@ -18,8 +18,8 @@ gsap.registerPlugin(ScrollTrigger);
  * perspectiva, como um objeto visto de lado, e se endireita até encarar o
  * leitor; o VIREO AM sobe para a frente; o telefone entra por último. É a
  * sequência "o aparelho adquire, o navegador lê, o bolso assina" contada como
- * gesto em vez de como lista. O aparelho em si vive no DeviceRail, que o mantém
- * visível durante a página inteira.
+ * gesto em vez de como lista. O aparelho em si vive na seção seguinte, em 3D, onde
+ * a rolagem o desmonta e o remonta.
  *
  * Por que GSAP e não CSS puro: a rolagem precisa ser o parâmetro da animação
  * (scrub), o que keyframes de CSS não fazem.

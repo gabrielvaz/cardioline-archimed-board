@@ -1,0 +1,8 @@
+/*
+ * O cabeçalho da seção do aparelho encosta na animação. Só o padding de baixo é
+ * zerado: uma margem negativa aqui sobrepõe a animação ao parágrafo e come a última
+ * linha dele — o texto tem duas linhas em 1440 e uma delas desaparecia.
+ */
+.tight {
+  padding-bottom: 0;
+}

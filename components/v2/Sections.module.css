@@ -71,48 +71,21 @@
 
 /* ---- Aparelho em destaque ---- */
 
-.deviceRow {
-  margin-top: 88px;
-  display: grid;
-  gap: 40px;
-  align-items: center;
-}
-
-@media (min-width: 900px) {
-  .deviceRow {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 64px;
-  }
-}
-
 /*
- * A partir de 1100px o trilho fixo já mantém o VIREO AM em cena, e esta foto
- * estática viraria um segundo aparelho na mesma tela. Ela existe para as larguras
- * em que o trilho não aparece.
+ * Bloco de ficha do aparelho. Sem foto: o VIREO AM aparece em 3D na seção anterior,
+ * e as duas juntas eram a mesma coisa duas vezes.
  */
-@media (min-width: 1100px) {
-  .deviceShot {
-    display: none;
-  }
-
-  .deviceRow {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.deviceCard {
+  margin-top: 88px;
+  max-width: 62ch;
 }
 
-.deviceShot {
-  position: relative;
-  margin-inline: auto;
-  width: 100%;
-  max-width: 340px;
-}
-
-.deviceShot img {
-  width: 100%;
-  height: auto;
+.deviceCard .h3 {
+  margin-bottom: 8px;
 }
 
 .specs {
+  margin-top: 32px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px 32px;
@@ -244,10 +217,26 @@
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(to right, color-mix(in srgb, var(--cl-orange) 26%, transparent) 0 1px, transparent 1px 16px),
-    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--cl-orange) 26%, transparent) 0 1px, transparent 1px 16px),
-    repeating-linear-gradient(to right, color-mix(in srgb, var(--cl-orange) 11%, transparent) 0 1px, transparent 1px 3.2px),
-    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--cl-orange) 11%, transparent) 0 1px, transparent 1px 3.2px);
+    repeating-linear-gradient(
+      to right,
+      color-mix(in srgb, var(--cl-orange) 26%, transparent) 0 1px,
+      transparent 1px 16px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--cl-orange) 26%, transparent) 0 1px,
+      transparent 1px 16px
+    ),
+    repeating-linear-gradient(
+      to right,
+      color-mix(in srgb, var(--cl-orange) 11%, transparent) 0 1px,
+      transparent 1px 3.2px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--cl-orange) 11%, transparent) 0 1px,
+      transparent 1px 3.2px
+    );
 }
 
 .stripSvg {

@@ -167,7 +167,9 @@
   max-width: 212px;
   aspect-ratio: 208 / 424;
   transform: translateY(14%) rotate(-2.5deg);
-  filter: drop-shadow(0 30px 50px color-mix(in srgb, var(--cl-ink) 26%, transparent));
+  filter: drop-shadow(
+    0 30px 50px color-mix(in srgb, var(--cl-ink) 26%, transparent)
+  );
 }
 
 @media (min-width: 1100px) {

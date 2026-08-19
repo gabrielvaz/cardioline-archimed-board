@@ -74,10 +74,26 @@
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(to right, color-mix(in srgb, var(--cl-orange) 30%, transparent) 0 1px, transparent 1px 12px),
-    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--cl-orange) 30%, transparent) 0 1px, transparent 1px 12px),
-    repeating-linear-gradient(to right, color-mix(in srgb, var(--cl-orange) 13%, transparent) 0 1px, transparent 1px 2.4px),
-    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--cl-orange) 13%, transparent) 0 1px, transparent 1px 2.4px);
+    repeating-linear-gradient(
+      to right,
+      color-mix(in srgb, var(--cl-orange) 30%, transparent) 0 1px,
+      transparent 1px 12px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--cl-orange) 30%, transparent) 0 1px,
+      transparent 1px 12px
+    ),
+    repeating-linear-gradient(
+      to right,
+      color-mix(in srgb, var(--cl-orange) 13%, transparent) 0 1px,
+      transparent 1px 2.4px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--cl-orange) 13%, transparent) 0 1px,
+      transparent 1px 2.4px
+    );
 }
 
 .traceSvg {

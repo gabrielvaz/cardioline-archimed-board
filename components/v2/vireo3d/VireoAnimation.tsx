@@ -211,6 +211,14 @@ export function VireoAnimation() {
           invalidateOnRefresh: true,
           onUpdate: (self) => draw(self.progress),
         });
+        /*
+         * A cena 3D carrega texturas antes de existir, então este pin nasce DEPOIS
+         * dos outros triggers da página. Sem o refresh, todos eles ficam com as
+         * posições de antes do pin-spacer entrar no documento e disparam no lugar
+         * errado. Dentro da landing isso é a diferença entre a página funcionar e
+         * não funcionar.
+         */
+        ScrollTrigger.refresh();
       }
 
       const onResize = () => {

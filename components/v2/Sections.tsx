@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { EcgTrace } from "@/components/product/EcgTrace";
 import {
   AI_NOTE,
@@ -35,35 +34,25 @@ export function Surfaces() {
         ))}
       </ul>
 
-      <div className={styles.deviceRow}>
-        <div className={styles.deviceShot}>
-          {/* Render oficial da Cardioline, com o fundo recortado em
-              scripts/cutout-device.py. O hardware não foi redesenhado. */}
-          <Image
-            src="/device/vireo-am-air.png"
-            alt={`Cardioline ${DEVICE.name} with the ${DEVICE.module} module detached`}
-            width={468}
-            height={1065}
-            sizes="(max-width: 900px) 60vw, 340px"
-          />
-        </div>
-        <div>
-          <h3 className={styles.h3}>{DEVICE.name}</h3>
-          <p className={styles.lede}>{DEVICE.blurb}</p>
-          <div className={styles.specs}>
-            {[
-              ["Acquisition", "12-lead resting ECG"],
-              ["On-screen guidance", "Electrode placement C1 to C6"],
-              ["Transmission", `${DEVICE.module} module, wireless`],
-              ["Opens in", "Anchor, no installation"],
-            ].map(([k, v]) => (
-              <div key={k} className={styles.spec}>
-                <p className={styles.specK}>{k}</p>
-                <p className={styles.specV}>{v}</p>
-              </div>
-            ))}
+      {/* Sem foto do aparelho aqui: ele já aparece em 3D na seção anterior, e as
+          duas juntas eram a mesma coisa duas vezes — com o agravante de o render
+          antigo ser cinza técnico, enquanto o 3D usa as cores das fotos. */}
+      <div className={styles.deviceCard}>
+        <h3 className={styles.h3}>{DEVICE.name}</h3>
+        <p className={styles.lede}>{DEVICE.blurb}</p>
+      </div>
+      <div className={styles.specs}>
+        {[
+          ["Acquisition", "12-lead resting ECG"],
+          ["On-screen guidance", "Electrode placement C1 to C6"],
+          ["Transmission", `${DEVICE.module} module, wireless`],
+          ["Opens in", "Anchor, no installation"],
+        ].map(([k, v]) => (
+          <div key={k} className={styles.spec}>
+            <p className={styles.specK}>{k}</p>
+            <p className={styles.specV}>{v}</p>
           </div>
-        </div>
+        ))}
       </div>
     </section>
   );

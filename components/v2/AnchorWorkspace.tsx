@@ -29,7 +29,10 @@ export function AnchorWorkspace() {
         />
         <nav className={styles.nav}>
           {NAV.map((n, i) => (
-            <span key={n} className={`${styles.navItem} ${i === 1 ? styles.navOn : ""}`}>
+            <span
+              key={n}
+              className={`${styles.navItem} ${i === 1 ? styles.navOn : ""}`}
+            >
               {n}
             </span>
           ))}
