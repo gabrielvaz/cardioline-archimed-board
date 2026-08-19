@@ -426,7 +426,7 @@ export type VireoModule = {
 export function createVireoModule(
   kind: ModuleKind,
   face: THREE.Texture,
-  extra?: { harness?: THREE.Texture; dock?: THREE.Texture },
+  extra?: { dock?: THREE.Texture },
 ): VireoModule {
   const group = new THREE.Group();
   const fades: THREE.Material[] = [];
@@ -510,35 +510,54 @@ export function createVireoModule(
     add(pads);
   }
 
-  if (kind === "top" && extra?.harness) {
-    // Alívio de tensão: tronco achatado que alarga ao descer até o módulo.
+  if (kind === "top") {
+    // Alívio de tensão: tronco achatado que alarga ao descer até o módulo. Esta
+    // peça É rígida no produto — é o plástico que segura o feixe.
     const st = M.harness.strain;
     const strain = new THREE.Mesh(
-      new THREE.CylinderGeometry(st.wTop / 2, st.wBottom / 2, st.h, 32, 1),
+      new THREE.CylinderGeometry(st.wTop / 2, st.wBottom / 2, st.h, 36, 1),
       cableMaterial(),
     );
     strain.scale.z = (DEPTH * 0.78) / st.wBottom;
     strain.position.y = h / 2 + st.h / 2 - 0.004;
     add(strain);
 
-    // Feixe de 12 derivações: caixa achatada com as estrias do render oficial nas
-    // duas faces. Um plano chapado desapareceria na rotação.
-    const cw = M.harness.cableW;
-    const ch = M.harness.cableH;
-    const bundle = new THREE.Mesh(
-      slab(roundedRect(cw, ch, 0.02), DEPTH * 0.62, 0.008),
-      cableMaterial(),
-    );
-    bundle.position.y = h / 2 + st.h + ch / 2 - 0.01;
-    add(bundle);
-    for (const sign of [1, -1] as const) {
-      const art = new THREE.Mesh(
-        new THREE.PlaneGeometry(cw, ch),
-        decalMaterial(extra.harness),
+    /*
+     * Feixe de 12 derivações: DOZE CABOS, cada um um tubo ao longo da própria
+     * curva. Antes era uma caixa reta com as estrias pintadas por cima, e o
+     * resultado lia como uma peça rígida saindo do aparelho — o oposto do que é.
+     * Cabos separados, um pouco mais abertos e mais curvos quanto mais externos,
+     * dão a maleabilidade sem depender de textura nenhuma.
+     */
+    const leads = 12;
+    const width = M.harness.cableW;
+    const radius = width / leads / 2;
+    const base = h / 2 + st.h - 0.01;
+    for (let i = 0; i < leads; i++) {
+      // -1 a 1 no eixo do feixe. Serve de posição e de intensidade da curva.
+      const u = (i / (leads - 1)) * 2 - 1;
+      const x = (u * (width - radius * 2)) / 2;
+      /*
+       * Os cabos saem JUNTOS do alívio de tensão e abrem subindo — é o que a peça
+       * de plástico faz: aperta o feixe na saída. Começar já espalhados na largura
+       * cheia dava a impressão de um pente rígido preso ao aparelho.
+       *
+       * A pequena contracurva no meio é o que tira a leitura de arco desenhado a
+       * compasso: cabo de verdade não descreve um arco perfeito.
+       */
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(x * 0.78, base - 0.03, u * 0.004),
+        new THREE.Vector3(x * 0.9, base + 0.1, u * 0.014),
+        new THREE.Vector3(x * 1.05 + 0.03, base + 0.23, u * 0.032),
+        new THREE.Vector3(x * 1.14 + 0.11, base + 0.35, u * 0.05),
+        new THREE.Vector3(x * 1.28 + 0.26, base + 0.47, u * 0.062),
+        new THREE.Vector3(x * 1.4 + 0.46, base + 0.56, u * 0.07),
+      ]);
+      const mesh = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 28, radius, 10, false),
+        cableMaterial(),
       );
-      art.position.set(0, bundle.position.y, sign * (DEPTH * 0.31 + 0.0015));
-      if (sign === -1) art.rotation.y = Math.PI;
-      add(art);
+      add(mesh);
     }
   }
 

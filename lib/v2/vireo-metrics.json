@@ -67,11 +67,6 @@
       "w": 0.85036,
       "h": 0.39964
     },
-    "harness": {
-      "file": "/device/model/face-harness.png",
-      "w": 0.42601,
-      "h": 0.39238
-    },
     "bodyBack": {
       "file": "/device/model/face-body-back.png",
       "w": 0.85145,

@@ -420,7 +420,9 @@ for stem, out, key in (
     mfx0, mfx1 = face_x(M.x0, M.w)
     crop(mod, M.w, Box(mfx0, m_top, mfx1, m_bottom), out, key)
 
-# Feixe de 12 derivações: só o trecho de largura constante, acima do alívio.
+# Alívio de tensão: mede a faixa acima do módulo onde a peça afina, para o modelo
+# saber onde o feixe começa. O feixe em si é GEOMETRIA — doze tubos em curva —, então
+# não há decalque a recortar aqui.
 harness = Box(A.x0, A.y0, A.x1, ASM_TOP)
 hw = [row_width(asm, A, y) for y in range(harness.y0, harness.y1)]
 strain_h = 0
@@ -432,13 +434,20 @@ CABLE_TOP = harness.y1 - strain_h
 cable_row = CABLE_TOP - 4
 cpx = asm.load()
 cxs = [x for x in range(A.x0, A.x1) if cpx[x, cable_row][3] > 160]
-crop(
-    asm,
-    UNIT,
-    Box(min(cxs), A.y0, max(cxs) + 1, CABLE_TOP),
-    "face-harness.png",
-    "harness",
-)
+
+# Módulos inferiores: dos renders ISOLADOS, que trazem o badge. O conjunto mostra
+# um módulo liso, sem marcação. A escala vem da largura própria de cada render —
+# módulo e corpo têm a mesma largura, então normalizar por ela basta.
+for stem, out, key in (
+    ("22-module-air", "face-air.png", "air"),
+    ("17-module-cable", "face-cable.png", "cable"),
+):
+    mod = load(stem)
+    M = bbox(mod)
+    m_top, _ = full_width_span(mod, M)
+    _, m_bottom = part_span(mod, M)
+    mfx0, mfx1 = face_x(M.x0, M.w)
+    crop(mod, M.w, Box(mfx0, m_top, mfx1, m_bottom), out, key)
 
 # Módulo de cabo: do conjunto com cabo, na escala DELE.
 cable_asm = load("15-assembly-cable")

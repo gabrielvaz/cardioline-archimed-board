@@ -86,9 +86,11 @@ export const ASSEMBLY_UNITS = 2.24;
 
 /**
  * Deslocamento vertical do conjunto. O feixe de derivações sai por cima e o módulo
- * se separa por baixo; este empurrão equilibra os dois no quadro.
+ * se separa por baixo; este empurrão equilibra os dois no quadro. Puxado para baixo
+ * o bastante para sobrar um trecho de cabo visível acima do alívio de tensão — sem
+ * ele a curva do feixe some antes de poder ser lida.
  */
-export const FRAME_LIFT = -0.06;
+export const FRAME_LIFT = -0.14;
 
 /**
  * Pose de repouso. O produto NÃO fica de frente chapado: um render de produto

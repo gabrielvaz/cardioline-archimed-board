@@ -26,7 +26,6 @@ const FACES = [
   "/device/model/face-top.png",
   "/device/model/face-air.png",
   "/device/model/face-cable.png",
-  "/device/model/face-harness.png",
   // Tela em uso: foto retificada, porque nenhum render CAD tem a tela ligada.
   "/device/model/screen-torso.png",
 ] as const;
@@ -55,22 +54,13 @@ export function createVireoScene(
 ): Promise<VireoScene> {
   const loader = new THREE.TextureLoader();
   return Promise.all(FACES.map((f) => loader.loadAsync(f))).then(
-    ([
-      bodyFront,
-      bodyBack,
-      topArt,
-      airArt,
-      cableArt,
-      harnessArt,
-      screenArt,
-    ]) => {
+    ([bodyFront, bodyBack, topArt, airArt, cableArt, screenArt]) => {
       for (const t of [
         bodyFront,
         bodyBack,
         topArt,
         airArt,
         cableArt,
-        harnessArt,
         screenArt,
       ]) {
         t.colorSpace = THREE.SRGBColorSpace;
@@ -126,9 +116,7 @@ export function createVireoScene(
 
       // O módulo superior fica acoplado durante toda a animação, então mora dentro
       // do pivô e gira com o corpo.
-      const moduleTop = createVireoModule("top", topArt, {
-        harness: harnessArt,
-      });
+      const moduleTop = createVireoModule("top", topArt, { dock });
       moduleTop.group.position.y = MODEL_ASPECT / 2;
       pivot.add(moduleTop.group);
 
