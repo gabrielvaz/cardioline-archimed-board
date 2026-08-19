@@ -8,6 +8,7 @@ import {
   type VireoDevice,
   type VireoModule,
 } from "./model";
+import { asset } from "@/lib/asset";
 import { createDockTexture, createLedTexture } from "./textures";
 import { ASSEMBLY_UNITS, FRAME_LIFT, REST_TILT, REST_YAW } from "./stages";
 
@@ -20,6 +21,10 @@ import { ASSEMBLY_UNITS, FRAME_LIFT, REST_TILT, REST_YAW } from "./stages";
  * mostrava diferente, e a conferência não valia nada.
  */
 
+/*
+ * Caminhos passam por asset() no carregamento: em publicação com prefixo de
+ * repositório, um caminho cru aqui daria 404 e a cena ficaria vazia.
+ */
 const FACES = [
   "/device/model/face-body.png",
   "/device/model/face-body-back.png",
@@ -53,7 +58,7 @@ export function createVireoScene(
   renderer: THREE.WebGLRenderer,
 ): Promise<VireoScene> {
   const loader = new THREE.TextureLoader();
-  return Promise.all(FACES.map((f) => loader.loadAsync(f))).then(
+  return Promise.all(FACES.map((f) => loader.loadAsync(asset(f)))).then(
     ([bodyFront, bodyBack, topArt, airArt, cableArt, screenArt]) => {
       for (const t of [
         bodyFront,

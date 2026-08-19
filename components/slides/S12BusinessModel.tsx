@@ -6,6 +6,7 @@ import { Reveal } from "@/components/deck/Reveal";
 import { Display, Kicker, Lede } from "@/components/primitives/Type";
 import shared from "./slides.module.css";
 import styles from "./S12BusinessModel.module.css";
+import { asset } from "@/lib/asset";
 
 const STEPS = [
   { label: "Device", key: false },
@@ -81,7 +82,7 @@ export function S12BusinessModel() {
                 competir com os rótulos. */}
             <image
               className={styles.hubMark}
-              href="/brand/cardioline-symbol.svg"
+              href={asset("/brand/cardioline-symbol.svg")}
               x={CX - 44}
               y={CY - 44}
               width={88}
@@ -103,7 +104,8 @@ export function S12BusinessModel() {
               const lx = CX + Math.cos(a) * LABEL_R;
               const ly = CY + Math.sin(a) * LABEL_R;
               const cos = Math.cos(a);
-              const anchor = cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle";
+              const anchor =
+                cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle";
               const dy = Math.sin(a) > 0.6 ? 18 : Math.sin(a) < -0.6 ? -12 : 6;
               return (
                 <g key={s.label}>

@@ -18,6 +18,7 @@ import {
 } from "@/lib/v1/copy";
 import { PLANS } from "@/lib/v1/plans";
 import { cn } from "@/lib/v1/cn";
+import { asset } from "@/lib/asset";
 
 /** Contêiner único da página. Margem larga, medida de leitura curta. */
 function Stage({
@@ -483,7 +484,7 @@ export function Close() {
             {/* O render com o módulo Air destacado: fecha a página mostrando
                 que o aparelho é modular. */}
             <Image
-              src="/device/vireo-am-air.png"
+              src={asset("/device/vireo-am-air.png")}
               alt="Cardioline VIREO AM with the Air module detached"
               width={468}
               height={1065}

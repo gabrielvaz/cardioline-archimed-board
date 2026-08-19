@@ -4,6 +4,7 @@ import { Body, Display, Kicker } from "@/components/primitives/Type";
 import { Flow } from "@/components/primitives/Flow";
 import shared from "./slides.module.css";
 import styles from "./S09DigitalLayer.module.css";
+import { asset } from "@/lib/asset";
 
 /**
  * A camada digital.
@@ -23,11 +24,14 @@ export function S09DigitalLayer() {
       <div className={styles.body}>
         <div className={styles.left}>
           <Reveal delay={100}>
-            <Display size="headline">Every Cardioline device becomes a doorway.</Display>
+            <Display size="headline">
+              Every Cardioline device becomes a doorway.
+            </Display>
           </Reveal>
           <Reveal delay={300}>
             <Body mute>
-              The relationship doesn&rsquo;t end when the device ships. It starts there.
+              The relationship doesn&rsquo;t end when the device ships. It
+              starts there.
             </Body>
           </Reveal>
         </div>
@@ -35,7 +39,7 @@ export function S09DigitalLayer() {
         <div className={styles.chain}>
           <Reveal delay={220} className={styles.device}>
             <Image
-              src="/product/ecg100l-cover-02.png"
+              src={asset("/product/ecg100l-cover-02.png")}
               alt="Cardioline ECG100L"
               width={660}
               height={495}

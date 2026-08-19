@@ -7,6 +7,7 @@ import { Display, Kicker } from "@/components/primitives/Type";
 import { BrowserFrame } from "@/components/product/Frames";
 import shared from "./slides.module.css";
 import styles from "./S14Reveal.module.css";
+import { asset } from "@/lib/asset";
 
 /**
  * Alvo do "Explore prototype".
@@ -15,7 +16,12 @@ import styles from "./S14Reveal.module.css";
  * completo no projeto irmão (dev-apps/cardioline-anchor): trocar este valor
  * repõe o destino sem mexer em mais nada.
  */
-export const PROTOTYPE_URL = "/anchor";
+/*
+ * Barra no fim de propósito: o export estático gera anchor/index.html, e com
+ * trailingSlash o caminho canônico é com barra. Sem ela o GitHub Pages responde um
+ * redirecionamento, e dentro de um iframe isso aparece como um piscar.
+ */
+export const PROTOTYPE_URL = "/anchor/";
 
 /**
  * O reveal.
@@ -58,7 +64,7 @@ export function S14Reveal() {
             <div className={styles.viewport}>
               {mounted ? (
                 <iframe
-                  src={PROTOTYPE_URL}
+                  src={asset(PROTOTYPE_URL)}
                   title="Anchor by Cardioline — prototype"
                   className={styles.iframe}
                   tabIndex={-1}

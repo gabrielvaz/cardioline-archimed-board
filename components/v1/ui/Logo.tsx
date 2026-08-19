@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/v1/cn";
+import { asset } from "@/lib/asset";
 
 /**
  * Logo oficial da Cardioline.
@@ -21,7 +22,11 @@ export function CardiolineLogo({
 }) {
   return (
     <Image
-      src={variant === "white" ? "/brand/cardioline-logo-white.svg" : "/brand/cardioline-logo.svg"}
+      src={asset(
+        variant === "white"
+          ? "/brand/cardioline-logo-white.svg"
+          : "/brand/cardioline-logo.svg",
+      )}
       alt="Cardioline"
       width={600}
       height={38}
@@ -49,7 +54,10 @@ export function AnchorLockup({
       <CardiolineLogo variant={variant} priority={priority} />
       <span
         aria-hidden
-        className={cn("h-5 w-px", variant === "white" ? "bg-white/25" : "bg-line-strong")}
+        className={cn(
+          "h-5 w-px",
+          variant === "white" ? "bg-white/25" : "bg-line-strong",
+        )}
       />
       <span
         className={cn(

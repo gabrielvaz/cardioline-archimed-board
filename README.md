@@ -26,14 +26,19 @@ Um único app Next.js hospeda todos os materiais, para que a navegação entre e
 seja instantânea numa reunião. Cada versão da landing continua viva na `main` em
 vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 
-| Rota | O que é |
-|---|---|
-| `/` | Hub de navegação |
-| `/vision` | O deck de 22 slides |
-| `/anchor` | Tela do workspace usada como apoio no deck |
-| `/v2` | Landing atual: VIREO AM e o Anchor em destaque, com movimento na rolagem |
-| `/v1` | Landing anterior: reverência ao produto, uma ideia por viewport |
-| `/v0` | Primeiro rascunho, guardado como base de comparação |
+| Rota         | O que é                                                                     |
+| ------------ | --------------------------------------------------------------------------- |
+| `/`          | Home: escolher o fluxo — apresentação, site, mockup do dispositivo, produto |
+| `/vision`    | O deck de 22 slides                                                         |
+| `/anchor`    | Tela do workspace usada como apoio no deck                                  |
+| `/v2`        | Landing atual: o VIREO AM em 3D se desmonta e remonta com a rolagem         |
+| `/v1`        | Landing anterior: reverência ao produto, uma ideia por viewport             |
+| `/v0`        | Primeiro rascunho, guardado como base de comparação                         |
+| `/showcase`  | A transformação do VIREO AM isolada da landing                              |
+| `/lab/vireo` | Folha de contato do modelo 3D: ferramenta de conferência, não apresentação  |
+
+A home agrupa por **fluxo** e não por lista corrida, porque é assim que a escolha se
+apresenta numa reunião: primeiro se decide o que mostrar, e só depois qual versão.
 
 ## A v2
 
@@ -43,136 +48,154 @@ O software em primeiro plano, em perspectiva, e a rolagem montando a composiçã
 
 - o workspace parte inclinado em 3D e se endireita até encarar o leitor;
 - o telefone entra depois, quando já há o que ler nele;
-- o **VIREO AM acompanha a rolagem toda**, fixo numa faixa reservada à direita, e
-  o **módulo Air sobe da base e encaixa** entre 16% e 34% do percurso;
+- o **VIREO AM em 3D** ocupa uma seção fixada e se desmonta e remonta ao longo dela;
 - cada seção revela os próprios blocos em sequência ao entrar no viewport.
 
-**Sem pin.** Um pin cria pin-spacer e muda a altura do documento, obrigando os
-outros triggers a recalcularem sobre um layout móvel. Com scrub puro há uma só
-origem de verdade, a rolagem real.
-
-A docagem é medida, não presumida: `scratchpad/railcheck.mjs` lê a folga vertical
-entre a base do corpo e o topo do módulo ao longo do percurso. Resultado atual
-**+67 px solto → -17 px encaixado** (o negativo é a sobreposição do conector).
-
 O estado **inicial** vive em CSS, não em JS, para que servidor e cliente rendam a
-mesma coisa e não haja divergência de hidratação; o GSAP assume a partir dali.
-Sob `prefers-reduced-motion` a composição aparece montada e o pin não acontece.
+mesma coisa e não haja divergência de hidratação; o GSAP assume a partir dali. Sob
+`prefers-reduced-motion` a composição aparece montada e nada fixa.
 
-**As três superfícies mostram o mesmo exame.** Mesmo paciente, mesmos valores
-medidos no navegador e no telefone. Números divergentes entre telas destroem a
-credibilidade de um material clínico mais rápido do que qualquer detalhe visual.
+### A seção do aparelho
 
-**Mockups.** `BrowserFrame`, `DeviceFrame` e `EcgTrace` vêm do design system do
-deck. O workspace, porém, é um componente próprio da v2
-(`components/v2/AnchorWorkspace.tsx`): a densidade pedida aqui é outra, com mais
-respiro e tipo menor, e alterar o `ExamViewer` do deck regrediria a apresentação,
-que é calibrada para projetor.
+Cinco etapas conduzidas pela rolagem, reversíveis nos dois sentidos: repouso,
+separação do módulo de cabo, giro de 360°, encaixe do módulo Air, e a tela acendendo.
+O roteiro inteiro mora em `components/v2/vireo3d/stages.ts` — mudar duração de etapa,
+número de voltas, curso do módulo ou distância total de rolagem é mudar um número.
 
-**Disciplina de cor.** O traçado é navy sobre grid laranja, como o papel térmico
-que o aparelho imprime. O logo oficial aparece no cabeçalho e dentro do mockup.
+Dois detalhes que só funcionam por serem tratados como o que são:
 
-O laranja da v2 é o **oficial `#F66201`**, a tinta do logo, tanto em superfície
-preenchida quanto em texto. É uma exceção consciente à regra de
-`styles/tokens.css`, que manda usar variantes escurecidas quando o laranja carrega
-texto, e está registrada com os números medidos no topo de `app/v2/v2.css`:
+- **o LED do botão é luz.** O anel verde e azul vem apagado na textura e uma
+  sobreposição em mistura aditiva o acende. Ele **pisca no tempo**, não na rolagem,
+  porque um LED pisca mesmo com o dedo parado — há um laço de quadro que vive só
+  durante o pisca;
+- **o módulo desacoplado sai de cena.** Ele desce e deixa o quadro em vez de
+  esmaecer: um módulo que alguém tirou da mão sai da mão, não fica transparente.
 
-| Uso | Contraste | AA |
-|---|---|---|
-| rótulo branco sobre `#F66201` | 3,15:1 | só texto grande |
-| texto `#F66201` sobre branco | 3,15:1 | só texto grande |
-| grafismo `#F66201` sobre branco | 3,15:1 | passa (grafismo pede 3:1) |
-
-Duas saídas de uma linha, se a prioridade virar conformidade sem perder a matiz:
-apontar `--v2-accent-on` para `--cl-ink` (navy sobre o laranja oficial dá
-**5,69:1**) ou `--v2-accent` para `--cl-orange-strong`.
-
-### Imagens do dispositivo
-
-Os renders oficiais do VIREO AM entram recortados por
-`scripts/cutout-device.py`: flood fill a partir da borda, erosão de 1 px e
-recorte para o conteúdo. **Os pixels do aparelho são os do render oficial** — o
-hardware não foi redesenhado nem regerado.
-
-Por que não geração de imagem para o aparelho: o `gpt-image` só gera a partir de
-texto, não edita. Um "VIREO AM" descrito em prompt seria um aparelho inventado,
-com proporções e conectores que não existem, o que contraria a regra de preservar
-a aparência dos produtos Cardioline.
-
-Detalhe do algoritmo: a carcaça do aparelho também é branca, então um threshold
-global de branco comeria o corpo do produto. O fundo é a região branca
-**conectada à borda**, e é só ela que sai. Os cabos de derivação são brancos sobre
-branco e não sobrevivem à erosão que limpa a franja da carcaça, por isso são
-cortados: `crop_to_body` detecta a primeira linha cuja faixa opaca cobre parte
-significativa da largura do objeto.
-
-`split_module` separa o corpo do módulo Air achando a única faixa de linhas
-totalmente transparentes entre os dois objetos no render oficial. São as duas
-peças que a animação de encaixe move, e as abas do conector caem na base porque
-ambas mantêm a proporção original.
-
-### A armadilha de cascata no reset da v2
-
-O reset de elemento da v2 vive dentro de `:where()`, que tem especificidade zero.
-Escrito como `.v2 a`, o seletor teria especificidade (0,1,1) e venceria uma classe
-de componente como `.cta` (0,1,0). Foi exatamente isso que fez `color: inherit`
-pintar de navy o rótulo de todos os botões e links, enquanto pills e valores
-(`span` e `p`) saíam laranja corretamente. O sintoma parecia um token de cor que
-não resolvia; a causa era cascata.
-
-Só a amostragem de pixel na captura revelou o problema: os seletores do probe de
-DOM erravam o elemento, e a inspeção visual não distingue "token não resolveu" de
-"outra regra ganhou".
+**Ordem dos triggers.** A cena 3D carrega texturas antes de existir, então o pin
+nasce depois dos outros triggers da página, e todos ficariam com as posições de antes
+do pin-spacer entrar no documento. Um `ScrollTrigger.refresh()` logo após criar o pin
+resolve; sem ele a landing inteira dispara no lugar errado.
 
 ## Modelo 3D do VIREO AM
 
-`assets/vireo-model/vireo-am.glb` (256 KB, glTF binário com texturas embutidas) e
-o modelo como código em `components/v2/vireo3d/model.ts`. Visualização em doze
-ângulos em `/lab/vireo`.
+`assets/vireo-model/vireo-am.glb` (glTF binário com texturas embutidas) e o modelo
+como código em `components/v2/vireo3d/`. Conferência em vários ângulos em
+`/lab/vireo`, transformação isolada em `/showcase`, e na landing em `/v2`.
 
-Construído por **extrusão da silhueta real**, não com primitivas:
-`scripts/trace-outline.py` traça o contorno do render ortográfico oficial e
-`model.ts` extruda esse contorno aplicando os renders oficiais de frente e
-traseira como textura. Perfil e faces são o produto real; a lateral é a única
-parte inventada. Detalhes e limites em `assets/vireo-model/README.md`.
+**Pipeline reprodutível de ponta a ponta:**
 
-Dois aprendizados que valem registro:
+```bash
+python3 scripts/extract-vireo-renders.py   # 85 renders JPEG embutidos no PDF oficial
+python3 scripts/measure-vireo.py           # mede tudo e recorta as faces
+python3 scripts/extract-screen.py          # retifica a tela em uso a partir de foto
+```
 
-**Não re-ilumine um render.** As texturas são renders de estúdio com key, fill e
-especular já embutidos. Com PBR e luzes por cima, o preto do vidro lavava e
-apareciam estouros especulares sobre a arte. As faces usam material não iluminado;
-a luz da cena serve só à lateral extrudada.
+A divisão de trabalho é a decisão central: **geometria** para casco, trilhos,
+encaixes, língua do conector, feixe de derivações e cabo, com proporções medidas nos
+renders; **textura** só para a arte das faces; **canvas** para o que é luz.
 
-**Um renderer WebGL por instância esgota os contextos do navegador.** O limite
-fica por volta de 8 a 16. A folha de contato usa um renderer só, renderizando em
-sequência e copiando cada quadro para um canvas 2D.
+Nada é chutado — cada número sai de uma varredura de pixels, normalizada pela largura
+do corpo. Detalhes e limites em `assets/vireo-model/README.md`.
 
-## Showcase do VIREO AM (revertido)
+Cinco aprendizados que valem registro:
 
-Uma seção de showcase controlada por rolagem foi construída e **revertida** em
-2026-08-19, por qualidade insuficiente. O problema não era a engenharia (canvas,
-pin, scrub e reversibilidade funcionavam e estavam medidos), era o material: os
-renders oficiais têm frente, traseira e 3/4, mas **não têm as laterais em 90
-graus**, e a rotação acabou sendo uma compressão horizontal entre os três ângulos.
-Isso lê como um cartão girando, não como um produto girando.
+**Abra o arquivo inteiro.** O PDF oficial tem 85 renders; eu trabalhei um bom tempo
+com seis recortes feitos à mão. A vista lateral, que dá a espessura exata, e o
+conjunto completo, que mostra o módulo superior, estavam lá desde o começo.
 
-Os assets ficaram preservados em `assets/vireo-showcase-frames/`, fora de
-`public/`, com um README explicando a procedência e o que faltaria. As camadas
-recortadas continuam em `assets/vireo-layers/` e os scripts
-(`cutout-device.py`, `build-vireo-frames.py`) continuam versionados.
+**Forma vem do render, cor vem da FOTO.** Os renders CAD são cinza técnico uniforme.
+O produto tem casco branco, trilho cinza médio e face de vidro preto — três materiais
+bem diferentes, e usar um só era o que deixava o 3D com cara de maquete.
 
-O caminho de retomada deixou de depender da Cardioline: o modelo 3D acima dá o
-turntable de 360 graus que faltava, com ângulos infinitos e sem sequência de
-frames. Falta ligá-lo à rolagem.
+**Vidro preto precisa de ambiente com contraste.** Com ambiente claro em todas as
+direções, o verniz espelha branco por igual e o preto vira cinza chapado. Ambiente
+escuro com faixas estreitas, e a luz difusa do casco vindo de direcionais.
 
-### Pendente
+**Uma rugosidade por peça denuncia o CG.** Superfície perfeita demais. Mapas
+procedurais de grão, escovado e verniz, mais sombra própria, é o que faz as peças
+parecerem encostadas umas nas outras.
 
-Nada foi gerado por `gpt-image`: a cota do plano Plus está esgotada
-(`HTTP 429 usage_limit_reached`, reset em 20/08 às 06:35). Testado três vezes.
+**Um renderer WebGL por instância esgota os contextos do navegador.** O limite fica
+por volta de 8 a 16. A folha de contato usa um renderer só, renderizando em sequência
+e copiando cada quadro para um canvas 2D.
 
-O que a geração de imagem ainda pode agregar, quando a cota voltar, são **plates
-de ambiente** para compor atrás do aparelho. O produto em si não deve ser gerado,
-e os ângulos faltantes da rotação também não.
+### Duas armadilhas geométricas
+
+**Raio de canto maior que a meia-altura da caixa** autointersecciona o contorno e a
+extrusão devolve faces enormes atravessando o produto. O raio de ponta do módulo é
+0,23 medido contra 0,199 de meia-altura de bloco — daí a função `fitRadius`.
+
+**A origem do módulo** tem de ser `+dir·h/2`, com a língua em `-dir`. Com os sinais
+trocados os módulos invadem o corpo e a língua fica pendurada para fora.
+
+### O showcase por sequência de frames, revertido
+
+Uma versão anterior montava a rotação como sequência de imagens e foi **revertida**
+por qualidade insuficiente. O problema não era a engenharia — canvas, pin, scrub e
+reversibilidade funcionavam e estavam medidos —, era o material: os renders oficiais
+não têm as laterais em 90 graus, e a rotação acabou sendo uma compressão horizontal
+entre três ângulos. Isso lê como um cartão girando, não como um produto girando.
+
+Os frames ficaram preservados em `assets/vireo-showcase-frames/`, fora de `public/`,
+com um README explicando a procedência. O compositor e os recortes manuais que ele
+consumia foram removidos junto com a abordagem — estão no histórico do git.
+
+## Publicar no GitHub Pages
+
+O build é **export estático** (`output: "export"`), sem nada de servidor. As onze
+rotas são prerenderizadas.
+
+```bash
+pnpm build                                   # out/ na raiz do site
+NEXT_PUBLIC_BASE_PATH=/cardioline-vision-2028 pnpm build   # como o Pages serve
+```
+
+O workflow é `.github/workflows/pages.yml` e tem **disparo manual apenas**
+(`workflow_dispatch`). Enquanto o protótipo não deve ficar público, um push na `main`
+não pode publicar sozinho.
+
+Para colocar no ar, duas coisas — e as duas são deliberadas:
+
+1. em **Settings > Pages**, escolher `GitHub Actions` como Source;
+2. rodar o workflow **Pages** manualmente (aba Actions).
+
+Só o workflow não põe nada no ar: sem o passo 1 o job termina em verde e o site
+continua indisponível.
+
+Para publicação automática a cada push, acrescentar ao workflow:
+
+```yaml
+on:
+  push:
+    branches: [main]
+```
+
+### O prefixo de caminho, e por que ele quebra coisas
+
+O Pages serve o projeto em `/<repositório>/`. O Next prefixa sozinho o que passa por
+ele, mas **não** o que o código monta à mão. Daí `lib/asset.ts`, que precisa envolver:
+
+- o `loadAsync` das texturas 3D;
+- o `href` de um `<image>` dentro de SVG e o `src` de um iframe;
+- **todo `src` de `next/image`** — com `unoptimized: true`, exigido pelo export
+  estático, o Next usa o `src` como veio e o prefixo não entra. Sem isso, toda imagem
+  do site dá 404 no ambiente publicado e em nenhum outro.
+
+A função é idempotente de propósito: aplicar o prefixo numa prop de componente
+próprio, que depois aplica de novo internamente, já produziu caminhos com o prefixo
+duplicado. O prefixo vai **uma vez**, onde a URL vira atributo do DOM.
+
+Isso só aparece testando o export servido em subcaminho, não em `pnpm dev`:
+
+```bash
+pnpm build   # com NEXT_PUBLIC_BASE_PATH
+mkdir -p /tmp/pages && ln -s "$PWD/out" /tmp/pages/cardioline-vision-2028
+cd /tmp/pages && python3 -m http.server 4399
+# abrir http://localhost:4399/cardioline-vision-2028/
+```
+
+Também há um `public/.nojekyll`: sem ele o Pages ignora `_next/`, que começa com
+underscore, e o site sai sem nenhum script nem estilo.
 
 ## Três mundos de CSS num app
 
@@ -202,24 +225,33 @@ rotas da apresentação um lugar onde carregar a tipografia delas.
 
 ```
 app/
-  layout.tsx  page.tsx  globals.css     hub e shell compartilhado
+  layout.tsx  page.tsx  globals.css     home e shell compartilhado
   (deck)/     vision/  anchor/          a apresentação
   v0/  v1/  v2/                         as landings, uma por versão
+  showcase/  lab/vireo/                 a transformação isolada e a conferência do 3D
 components/
   brand/  deck/  primitives/  product/  slides/     design system do deck
   v1/                                   componentes da landing v1 e v0
   v2/                                   componentes da landing v2
+  v2/vireo3d/                           o modelo 3D, a cena e a animação de rolagem
 lib/
+  asset.ts                              prefixo de caminho para publicação
   contrast.ts  ecg.ts  slides.ts  synthetic.ts      libs do deck
   v1/                                   libs da landing v1 e v0
-  v2/                                   libs da landing v2
+  v2/  vireo-metrics.json               libs da v2 e as medidas do aparelho
 styles/tokens.css                       fonte única da identidade
 assets/
   brand-source/                         PNG oficial do logo, fonte da vetorização
-  device-source/                        renders e fotos do VIREO AM
+  device-source/                        PDF e fotos do VIREO AM
+  device-source/renders/                os 85 renders extraídos do PDF
+  vireo-model/                          o .glb exportado, com README de procedência
+  vireo-showcase-frames/                frames da abordagem revertida
 public/
   brand/  product/  devices/  device/   assets servidos
-scripts/                                vetorização de marca e verificação
+  device/model/                         faces recortadas e a tela retificada
+  .nojekyll                             sem ele o Pages ignora _next/
+scripts/                                extração, medição e vetorização
+.github/workflows/pages.yml             publicação, disparo manual
 tests/                                  vitest
 docs/deck.md                            documentação da apresentação
 ```
@@ -234,17 +266,17 @@ Três papéis para o laranja, mesma matiz e saturação, só o valor muda, porqu
 laranja oficial `#F66201` tem 3,19:1 sobre branco: serve para grafismo (WCAG pede
 3:1) mas não para texto nem para superfície com texto branco (4,5:1).
 
-| Token | Uso |
-|---|---|
-| `--cl-orange` `#F66201` | grafismo: traçados, filetes, pontos, grid |
-| `--cl-orange-strong` `#CA5001` | superfície preenchida com texto branco |
-| `--cl-orange-ink` `#B84A01` | laranja como texto sobre fundo claro |
-| `--cl-ink` `#071046` | texto corrido; é a cor dos H1/H2 do site oficial |
+| Token                          | Uso                                              |
+| ------------------------------ | ------------------------------------------------ |
+| `--cl-orange` `#F66201`        | grafismo: traçados, filetes, pontos, grid        |
+| `--cl-orange-strong` `#CA5001` | superfície preenchida com texto branco           |
+| `--cl-orange-ink` `#B84A01`    | laranja como texto sobre fundo claro             |
+| `--cl-ink` `#071046`           | texto corrido; é a cor dos H1/H2 do site oficial |
 
 ## Regra editorial
 
-Toda a copy está no tempo verbal do começo (*starts, opens, included, extended*)
-e nunca no do encerramento (*already yours, nothing more to buy, free forever*).
+Toda a copy está no tempo verbal do começo (_starts, opens, included, extended_)
+e nunca no do encerramento (_already yours, nothing more to buy, free forever_).
 Sempre que o texto afirma o que está incluído, precisa deixar visível que existe
 um degrau acima. **Incluído não é o mesmo que completo.**
 

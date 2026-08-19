@@ -3,6 +3,7 @@ import { Section, SectionHeading } from "@/components/v1/ui/Section";
 import { modalities } from "@/lib/v1/data";
 import { AnchorLockup } from "@/components/v1/ui/Logo";
 import { IconArrowDown } from "@/components/v1/icons";
+import { asset } from "@/lib/asset";
 
 /**
  * "Your devices. One workspace."
@@ -29,7 +30,7 @@ export function ConnectedWorkflow() {
             >
               <div className="relative h-[132px] border-b border-line bg-surface-muted/50">
                 <Image
-                  src={m.image}
+                  src={asset(m.image)}
                   alt={`Cardioline ${m.device}`}
                   fill
                   sizes="(max-width: 1024px) 100vw, 280px"
@@ -38,14 +39,22 @@ export function ConnectedWorkflow() {
               </div>
               <div className="flex flex-1 flex-col gap-3 p-5">
                 <div>
-                  <h3 className="text-[1.0625rem] tracking-[-0.015em]">{m.type}</h3>
-                  <p className="tnum mt-0.5 text-[11.5px] font-medium text-ink-3">{m.device}</p>
+                  <h3 className="text-[1.0625rem] tracking-[-0.015em]">
+                    {m.type}
+                  </h3>
+                  <p className="tnum mt-0.5 text-[11.5px] font-medium text-ink-3">
+                    {m.device}
+                  </p>
                 </div>
-                <p className="flex-1 text-[13.5px] leading-relaxed text-ink-2">{m.blurb}</p>
+                <p className="flex-1 text-[13.5px] leading-relaxed text-ink-2">
+                  {m.blurb}
+                </p>
                 <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 border-t border-line pt-3.5">
                   {m.steps.map((step, i) => (
                     <li key={step} className="flex items-center gap-1.5">
-                      <span className="text-[11.5px] font-medium text-ink-2">{step}</span>
+                      <span className="text-[11.5px] font-medium text-ink-2">
+                        {step}
+                      </span>
                       {i < m.steps.length - 1 ? (
                         <span aria-hidden className="text-ink-3">
                           →
@@ -88,8 +97,8 @@ export function ConnectedWorkflow() {
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-[14px] border border-brand/30 bg-brand-soft/40 px-6 py-7 text-center">
           <AnchorLockup />
           <p className="text-[15px] text-ink-2">
-            One worklist, one patient record, one reporting workflow, regardless of which
-            Cardioline device acquired the exam.
+            One worklist, one patient record, one reporting workflow, regardless
+            of which Cardioline device acquired the exam.
           </p>
         </div>
       </div>

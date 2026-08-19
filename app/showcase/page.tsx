@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { VireoAnimation } from "@/components/v2/vireo3d/VireoAnimation";
 import styles from "./page.module.css";
+import { asset } from "@/lib/asset";
 
 export const metadata = { title: "VIREO AM · Showcase" };
 
@@ -15,7 +16,7 @@ export default function Showcase() {
     <div className={styles.page}>
       <header className={styles.header}>
         <Image
-          src="/brand/cardioline-logo.svg"
+          src={asset("/brand/cardioline-logo.svg")}
           alt="Cardioline"
           width={600}
           height={38}
@@ -29,8 +30,9 @@ export default function Showcase() {
 
       <footer className={styles.footer}>
         <p className={styles.note}>
-          Modelo 3D construído por extrusão da silhueta traçada dos renders ortográficos oficiais
-          da Cardioline. Protótipo de Product Design para discussão interna.
+          Modelo 3D construído por extrusão da silhueta traçada dos renders
+          ortográficos oficiais da Cardioline. Protótipo de Product Design para
+          discussão interna.
         </p>
       </footer>
     </div>

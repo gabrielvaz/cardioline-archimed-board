@@ -2,6 +2,7 @@ import Image from "next/image";
 import { EcgTrace } from "@/components/product/EcgTrace";
 import { EXAM } from "@/lib/v2/copy";
 import styles from "./AnchorWorkspace.module.css";
+import { asset } from "@/lib/asset";
 
 const NAV = ["Home", "Exams", "Patients", "Reports", "Devices"] as const;
 const LEADS = [
@@ -21,7 +22,7 @@ export function AnchorWorkspace() {
     <div className={styles.app}>
       <aside className={styles.side}>
         <Image
-          src="/brand/cardioline-logo.svg"
+          src={asset("/brand/cardioline-logo.svg")}
           alt="Cardioline"
           width={600}
           height={38}

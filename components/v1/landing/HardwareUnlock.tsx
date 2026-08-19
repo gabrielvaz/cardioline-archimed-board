@@ -12,6 +12,7 @@ import {
   IconGlobe,
   IconKey,
 } from "@/components/v1/icons";
+import { asset } from "@/lib/asset";
 
 /**
  * "Your Cardioline device unlocks Anchor."
@@ -32,13 +33,15 @@ const STEPS = [
   {
     key: "connect",
     label: "Connect",
-    detail: "Register the device once. No local installation, no software licence to buy.",
+    detail:
+      "Register the device once. No local installation, no software licence to buy.",
     icon: IconConnect,
   },
   {
     key: "anchor",
     label: "Anchor Free",
-    detail: "The essential cardiac workspace, active at no additional monthly cost",
+    detail:
+      "The essential cardiac workspace, active at no additional monthly cost",
     icon: IconCloud,
     accent: true,
   },
@@ -71,9 +74,9 @@ export function HardwareUnlock() {
               Your Cardioline device unlocks Anchor.
             </h2>
             <p className="max-w-xl text-lg text-ink-2">
-              Compatible Cardioline devices include access to the essential Anchor experience at
-              no additional monthly cost. The software your device needs is part of the device,
-              not a second purchase.
+              Compatible Cardioline devices include access to the essential
+              Anchor experience at no additional monthly cost. The software your
+              device needs is part of the device, not a second purchase.
             </p>
 
             <ul className="mt-2 grid w-full gap-x-8 gap-y-3.5 sm:grid-cols-2">
@@ -82,7 +85,9 @@ export function HardwareUnlock() {
                   <span className="mt-px flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-brand">
                     <Icon className="size-3.5" />
                   </span>
-                  <span className="text-[14.5px] leading-snug text-ink">{text}</span>
+                  <span className="text-[14.5px] leading-snug text-ink">
+                    {text}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -114,7 +119,7 @@ export function HardwareUnlock() {
                     {step.image ? (
                       <span className="relative size-14 shrink-0 rounded-[10px] bg-surface-muted">
                         <Image
-                          src={step.image}
+                          src={asset(step.image)}
                           alt={step.imageAlt ?? ""}
                           fill
                           sizes="56px"
@@ -125,7 +130,9 @@ export function HardwareUnlock() {
                       <span
                         className={cn(
                           "flex size-14 shrink-0 items-center justify-center rounded-[10px]",
-                          step.accent ? "bg-brand-strong text-white" : "bg-surface-muted text-ink-2",
+                          step.accent
+                            ? "bg-brand-strong text-white"
+                            : "bg-surface-muted text-ink-2",
                         )}
                       >
                         <Icon className="size-5" />
@@ -151,7 +158,10 @@ export function HardwareUnlock() {
                     ) : null}
                   </div>
                   {i < STEPS.length - 1 ? (
-                    <span aria-hidden className="flex h-7 flex-col items-center">
+                    <span
+                      aria-hidden
+                      className="flex h-7 flex-col items-center"
+                    >
                       <span className="flex-1 w-px bg-brand/35" />
                       <IconArrowDown className="-mt-1.5 size-3.5 text-brand/50" />
                     </span>

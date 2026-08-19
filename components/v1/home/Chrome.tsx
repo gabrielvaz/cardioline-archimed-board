@@ -12,6 +12,7 @@ import { CaretRight } from "@phosphor-icons/react/dist/ssr";
 import { CardiolineLogo } from "@/components/v1/ui/Logo";
 import { NAV } from "@/lib/v1/copy";
 import { cn } from "@/lib/v1/cn";
+import { asset } from "@/lib/asset";
 
 /**
  * LINGUAGEM VISUAL DA HOME
@@ -151,12 +152,14 @@ export function DeviceSculpture({
       style={reduce || !hydrated ? undefined : { scale }}
       className={cn(
         "relative mx-auto w-full",
-        ratio === "portrait" ? "aspect-[3/4] max-w-[400px]" : "aspect-[4/3] max-w-[860px]",
+        ratio === "portrait"
+          ? "aspect-[3/4] max-w-[400px]"
+          : "aspect-[4/3] max-w-[860px]",
         className,
       )}
     >
       <Image
-        src={src}
+        src={asset(src)}
         alt={alt}
         fill
         sizes="(max-width: 900px) 80vw, 400px"

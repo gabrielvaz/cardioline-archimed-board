@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { NAV } from "@/lib/v2/copy";
 import styles from "./SiteHeader.module.css";
+import { asset } from "@/lib/asset";
 
 /** Cabeçalho com o logo oficial. O filete só aparece depois que a página rola. */
 export function SiteHeader() {
@@ -21,7 +22,7 @@ export function SiteHeader() {
       <div className={styles.inner}>
         <a href="#top" aria-label="Anchor by Cardioline, home">
           <Image
-            src="/brand/cardioline-logo.svg"
+            src={asset("/brand/cardioline-logo.svg")}
             alt="Cardioline"
             width={600}
             height={38}
