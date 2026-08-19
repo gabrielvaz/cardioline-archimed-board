@@ -355,6 +355,28 @@ arcs = region(
 faces: dict[str, dict[str, float]] = {}
 
 
+def dim_led(piece: Image.Image, cx: float, cy: float, r: float) -> None:
+    """Apaga os arcos verde e azul do botão na arte base.
+
+    No aparelho aquilo é uma LUZ, não pintura. Se ela fica acesa na textura, o LED
+    da animação não tem como apagar: a cor continuaria ali com o aparelho
+    desmontado. Escurecido, o anel lê como LED apagado e a sobreposição aditiva o
+    acende quando deve.
+    """
+    px = piece.load()
+    x0, y0 = int(cx - r), int(cy - r)
+    x1, y1 = int(cx + r) + 1, int(cy + r) + 1
+    for y in range(max(0, y0), min(piece.height, y1)):
+        for x in range(max(0, x0), min(piece.width, x1)):
+            d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+            if d > r:
+                continue
+            # Borda suave nos 12% externos, senão aparece um disco recortado.
+            k = 0.2 if d < r * 0.88 else 0.2 + 0.8 * ((d - r * 0.88) / (r * 0.12))
+            rr, gg, bb, aa = px[x, y]
+            px[x, y] = (round(rr * k), round(gg * k), round(bb * k), aa)
+
+
 def crop(im: Image.Image, unit: int, b: Box, out: str, key: str) -> None:
     piece = grade(im.crop((b.x0, b.y0, b.x1, b.y1)))
     FACES.mkdir(parents=True, exist_ok=True)
@@ -372,6 +394,16 @@ def face_x(x_left: int, unit: int) -> tuple[int, int]:
 
 fx0, fx1 = face_x(A.x0, UNIT)
 crop(asm, UNIT, Box(fx0, SEAM_TOP, fx1, SEAM_BOTTOM), "face-body.png", "bodyFront")
+
+# O botão fica na arte da frente do corpo; apaga o LED nela.
+_body = Image.open(FACES / "face-body.png").convert("RGBA")
+dim_led(
+    _body,
+    cx=(0.5 - FACE_X0) * UNIT,
+    cy=(arcs.y0 + arcs.y1) / 2 - SEAM_TOP,
+    r=arcs.w / 2 * 1.6,
+)
+_body.save(FACES / "face-body.png")
 crop(asm, UNIT, Box(fx0, ASM_TOP, fx1, SEAM_TOP), "face-top.png", "moduleTop")
 
 # Módulos inferiores: dos renders ISOLADOS, que trazem o badge. O conjunto mostra

@@ -307,12 +307,15 @@ export type DeviceTextures = {
   bodyFront: THREE.Texture;
   bodyBack: THREE.Texture;
   screen: THREE.Texture;
+  led: THREE.Texture;
 };
 
 export type VireoDevice = {
   group: THREE.Group;
   /** Sobreposição da tela acesa. Controle por material.opacity, 0 a 1. */
   screen: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+  /** Brilho do LED do botão. Controle por material.opacity, 0 a 1. */
+  led: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
 };
 
 /** Origem no centro do corpo. Não inclui os módulos. */
@@ -379,7 +382,30 @@ export function createVireoDevice(tex: DeviceTextures): VireoDevice {
   screen.renderOrder = 2;
   group.add(screen);
 
-  return { group, screen };
+  /*
+   * LED do botão, em mistura ADITIVA sobre a arte. Aditivo e não normal: uma luz
+   * soma brilho ao que está embaixo, ela não cobre. Com mistura normal o anel
+   * apagava o desenho do botão em vez de acendê-lo.
+   */
+  const led = new THREE.Mesh(
+    new THREE.PlaneGeometry(M.button.r * 3.3, M.button.r * 3.3),
+    new THREE.MeshBasicMaterial({
+      map: tex.led,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      opacity: 0,
+      toneMapped: false,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -6,
+      polygonOffsetUnits: -6,
+    }),
+  );
+  led.position.set(0, M.button.cy, faceZ + 0.005);
+  led.renderOrder = 3;
+  group.add(led);
+
+  return { group, screen, led };
 }
 
 // ------------------------------------------------------------------ módulos

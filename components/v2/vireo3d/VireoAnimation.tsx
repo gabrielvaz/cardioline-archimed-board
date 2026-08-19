@@ -6,11 +6,15 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { createVireoScene, fitToElement } from "./scene";
 import {
-  MODULE_TRAVEL,
+  LED_BLINK_HZ,
+  LED_BLINK_UNTIL,
+  MODULE_EXIT,
   SCROLL_LENGTH,
   STAGES,
   TURNS,
+  easeIn,
   easeInOut,
+  easeOut,
   localProgress,
   stageAt,
   type StageKey,
@@ -54,6 +58,7 @@ export function VireoAnimation() {
     let disposed = false;
     let trigger: ScrollTrigger | null = null;
     let cleanupResize: (() => void) | null = null;
+    let stopAnimation: (() => void) | null = null;
 
     createVireoScene(renderer).then((v) => {
       if (disposed) {
@@ -63,73 +68,86 @@ export function VireoAnimation() {
       fitToElement(renderer, v.camera, el);
       setReady(true);
 
-      const setOpacity = (mats: THREE.Material[], value: number) => {
-        for (const m of mats) {
-          m.transparent = value < 0.999;
-          m.opacity = value;
-        }
-      };
+      /*
+       * Estado do LED do botão. É uma LUZ no aparelho, não um adesivo: acesa
+       * enquanto o módulo de aquisição está no lugar, apagada com o aparelho
+       * desmontado, e PISCANDO no instante em que o módulo novo encaixa.
+       */
+      type Led = "off" | "blink" | "on";
 
-      const apply = (progress: number) => {
+      const apply = (progress: number, clockMs: number) => {
         const s = stageAt(progress);
-        const t = easeInOut(localProgress(progress, s));
+        const t = localProgress(progress, s);
 
         // Estado de cada etapa, escrito como switch e não como timeline do GSAP:
         // cada etapa depende só do próprio progresso local, então fica mais fácil
         // de ler e de reordenar em stages.ts.
         let cableY = v.dockedY;
-        let cableOpacity = 1;
-        let airY = v.dockedY - MODULE_TRAVEL;
-        let airOpacity = 0;
+        let airY = v.dockedY - MODULE_EXIT;
         let yaw = 0;
         let lit = 1;
+        let led: Led = "on";
 
         switch (s.key) {
           case "hold":
             break;
           case "undock":
-            cableY = v.dockedY - MODULE_TRAVEL * t;
-            cableOpacity = 1 - Math.max(0, (t - 0.72) / 0.28);
+            // Sai de cena descendo, sem esmaecer. easeIn deixa a separação do
+            // encaixe visível antes de o módulo ganhar velocidade e deixar o
+            // quadro — antes ele simplesmente desaparecia no meio do caminho.
+            cableY = v.dockedY - MODULE_EXIT * easeIn(t);
+            led = t < 0.25 ? "on" : "off";
             break;
           case "rotate":
-            cableOpacity = 0;
-            cableY = v.dockedY - MODULE_TRAVEL;
-            yaw = Math.PI * 2 * TURNS * t;
+            cableY = v.dockedY - MODULE_EXIT;
+            yaw = Math.PI * 2 * TURNS * easeInOut(t);
             // A tela apaga na saída da frente e não volta: o aparelho está sem
             // módulo de aquisição, e uma tela acesa ali seria mentira.
             lit = 1 - Math.min(1, t / 0.22);
+            led = "off";
             break;
           case "dock":
-            cableOpacity = 0;
-            cableY = v.dockedY - MODULE_TRAVEL;
-            airOpacity = Math.min(1, t / 0.22);
-            airY = v.dockedY - MODULE_TRAVEL * (1 - t);
+            cableY = v.dockedY - MODULE_EXIT;
+            // Entra do fundo do quadro e desacelera ao encostar no aparelho.
+            airY = v.dockedY - MODULE_EXIT * (1 - easeOut(t));
             lit = 0;
+            led = t > 0.94 ? "blink" : "off";
             break;
           case "power":
-            cableOpacity = 0;
-            cableY = v.dockedY - MODULE_TRAVEL;
-            airOpacity = 1;
+            cableY = v.dockedY - MODULE_EXIT;
             airY = v.dockedY;
-            lit = t;
+            lit = easeInOut(t);
+            led = t < LED_BLINK_UNTIL ? "blink" : "on";
             break;
         }
 
         v.pivot.rotation.y = yaw;
         v.cable.group.position.y = cableY;
         v.air.group.position.y = airY;
-        setOpacity(v.cable.fades, cableOpacity);
-        setOpacity(v.air.fades, airOpacity);
         v.device.screen.material.opacity = lit;
-        v.cable.group.visible = cableOpacity > 0.01;
-        v.air.group.visible = airOpacity > 0.01;
+
+        const pulse =
+          led === "on"
+            ? 1
+            : led === "off"
+              ? 0
+              : // Onda quase quadrada: um LED pisca, não respira. O smoothstep
+                // sobre o seno tira o degrau sem transformar em pulsação.
+                (() => {
+                  const phase = Math.sin(
+                    (clockMs / 1000) * Math.PI * 2 * LED_BLINK_HZ,
+                  );
+                  const k = Math.min(1, Math.max(0, phase * 3 + 0.5));
+                  return 0.06 + 0.94 * (k * k * (3 - 2 * k));
+                })();
+        v.device.led.material.opacity = pulse;
 
         renderer.render(v.scene, v.camera);
 
         /*
-         * Estado aplicado, exposto no DOM. O canvas é WebGL, então não há como
-         * ler um pixel de fora com getContext("2d"); estes atributos deixam a
-         * animação verificável por medição, e não só por inspeção visual.
+         * Estado aplicado, exposto no DOM. O canvas é WebGL, então não há como ler
+         * um pixel de fora com getContext("2d"); estes atributos deixam a animação
+         * verificável por medição, e não só por inspeção visual.
          */
         el.dataset.progress = progress.toFixed(4);
         el.dataset.stage = s.key;
@@ -137,8 +155,41 @@ export function VireoAnimation() {
         el.dataset.cableY = cableY.toFixed(3);
         el.dataset.airY = airY.toFixed(3);
         el.dataset.lit = lit.toFixed(3);
+        el.dataset.led = led;
+        el.dataset.ledLevel = pulse.toFixed(3);
 
         setStage((prev) => (prev === s.key ? prev : s.key));
+        return led;
+      };
+
+      /*
+       * O pisca do LED corre no TEMPO, não na rolagem: um LED pisca mesmo com o
+       * dedo parado. Por isso um laço de quadro que existe SÓ enquanto o LED está
+       * piscando — fora disso a cena continua desenhando sob demanda, sem queimar
+       * quadro à toa.
+       */
+      let progressNow = 0;
+      let raf = 0;
+      const stopLoop = () => {
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      };
+      const frame = (now: number) => {
+        raf = 0;
+        if (apply(progressNow, now) === "blink") {
+          raf = requestAnimationFrame(frame);
+        }
+      };
+      const draw = (progress: number) => {
+        progressNow = progress;
+        const led = apply(progress, performance.now());
+        if (led === "blink") {
+          if (!raf) raf = requestAnimationFrame(frame);
+        } else {
+          stopLoop();
+        }
       };
 
       const reduce = window.matchMedia(
@@ -146,9 +197,9 @@ export function VireoAnimation() {
       ).matches;
       if (reduce) {
         // Sem movimento: estado final, montado com o Air e a tela acesa.
-        apply(1);
+        draw(1);
       } else {
-        apply(0);
+        draw(0);
         trigger = ScrollTrigger.create({
           trigger: sec,
           start: "top top",
@@ -156,21 +207,23 @@ export function VireoAnimation() {
           pin: true,
           scrub: true,
           invalidateOnRefresh: true,
-          onUpdate: (self) => apply(self.progress),
+          onUpdate: (self) => draw(self.progress),
         });
       }
 
       const onResize = () => {
         fitToElement(renderer, v.camera, el);
-        apply(trigger ? trigger.progress : reduce ? 1 : 0);
+        draw(trigger ? trigger.progress : reduce ? 1 : 0);
       };
       window.addEventListener("resize", onResize);
       el.dataset.ready = "1";
       cleanupResize = () => window.removeEventListener("resize", onResize);
+      stopAnimation = stopLoop;
     });
 
     return () => {
       disposed = true;
+      stopAnimation?.();
       cleanupResize?.();
       trigger?.kill();
       renderer.dispose();

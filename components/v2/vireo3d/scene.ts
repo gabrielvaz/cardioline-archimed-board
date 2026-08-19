@@ -8,7 +8,7 @@ import {
   type VireoDevice,
   type VireoModule,
 } from "./model";
-import { createDockTexture, createScreenTexture } from "./textures";
+import { createDockTexture, createLedTexture } from "./textures";
 import { ASSEMBLY_UNITS, FRAME_LIFT, REST_TILT, REST_YAW } from "./stages";
 
 /**
@@ -27,6 +27,8 @@ const FACES = [
   "/device/model/face-air.png",
   "/device/model/face-cable.png",
   "/device/model/face-harness.png",
+  // Tela em uso: foto retificada, porque nenhum render CAD tem a tela ligada.
+  "/device/model/screen-torso.png",
 ] as const;
 
 export type VireoScene = {
@@ -53,7 +55,15 @@ export function createVireoScene(
 ): Promise<VireoScene> {
   const loader = new THREE.TextureLoader();
   return Promise.all(FACES.map((f) => loader.loadAsync(f))).then(
-    ([bodyFront, bodyBack, topArt, airArt, cableArt, harnessArt]) => {
+    ([
+      bodyFront,
+      bodyBack,
+      topArt,
+      airArt,
+      cableArt,
+      harnessArt,
+      screenArt,
+    ]) => {
       for (const t of [
         bodyFront,
         bodyBack,
@@ -61,6 +71,7 @@ export function createVireoScene(
         airArt,
         cableArt,
         harnessArt,
+        screenArt,
       ]) {
         t.colorSpace = THREE.SRGBColorSpace;
         t.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -108,7 +119,8 @@ export function createVireoScene(
       const device = createVireoDevice({
         bodyFront,
         bodyBack,
-        screen: createScreenTexture(),
+        screen: screenArt,
+        led: createLedTexture(),
       });
       pivot.add(device.group);
 

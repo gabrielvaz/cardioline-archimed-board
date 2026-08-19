@@ -12,7 +12,23 @@ A divisão de trabalho é a decisão central do modelo:
 | --- | --- |
 | casco, trilhos, língua do conector, alívio de tensão, feixe, cabo | **geometria**, com proporções medidas nos renders |
 | arte de cada face (wordmarks, botão, badge Air, etiqueta traseira) | **textura**, recortada dos renders oficiais e gradada às cores das fotos |
-| tela acesa e contatos do conector | canvas desenhado em código, paciente sintético |
+| tela em uso (tórax com eletrodos C1 a C6) | **foto retificada** (`scripts/extract-screen.py`) |
+| LED do botão e contatos do conector | canvas desenhado em código, porque são LUZ e precisam ser controláveis |
+
+## O que é luz não é pintura
+
+Duas coisas no aparelho **acendem**, e por isso não podem ser textura chapada:
+
+- **A tela.** Nenhum render CAD a tem ligada. A única fonte é a foto, então a arte
+  é uma retificação de perspectiva de `2A1A7BDC…jpeg` para a proporção medida da
+  tela, com piso de preto, ganho e vinheta nas bordas — a tela do produto não tem
+  moldura, ela se funde ao vidro, e sem a vinheta o retângulo da textura aparecia
+  desenhado na face.
+- **O LED do botão.** O anel verde e azul vem pintado no render. O
+  `measure-vireo.py` o **apaga** na arte base (`dim_led`) e uma sobreposição em
+  mistura ADITIVA o acende. Aditiva e não normal: uma luz soma brilho ao que está
+  embaixo, não cobre. E apagar na base era necessário — com o anel aceso na
+  textura, não havia como mostrar o aparelho desmontado com a luz apagada.
 
 ## Cor: renders para a forma, FOTOS para a cor
 

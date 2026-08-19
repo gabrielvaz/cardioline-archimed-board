@@ -3,12 +3,11 @@ import * as THREE from "three";
 /**
  * Texturas desenhadas em código para o modelo do VIREO AM.
  *
- * O que é arte oficial da Cardioline vem de recorte de render (public/device/model/
- * face-*.png). Aqui ficam só as duas coisas que NENHUM render oficial tem: a tela
- * acesa e a sombra de contato. A tela é interface nossa, com paciente sintético.
+ * A arte oficial vem de recorte de render (public/device/model/face-*.png) e a
+ * tela em uso vem de foto retificada (scripts/extract-screen.py). Aqui ficam só os
+ * dois elementos que são LUZ, e por isso precisam ser controláveis em vez de
+ * pintados: o LED do botão e os contatos do encaixe.
  */
-
-const ORANGE = "#f66201";
 
 function canvas(w: number, h: number) {
   const el = document.createElement("canvas");
@@ -27,103 +26,50 @@ function finish(el: HTMLCanvasElement): THREE.CanvasTexture {
 }
 
 /**
- * Traçado de ECG sintético. Um batimento por ciclo, com P, QRS e T em proporções
- * plausíveis — o suficiente para ler como derivação real a esse tamanho, e nada
- * além disso: não é laudo nem dado de paciente.
+ * LED do botão, para sobrepor à arte da face com mistura ADITIVA.
+ *
+ * O anel verde e azul do render é arte chapada; no aparelho é uma LUZ. Esta
+ * textura é só o brilho — o anel em si continua vindo do render oficial —, então
+ * variar a opacidade dela acende e apaga a luz sem tocar na arte.
  */
-function beat(phase: number): number {
-  const p = phase % 1;
-  const gauss = (c: number, w: number, a: number) =>
-    a * Math.exp(-(((p - c) / w) ** 2));
-  return (
-    gauss(0.16, 0.035, 0.16) + // P
-    gauss(0.3, 0.012, -0.22) + // Q
-    gauss(0.34, 0.014, 1) + // R
-    gauss(0.39, 0.016, -0.3) + // S
-    gauss(0.62, 0.06, 0.28) // T
-  );
-}
+export function createLedTexture(): THREE.CanvasTexture {
+  const S = 512;
+  const { el, ctx } = canvas(S, S);
+  const c = S / 2;
+  // Raio do anel dentro da textura. A moldura sobra para o halo caber.
+  const r = S * 0.3;
 
-/** Tela do aparelho em aquisição. Paciente sintético, sem interpretação. */
-export function createScreenTexture(): THREE.CanvasTexture {
-  const W = 1024;
-  const H = 763; // 1024 / 1,3417, a proporção medida da tela no render
-  const { el, ctx } = canvas(W, H);
-
-  ctx.fillStyle = "#07090c";
-  ctx.fillRect(0, 0, W, H);
-
-  // Grade de ECG: 1 mm fino, 5 mm forte, como papel milimetrado.
-  const mm = W / 46;
-  for (let i = 0; i * mm <= W; i++) {
-    ctx.strokeStyle =
-      i % 5 === 0 ? "rgba(246,98,1,0.30)" : "rgba(246,98,1,0.12)";
-    ctx.lineWidth = i % 5 === 0 ? 2 : 1;
-    ctx.beginPath();
-    ctx.moveTo(Math.round(i * mm) + 0.5, 0);
-    ctx.lineTo(Math.round(i * mm) + 0.5, H);
-    ctx.stroke();
-  }
-  for (let i = 0; i * mm <= H; i++) {
-    ctx.strokeStyle =
-      i % 5 === 0 ? "rgba(246,98,1,0.30)" : "rgba(246,98,1,0.12)";
-    ctx.lineWidth = i % 5 === 0 ? 2 : 1;
-    ctx.beginPath();
-    ctx.moveTo(0, Math.round(i * mm) + 0.5);
-    ctx.lineTo(W, Math.round(i * mm) + 0.5);
-    ctx.stroke();
-  }
-
-  // Duas derivações, para a tela ler como aquisição e não como um traço solto.
-  const lanes = [
-    { label: "II", y: H * 0.46, amp: H * 0.2, cycles: 2.4 },
-    { label: "V5", y: H * 0.79, amp: H * 0.15, cycles: 2.4 },
-  ];
-  for (const lane of lanes) {
-    ctx.beginPath();
-    for (let x = 0; x <= W; x += 1) {
-      const y = lane.y - beat((x / W) * lane.cycles) * lane.amp;
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+  const arc = (from: number, to: number, color: string) => {
+    // Halo primeiro, traço depois: o halo largo e fraco é o que faz ler como luz
+    // difundindo no vidro, e não como risco desenhado.
+    for (const [width, alpha, blur] of [
+      [S * 0.085, 0.16, S * 0.06],
+      [S * 0.05, 0.34, S * 0.03],
+      [S * 0.028, 1, 0],
+    ] as const) {
+      ctx.beginPath();
+      ctx.arc(c, c, r, from, to);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.shadowColor = color;
+      ctx.shadowBlur = blur;
+      ctx.stroke();
     }
-    ctx.strokeStyle = "#eef3f8";
-    ctx.lineWidth = 7;
-    ctx.lineJoin = "round";
-    ctx.shadowColor = "rgba(238,243,248,0.55)";
-    ctx.shadowBlur = 14;
-    ctx.stroke();
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
+  };
 
-    ctx.font = `600 ${Math.round(H * 0.085)}px ui-sans-serif, system-ui, sans-serif`;
-    ctx.fillStyle = "rgba(238,243,248,0.7)";
-    ctx.textBaseline = "middle";
-    ctx.fillText(lane.label, W * 0.03, lane.y - lane.amp * 1.3);
-  }
-
-  // Cabeçalho: estado e frequência. Os números batem com lib/v2/copy.ts.
-  ctx.fillStyle = "rgba(7,9,12,0.86)";
-  ctx.fillRect(0, 0, W, H * 0.2);
-
-  ctx.font = `700 ${Math.round(H * 0.1)}px ui-sans-serif, system-ui, sans-serif`;
-  ctx.fillStyle = ORANGE;
-  ctx.textBaseline = "middle";
-  ctx.fillText("ACQUIRING", W * 0.03, H * 0.1);
-
-  ctx.textAlign = "right";
-  ctx.font = `700 ${Math.round(H * 0.15)}px ui-sans-serif, system-ui, sans-serif`;
-  ctx.fillStyle = "#eef3f8";
-  ctx.fillText("68", W * 0.86, H * 0.098);
-  ctx.font = `600 ${Math.round(H * 0.075)}px ui-sans-serif, system-ui, sans-serif`;
-  ctx.fillStyle = "rgba(238,243,248,0.62)";
-  ctx.fillText("bpm", W * 0.985, H * 0.108);
-  ctx.textAlign = "left";
-
+  // Ângulos lidos no render: verde em cima, azul embaixo, com folga nos lados.
+  arc(Math.PI * 1.16, Math.PI * 1.84, "#2fd44f");
+  arc(Math.PI * 0.16, Math.PI * 0.84, "#2f8bff");
   return finish(el);
 }
 
 /**
  * Fundo do encaixe: fileira de contatos dourados sobre plástico escuro, como no
- * render explodido oficial. Só aparece nos poucos instantes em que o módulo está
+ * render explodido oficial. Só aparece nos instantes em que o módulo está
  * separado, e é justamente o que mostra que ali existe um conector.
  */
 export function createDockTexture(): THREE.CanvasTexture {

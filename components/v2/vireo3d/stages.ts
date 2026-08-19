@@ -1,9 +1,9 @@
 /**
  * Roteiro da animação do VIREO AM.
  *
- * Único lugar para mexer no tempo e na coreografia. Cada etapa tem início e fim
- * em progresso normalizado de 0 a 1, então mudar a duração de uma é mover um
- * número, sem tocar no componente.
+ * Único lugar para mexer no tempo e na coreografia. Cada etapa tem início e fim em
+ * progresso normalizado de 0 a 1, então mudar a duração de uma é mover um número,
+ * sem tocar no componente.
  */
 
 export type StageKey = "hold" | "undock" | "rotate" | "dock" | "power";
@@ -17,8 +17,9 @@ export type Stage = {
 };
 
 /**
- * Os limites somam 1 e não têm lacuna. A rotação recebe a maior fatia porque é
- * o movimento que precisa de tempo para ser lido como volta completa.
+ * Os limites somam 1 e não têm lacuna. A separação recebe uma fatia larga porque o
+ * módulo não some por esmaecimento: ele desce e SAI DE CENA, e sair de cena
+ * devagar consome rolagem.
  */
 export const STAGES: readonly Stage[] = [
   {
@@ -33,15 +34,15 @@ export const STAGES: readonly Stage[] = [
   {
     key: "undock",
     from: 0.1,
-    to: 0.3,
+    to: 0.36,
     caption: { title: "One dock", body: "The lead cable module releases." },
   },
   // Durante o giro nada compete com o produto.
-  { key: "rotate", from: 0.3, to: 0.64, caption: null },
+  { key: "rotate", from: 0.36, to: 0.66, caption: null },
   {
     key: "dock",
-    from: 0.64,
-    to: 0.85,
+    from: 0.66,
+    to: 0.86,
     caption: {
       title: "Air module",
       body: "Wireless transmission clicks into the same dock.",
@@ -49,7 +50,7 @@ export const STAGES: readonly Stage[] = [
   },
   {
     key: "power",
-    from: 0.85,
+    from: 0.86,
     to: 1,
     caption: {
       title: "Ready",
@@ -68,11 +69,13 @@ export const SCROLL_LENGTH = 4;
 export const TURNS = 1;
 
 /**
- * Curso do módulo ao se separar, em unidades de largura do corpo. Limitado pelo
- * quadro: o conjunto já ocupa quase toda a altura visível, e passar de ~0,34 joga
- * o módulo fora da câmera no ponto de separação máxima.
+ * Curso do módulo até SAIR DO QUADRO, em larguras de corpo. O módulo não esmaece:
+ * ele desce e deixa a cena, como uma peça que alguém tirou da mão. Com a escala
+ * atual a borda inferior do quadro está a 1,44 do centro do corpo, e o bloco
+ * acoplado termina em 1,15. Com 0,95 a língua do conector ainda encostava na borda
+ * de baixo do quadro; 1,16 dá folga para o conjunto todo deixar a cena.
  */
-export const MODULE_TRAVEL = 0.3;
+export const MODULE_EXIT = 1.16;
 
 /**
  * Altura do CONJUNTO MONTADO na cena, em unidades de mundo. É o único número de
@@ -82,8 +85,8 @@ export const MODULE_TRAVEL = 0.3;
 export const ASSEMBLY_UNITS = 2.24;
 
 /**
- * Deslocamento vertical do conjunto. O feixe de derivações sai por cima e o
- * módulo se separa por baixo; este empurrão equilibra os dois no quadro.
+ * Deslocamento vertical do conjunto. O feixe de derivações sai por cima e o módulo
+ * se separa por baixo; este empurrão equilibra os dois no quadro.
  */
 export const FRAME_LIFT = -0.06;
 
@@ -95,6 +98,12 @@ export const FRAME_LIFT = -0.06;
  */
 export const REST_YAW = (-20 * Math.PI) / 180;
 export const REST_TILT = (-7 * Math.PI) / 180;
+
+/** Piscadas por segundo do LED ao acoplar o módulo. */
+export const LED_BLINK_HZ = 2.2;
+
+/** Fração da etapa power em que o LED ainda pisca antes de firmar aceso. */
+export const LED_BLINK_UNTIL = 0.55;
 
 export function stageAt(progress: number): Stage {
   for (const s of STAGES) {
@@ -113,4 +122,14 @@ export function localProgress(progress: number, stage: Stage): number {
 /** Suavização de entrada e saída, para nada partir nem chegar em velocidade máxima. */
 export function easeInOut(t: number): number {
   return t * t * (3 - 2 * t);
+}
+
+/** Parte devagar e acelera. Deixa a separação do encaixe visível antes da saída. */
+export function easeIn(t: number): number {
+  return t * t;
+}
+
+/** Chega devagar. O módulo que entra desacelera antes de encostar no aparelho. */
+export function easeOut(t: number): number {
+  return 1 - (1 - t) * (1 - t);
 }

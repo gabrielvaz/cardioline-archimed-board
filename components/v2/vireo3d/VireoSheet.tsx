@@ -61,6 +61,9 @@ export function VireoSheet({
       v.camera.aspect = tile / th;
       v.camera.updateProjectionMatrix();
       v.device.screen.material.opacity = lit ? 1 : 0;
+      // A folha é estática, então o LED entra aceso: piscar aqui só daria quadros
+      // diferentes entre si sem informação nenhuma.
+      v.device.led.material.opacity = lit ? 1 : 0;
       v.air.group.visible = moduleKind === "air";
       v.cable.group.visible = moduleKind === "cable";
 
