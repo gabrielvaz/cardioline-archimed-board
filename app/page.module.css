@@ -30,10 +30,48 @@
   color: var(--cl-mute);
 }
 
+/*
+ * Grupo de fluxo. O título fica numa coluna à esquerda a partir de 900px, alinhado
+ * com o começo da lista: a hierarquia aparece pela posição, sem precisar de caixa
+ * nem de fio em volta.
+ */
+.group {
+  margin-top: 40px;
+  display: grid;
+  gap: 4px 40px;
+}
+
+@media (min-width: 900px) {
+  .group {
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1.58fr);
+    align-items: start;
+  }
+}
+
+.groupHead {
+  padding-top: 24px;
+}
+
+.groupTitle {
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  color: var(--cl-ink);
+}
+
+.groupLede {
+  margin-top: 8px;
+  max-width: 34ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--cl-mute);
+}
+
 .list {
-  margin-top: 64px;
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .item {
@@ -43,14 +81,14 @@
 .link {
   display: grid;
   gap: 8px 40px;
-  padding: 28px 0;
+  padding: 24px 0;
   text-decoration: none;
   color: inherit;
 }
 
 @media (min-width: 720px) {
   .link {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
   }
 }
 
@@ -65,7 +103,7 @@
 
 .name {
   margin-top: 10px;
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.022em;
