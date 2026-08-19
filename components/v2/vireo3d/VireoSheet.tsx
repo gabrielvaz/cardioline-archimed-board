@@ -65,7 +65,7 @@ export function VireoSheet({
       v.cable.group.visible = moduleKind === "cable";
 
       angles.forEach((a, i) => {
-        v.pivot.rotation.y = (a * Math.PI) / 180;
+        v.spin((a * Math.PI) / 180);
         renderer.render(v.scene, v.camera);
         ctx2d.drawImage(
           renderer.domElement,
@@ -95,7 +95,7 @@ export function VireoSheet({
         import("three/examples/jsm/exporters/GLTFExporter.js").then(
           ({ GLTFExporter }) =>
             new Promise<string>((resolve, reject) => {
-              v.pivot.rotation.y = 0;
+              v.spin(0);
               new GLTFExporter().parse(
                 v.pivot,
                 (result) => {

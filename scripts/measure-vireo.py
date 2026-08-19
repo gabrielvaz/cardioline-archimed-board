@@ -45,6 +45,76 @@ FACE_X1 = 0.9255
 
 WHITE = 244
 
+# ---------------------------------------------------------------- gradação
+#
+# Os renders CAD são cinza técnico: a face escura sai em luminância 53 e o metal
+# em 179. O produto FOTOGRAFADO é outro: a face é vidro PRETO (luminância de
+# albedo por volta de 14) e o casco é branco (232). Agrupando as cores das fotos
+# em assets/device-source por k-means, os três aglomerados neutros aparecem em 46
+# a 58, 74 a 88 e 211 a 215 nas três fotos — consistentes entre elas.
+#
+# A curva abaixo leva os NEUTROS do render para esses alvos e deixa os pixels
+# saturados em paz. Sem a ressalva de croma, o laranja do wordmark e os arcos
+# verde e azul do botão iam junto e o produto perdia a marca.
+
+GRADE_DARK = 0.27  # fator nos escuros: 53 -> 14
+GRADE_LIGHT_GAIN = 1.18  # ganho nos claros: 179 -> 233
+GRADE_LIGHT_LIFT = 22
+CHROMA_KEEP = 38  # croma a partir do qual a cor é preservada por inteiro
+CHROMA_FADE = 18  # abaixo disto a gradação é total
+
+
+def _grade_lut() -> list[float]:
+    """Fator de escala por luminância de entrada, suavizado na transição."""
+    lut = []
+    for L in range(256):
+        if L <= 70:
+            out = GRADE_DARK * L
+        elif L >= 150:
+            out = min(255.0, GRADE_LIGHT_GAIN * L + GRADE_LIGHT_LIFT)
+        else:
+            # Smoothstep entre as duas pontas. Uma rampa reta deixava um halo
+            # visível na borda entre a face e o metal.
+            t = (L - 70) / 80
+            t = t * t * (3 - 2 * t)
+            a = GRADE_DARK * 70
+            b = GRADE_LIGHT_GAIN * 150 + GRADE_LIGHT_LIFT
+            out = a + (b - a) * t
+        lut.append(out / max(1, L) if L else 0.0)
+    return lut
+
+
+LUT = _grade_lut()
+
+
+def grade(im: Image.Image) -> Image.Image:
+    """Aproxima um recorte de render CAD às cores do produto fotografado."""
+    out = im.copy()
+    px = out.load()
+    w, h = out.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            croma = max(r, g, b) - min(r, g, b)
+            if croma >= CHROMA_KEEP:
+                continue
+            lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+            k = LUT[min(255, int(lum))]
+            # Croma intermediário recebe gradação parcial, senão a borda entre o
+            # laranja e o preto ganha um contorno cinza.
+            if croma > CHROMA_FADE:
+                mix = (CHROMA_KEEP - croma) / (CHROMA_KEEP - CHROMA_FADE)
+                k = 1 + (k - 1) * mix
+            px[x, y] = (
+                min(255, round(r * k)),
+                min(255, round(g * k)),
+                min(255, round(b * k)),
+                a,
+            )
+    return out
+
 # Proporção língua/bloco na peça isolada do módulo, medida por varredura de
 # opacidade em 22-module-air: até 0,42 da altura a peça tem só a largura da língua.
 TONGUE_FRAC = 0.42
@@ -286,7 +356,7 @@ faces: dict[str, dict[str, float]] = {}
 
 
 def crop(im: Image.Image, unit: int, b: Box, out: str, key: str) -> None:
-    piece = im.crop((b.x0, b.y0, b.x1, b.y1))
+    piece = grade(im.crop((b.x0, b.y0, b.x1, b.y1)))
     FACES.mkdir(parents=True, exist_ok=True)
     piece.save(FACES / out)
     faces[key] = {

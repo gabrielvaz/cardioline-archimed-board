@@ -11,8 +11,35 @@ A divisão de trabalho é a decisão central do modelo:
 | parte | origem |
 | --- | --- |
 | casco, trilhos, língua do conector, alívio de tensão, feixe, cabo | **geometria**, com proporções medidas nos renders |
-| arte de cada face (wordmarks, botão, badge Air, etiqueta traseira) | **textura**, recortada dos renders oficiais |
+| arte de cada face (wordmarks, botão, badge Air, etiqueta traseira) | **textura**, recortada dos renders oficiais e gradada às cores das fotos |
 | tela acesa e contatos do conector | canvas desenhado em código, paciente sintético |
+
+## Cor: renders para a forma, FOTOS para a cor
+
+Os renders CAD são cinza técnico uniforme. O produto tem três materiais bem
+diferentes, e usar um só era o que deixava o 3D com cara de maquete. Agrupando as
+cores das fotos em `assets/device-source/` por k-means, os aglomerados neutros
+aparecem nos mesmos lugares nas três fotos:
+
+| peça | luminância nas fotos | no modelo |
+| --- | --- | --- |
+| face | 46 a 58 | vidro preto, albedo em ~15 |
+| meio-tom / sombra | 74 a 88 | — |
+| trilho do corpo | ~134 | cinza médio semi-brilhante |
+| casco dos módulos e cabo | 211 a 215 | branco fosco |
+
+O `measure-vireo.py` grada os recortes com uma curva por luminância que leva os
+NEUTROS do render a esses alvos e **preserva os pixels saturados** — sem a ressalva
+de croma, o laranja do wordmark e os arcos verde e azul do botão iam junto e o
+produto perdia a marca.
+
+O ambiente de estúdio é **escuro com faixas estreitas de luz**, e a luz difusa do
+casco branco vem de três direcionais. Com ambiente claro em todas as direções, o
+verniz da face espelhava branco por igual e o vidro preto virava cinza chapado. A
+radiância das faixas também importa: com faixas de radiância 15 o especular somava
+0,37 em linear sobre a face e o preto renderizava em 164 de 255, com a arte inteira
+sob um véu. A mesma face com material não iluminado dá 14 — o teste que provou que
+o problema era luz, e não textura.
 
 Pipeline, reprodutível de ponta a ponta:
 
@@ -43,8 +70,10 @@ que é o que se mede incluindo os encaixes.
    cromado. O produto real é alumínio claro **fosco**, com reflexo largo e uma
    linha de junção no meio do perfil — que existe e aparece na vista lateral
    oficial.
-3. **Esta.** Alumínio fosco calibrado contra o render, três blocos, e espessura
-   medida em vez de estimada.
+3. **Alumínio fosco calibrado contra o render**, três blocos, espessura medida.
+   Melhor, mas ainda a paleta do render técnico: tudo cinza claro.
+4. **Esta.** Cor medida nas FOTOS: casco branco, trilho cinza médio, face de vidro
+   preto. Ambiente escuro com faixas, para o preto refletir faixa e não branco.
 
 ## Duas armadilhas geométricas que custaram uma rodada cada
 

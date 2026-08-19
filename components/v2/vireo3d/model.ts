@@ -155,56 +155,79 @@ function decal(shape: THREE.Shape, w: number, h: number): THREE.ShapeGeometry {
 // ---------------------------------------------------------------- materiais
 
 /**
- * Alumínio claro do casco. Calibrado contra o render oficial, não contra a ideia
- * de "metal": o produto é anodizado FOSCO, com reflexo largo e suave. A versão
- * anterior usava metalness 0,94 com anisotropia, e o resultado lia como brinquedo
- * cromado — foi o "material fake" que apareceu na revisão.
+ * PALETA, medida nas fotos do produto em assets/device-source/ e não no render
+ * CAD. Os renders são cinza técnico uniforme; o produto tem três materiais bem
+ * diferentes, e usar um só era o que deixava o 3D com cara de maquete:
+ *
+ *   trilho do corpo   cinza médio semi-brilhante (agrupamento em luminância 134)
+ *   casco dos módulos branco fosco (agrupamento em 213)
+ *   face              VIDRO PRETO, com reflexo especular nítido (albedo em ~14)
  */
-function shellMaterial() {
+
+/** Trilho lateral do corpo: cinza médio, levemente metálico. */
+function railMaterial() {
   return new THREE.MeshPhysicalMaterial({
-    color: 0xe4e7ea,
-    metalness: 0.42,
-    roughness: 0.3,
-    clearcoat: 0.42,
+    color: 0x74787c,
+    metalness: 0.3,
+    roughness: 0.33,
+    clearcoat: 0.3,
     clearcoatRoughness: 0.22,
     envMapIntensity: 1.05,
   });
 }
 
-/** Plástico escuro da face. */
-function darkMaterial() {
+/** Casco dos módulos e do cabo: plástico branco fosco. */
+function shellMaterial() {
   return new THREE.MeshPhysicalMaterial({
-    color: 0x22262a,
-    metalness: 0.04,
-    roughness: 0.44,
-    clearcoat: 0.3,
-    clearcoatRoughness: 0.26,
-    envMapIntensity: 0.75,
-  });
-}
-
-/** Cinza do cabo e do alívio de tensão: PVC claro, mais fosco que o casco. */
-function cableMaterial() {
-  return new THREE.MeshStandardMaterial({
-    color: 0xdfe2e5,
-    metalness: 0.04,
-    roughness: 0.44,
+    color: 0xeceeeb,
+    metalness: 0,
+    roughness: 0.42,
+    clearcoat: 0.22,
+    clearcoatRoughness: 0.3,
     envMapIntensity: 0.95,
   });
 }
 
+/** Miolo sob a face: preto, praticamente sem reflexo próprio. */
+function darkMaterial() {
+  return new THREE.MeshPhysicalMaterial({
+    color: 0x101215,
+    metalness: 0.02,
+    roughness: 0.4,
+    clearcoat: 0.5,
+    clearcoatRoughness: 0.14,
+    envMapIntensity: 0.7,
+  });
+}
+
+/** Cabo e alívio de tensão: PVC branco, mais fosco que o casco. */
+function cableMaterial() {
+  return new THREE.MeshStandardMaterial({
+    color: 0xeae8e4,
+    metalness: 0.02,
+    roughness: 0.5,
+    envMapIntensity: 0.85,
+  });
+}
+
 /**
- * Arte oficial numa face. alphaTest e não transparent: assim o decalque desenha
- * na passagem opaca e o Z fica confiável — com transparent, a ordenação por
- * distância fazia a arte atravessar o corpo em certos ângulos.
+ * Arte oficial numa face, sob verniz. O clearcoat é o que faz a frente ler como
+ * VIDRO e não como adesivo: a arte fica embaixo, difusa, e o reflexo especular
+ * corre por cima dela — é o que se vê nas fotos do produto.
+ *
+ * alphaTest e não transparent: assim o decalque desenha na passagem opaca e o Z
+ * fica confiável. Com transparent, a ordenação por distância fazia a arte
+ * atravessar o corpo em certos ângulos.
  */
 function decalMaterial(map: THREE.Texture) {
-  return new THREE.MeshStandardMaterial({
+  return new THREE.MeshPhysicalMaterial({
     map,
     alphaTest: 0.5,
-    roughness: 0.42,
+    roughness: 0.34,
     metalness: 0.02,
-    envMapIntensity: 0.5,
+    clearcoat: 1,
+    clearcoatRoughness: 0.05,
+    envMapIntensity: 0.72,
     polygonOffset: true,
     polygonOffsetFactor: -2,
     polygonOffsetUnits: -2,
@@ -217,9 +240,16 @@ function decalMaterial(map: THREE.Texture) {
  * Estúdio de produto em softboxes largas. Um HDRI resolveria, mas seria um
  * download; e metal sem fonte de luz com FORMA não lê como metal.
  *
- * As fontes são largas e de baixa potência de propósito: o render oficial tem
- * reflexo suave, sem risco duro. Fontes estreitas e fortes produziam a faixa
- * espelhada que fazia o material parecer falso.
+ * A RADIÂNCIA das faixas é modesta de propósito. Com faixas de radiância 15, o
+ * especular do verniz somava 0,37 em linear sobre a face e o preto renderizava em
+ * 164 de 255 — a arte inteira aparecia sob um véu branco. Medido: a mesma face com
+ * material não iluminado dá 14, então o problema era luz e não textura.
+ *
+ * O FUNDO do ambiente é ESCURO, e isso é essencial. Com um ambiente claro em todas
+ * as direções, o verniz da face espelhava branco por igual e o vidro preto virava
+ * um cinza chapado. Precisa de contraste: fundo escuro com faixas de luz, para o
+ * preto refletir a faixa e ler como vidro. O fundo branco da CENA é outra coisa e
+ * continua branco.
  */
 export function createStudioEnvironment(
   renderer: THREE.WebGLRenderer,
@@ -235,7 +265,7 @@ export function createStudioEnvironment(
         vertexShader:
           "varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
         fragmentShader:
-          "varying vec3 vP; void main(){ float t = clamp(vP.y/14.0*0.5+0.5,0.0,1.0); gl_FragColor = vec4(mix(vec3(0.46),vec3(0.98),t),1.0); }",
+          "varying vec3 vP; void main(){ float t = clamp(vP.y/14.0*0.5+0.5,0.0,1.0); gl_FragColor = vec4(mix(vec3(0.02),vec3(0.13),t),1.0); }",
       }),
     ),
   );
@@ -258,11 +288,13 @@ export function createStudioEnvironment(
     scene.add(m);
   };
 
-  softbox(11, 6, [-3.2, 5.6, 4.4], 3.4); // principal, larga e alta
-  softbox(6, 12, [5.8, 0.8, 3.2], 2.2); // lateral direita
-  softbox(5, 12, [-5.8, 0.4, 2.4], 1.6); // lateral esquerda
-  softbox(9, 6, [0.8, -5.2, 3.6], 0.9); // preenchimento baixo
-  softbox(8, 8, [0.4, 1.4, -6.8], 1.4); // contraluz, separa do fundo branco
+  // Faixas ESTREITAS: é o que o vidro preto reflete como risco de luz. Softboxes
+  // largas cobriam quase toda a esfera do ambiente, o especular tomava a face
+  // inteira e o preto voltava a ler como cinza chapado.
+  softbox(1.5, 12, [-3.4, 2.8, 5.2], 2); // risco principal, cruzando a face
+  softbox(0.9, 9, [4.4, -0.8, 4.8], 1.5); // risco secundário, do outro lado
+  softbox(14, 10, [0, 0, 9], 0.12); // preenchimento amplo, só para não afundar
+  softbox(7, 7, [0.4, 1.4, -6.8], 0.7); // contraluz, separa do fundo branco
 
   const env = pmrem.fromScene(scene, 0.05).texture;
   pmrem.dispose();
@@ -293,7 +325,7 @@ export function createVireoDevice(tex: DeviceTextures): VireoDevice {
   const railGeo = slab(railSection(RAIL_W, DEPTH, 0.028, 0.011), H, 0.016);
   railGeo.rotateX(-Math.PI / 2);
   for (const sign of [-1, 1]) {
-    const rail = new THREE.Mesh(railGeo, shellMaterial());
+    const rail = new THREE.Mesh(railGeo, railMaterial());
     rail.position.set(sign * (0.5 - RAIL_W / 2), 0, 0);
     group.add(rail);
   }

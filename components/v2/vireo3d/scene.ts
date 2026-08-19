@@ -32,8 +32,14 @@ const FACES = [
 export type VireoScene = {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
-  /** Guinada da animação, somada à pose de repouso. */
+  /** Guinada da animação: gira só o corpo, deixando os módulos soltos parados. */
   pivot: THREE.Group;
+  /**
+   * Gira o CONJUNTO inteiro a partir da pose de repouso. É o que a folha de
+   * contato usa: girando apenas o pivô, os módulos acoplados ficavam onde estavam
+   * e a língua do conector aparecia atravessando a face do corpo girado.
+   */
+  spin: (radians: number) => void;
   device: VireoDevice;
   moduleTop: VireoModule;
   air: VireoModule;
@@ -67,11 +73,20 @@ export function createVireoScene(
       const camera = new THREE.PerspectiveCamera(26, 0.8, 0.1, 100);
       camera.position.set(0, 0, 6.4);
 
-      // O ambiente faz quase tudo. Esta direcional existe só para o plástico
-      // escuro da face ganhar gradiente próprio — com ambiente puro ele lê chapado.
-      const key = new THREE.DirectionalLight(0xffffff, 0.7);
-      key.position.set(-2.4, 3.2, 4.2);
+      /*
+       * O ambiente é escuro de propósito, para o vidro preto refletir faixas em
+       * vez de branco por igual. A luz DIFUSA do casco branco vem daqui: sem
+       * estas três direcionais, com ambiente escuro, o branco ficava cinza.
+       */
+      const key = new THREE.DirectionalLight(0xffffff, 2.1);
+      key.position.set(-2.6, 3.4, 4);
       scene.add(key);
+      const fill = new THREE.DirectionalLight(0xf2f5f8, 0.85);
+      fill.position.set(3.2, -0.4, 2.6);
+      scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.6);
+      rim.position.set(0.4, 1.2, -3.6);
+      scene.add(rim);
 
       /*
        * tilt > base > pivot. A pose de repouso mora nos dois grupos de fora, então
@@ -112,7 +127,21 @@ export function createVireoScene(
       cable.group.position.y = dockedY;
       base.add(air.group, cable.group);
 
-      return { scene, camera, pivot, device, moduleTop, air, cable, dockedY };
+      const spin = (radians: number) => {
+        base.rotation.y = REST_YAW + radians;
+      };
+
+      return {
+        scene,
+        camera,
+        pivot,
+        spin,
+        device,
+        moduleTop,
+        air,
+        cable,
+        dockedY,
+      };
     },
   );
 }
