@@ -120,22 +120,16 @@ def find_screen(body: Image.Image) -> tuple[int, int, int, int]:
         r, g, b, a = px[x, y]
         return a > 200 and 70 < r < 130 and abs(r - g) < 10 and abs(g - b) < 12
 
-    x_from, x_to = int(w * 0.08), int(w * 0.92)
+    # A busca exclui as faixas laterais: os trilhos metálicos também são cinza
+    # neutro e, incluídos, esticavam o retângulo de 0,22..0,78 para 0,09..0,90 da
+    # largura, quase a face inteira.
+    x_from, x_to = int(w * 0.16), int(w * 0.84)
     y_from, y_to = int(h * 0.05), int(h * 0.60)
 
-    # Perfis de linha e coluna, e não a caixa de todos os pixels que casam. Um
-    # bbox global é inflado por qualquer cinza solto fora do retângulo (o anel do
-    # botão, um reflexo na lateral), e foi isso que fez o conteúdo da tela
-    # transbordar o bezel e cobrir o wordmark.
-    rows = [sum(1 for x in range(x_from, x_to) if is_screen(x, y)) for y in range(y_from, y_to)]
-    if not any(rows):
+    xs = [x for y in range(y_from, y_to) for x in range(x_from, x_to) if is_screen(x, y)]
+    ys = [y for y in range(y_from, y_to) for x in range(x_from, x_to) if is_screen(x, y)]
+    if not xs:
         raise SystemExit("não localizei a tela na camada frontal")
-    row_gate = max(rows) * 0.55
-    ys = [y_from + i for i, c in enumerate(rows) if c >= row_gate]
-
-    cols = [sum(1 for y in ys if is_screen(x, y)) for x in range(x_from, x_to)]
-    col_gate = max(cols) * 0.55
-    xs = [x_from + i for i, c in enumerate(cols) if c >= col_gate]
 
     return (min(xs), min(ys), max(xs) + 1, max(ys) + 1)
 

@@ -1,51 +1,54 @@
 # Modelo 3D do VIREO AM
 
-`vireo-am.glb` — modelo glTF binário, com geometria e texturas embutidas. Abre em
-Blender, Keyshot, macOS Preview, ou qualquer visor glTF.
+`vireo-am.glb` — modelo glTF binário (13 malhas, 4 texturas embutidas). Abre em
+Blender, Keyshot, Preview do macOS ou qualquer visor glTF.
 
 ## Como foi construído
 
-Não é modelagem com primitivas. É **extrusão da silhueta real**:
+A divisão de trabalho é a decisão central do modelo:
 
-1. `scripts/trace-outline.py` traça o contorno do render ortográfico frontal
-   oficial (marching squares sub-pixel no canal alpha em iso 0.5, depois
-   Douglas-Peucker). Resultado em `lib/v2/vireo-outline.json`, 45 pontos.
-2. `components/v2/vireo3d/model.ts` extruda esse contorno com chanfro e aplica os
-   renders oficiais de frente e traseira como textura nas duas faces.
+| parte | origem |
+| --- | --- |
+| casco, trilhos, encaixe, língua do conector, cabo | **geometria**, com proporções medidas nos renders oficiais |
+| arte de cada face (wordmarks, botão, badge Air, etiqueta traseira) | **textura**, recortada dos renders oficiais |
+| tela acesa | canvas desenhado em código, paciente sintético |
 
-Portanto **o perfil do produto e as duas faces são o produto real**. O que o
-modelo inventa é apenas a lateral da extrusão.
+1. `scripts/measure-vireo.py` mede os renders de `assets/vireo-layers/` (recortes
+   do PDF CAD oficial) e grava `lib/v2/vireo-metrics.json`: proporção do corpo,
+   largura dos trilhos, retângulo da tela, geometria do módulo e do cabo. O mesmo
+   script recorta as faces para `public/device/model/face-*.png`.
+2. `components/v2/vireo3d/model.ts` constrói a geometria a partir dessas medidas.
 
-Por que não modelar com caixas arredondadas: o aparelho tem filetes compostos,
-trilhos metálicos com perfil próprio e chanfros no vidro. Aproximar isso com
-primitivas produz um brinquedo e erra a silhueta.
+Nada aqui é chute: cada número sai de uma varredura de pixels nos renders, e a
+normalização é sempre pela largura do corpo. Os renders têm escalas diferentes em
+pixels (frente 550 px de largura de corpo, traseira 421), então cada um é
+normalizado pelo próprio bbox — normalizar tudo pela frente esticava a traseira
+em 30%.
 
-## Detalhe que importa nos materiais
+## A tentativa anterior, e por que foi trocada
 
-As faces usam material **não iluminado** (`MeshBasicMaterial`). As texturas são
-renders de estúdio e já trazem key, fill e especular embutidos; aplicar PBR e
-luzes por cima ilumina duas vezes, lava o preto do vidro e produz estouros
-especulares sobre a arte. A luz da cena serve apenas à lateral extrudada, que é a
-única parte sem informação de sombreamento.
+A primeira versão extrudava a silhueta traçada inteira e colava os renders na
+frente e na traseira. De frente convencia; girando, virava papelão. Os trilhos
+metálicos são o que dá volume ao produto e, como pintura numa face chata,
+desapareciam a 90°: o perfil ficava uma barra cinza sem gráfico nenhum.
 
-## O que ainda é aproximação
+Com os trilhos em geometria e material anisotrópico, a luz faz o trabalho e a
+volta completa lê como um objeto só — que é o critério de qualidade que importa.
 
-| Parte | Estado |
-|---|---|
-| silhueta | contorno traçado do render oficial |
-| face frontal | render oficial, pixel a pixel |
-| face traseira | render oficial, pixel a pixel |
-| lateral | extrusão com chanfro, cor amostrada da carcaça |
-| profundidade | 0,22 da largura, estimada no render 3/4 |
-| trilhos metálicos, costuras, portas laterais | **não modelados** |
+## Limites conhecidos
 
-Para chegar a fidelidade de CAD seria preciso o modelo original da Cardioline. O
-que existe aqui já entrega um turntable de 360 graus em que frente, 3/4 e traseira
-são o produto real.
+- **Profundidade estimada.** `metrics.depth` (0,33 largura de corpo) vem da
+  espessura aparente no render em três quartos. Os renders oficiais não incluem
+  vista lateral a 90°, então a espessura exata precisaria do CAD da Cardioline.
+- **Sem filetes compostos nem portas laterais.** O CAD tem detalhes de lateral que
+  nenhum render disponível mostra.
+- **Traseira do módulo espelhada da frente.** Não existe render da traseira do
+  módulo; espelhar é mais honesto que inventar uma face.
 
-## Ver no navegador
+## Como regerar
 
-`/lab/vireo` renderiza uma folha de contato em doze ângulos, com um único
-contexto WebGL (um renderer por ângulo esgota o limite de contextos do
-navegador). A mesma página expõe `window.exportVireoGlb()`, que gera este
-arquivo.
+```bash
+python3 scripts/measure-vireo.py     # mede e recorta as faces
+# abra /lab/vireo e no console:
+await window.exportVireoGlb()        # devolve o .glb em base64
+```

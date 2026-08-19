@@ -1,0 +1,73 @@
+{
+  "note": "Tudo em unidades de LARGURA DO CORPO. Y cresce para baixo nas fra\u00e7\u00f5es de render.",
+  "source": "assets/vireo-layers/ (recortes dos renders CAD oficiais)",
+  "aspect": 1.55636,
+  "depth": 0.33,
+  "face": {
+    "x0": 0.0745,
+    "x1": 0.9255,
+    "w": 0.851
+  },
+  "screen": {
+    "w": 0.57818,
+    "h": 0.43091,
+    "cy": 0.18636
+  },
+  "button": {
+    "cy": -0.27091,
+    "r": 0.09455
+  },
+  "tabTop": {
+    "x0": 0.2436,
+    "x1": 0.7564,
+    "h": 0.0498
+  },
+  "tabBottom": {
+    "x0": 0.4127,
+    "x1": 0.5855,
+    "h": 0.03424
+  },
+  "faces": {
+    "front": {
+      "file": "/device/model/face-front.png",
+      "w": 0.85091,
+      "h": 1.55636
+    },
+    "back": {
+      "file": "/device/model/face-back.png",
+      "w": 0.85273,
+      "h": 1.55582
+    },
+    "air": {
+      "file": "/device/model/face-air.png",
+      "w": 0.84,
+      "h": 0.38545
+    },
+    "cable": {
+      "file": "/device/model/face-cable.png",
+      "w": 0.84,
+      "h": 0.38545
+    }
+  },
+  "module": {
+    "w": 0.98909,
+    "tongue": {
+      "w": 0.57268,
+      "h": 0.27949
+    },
+    "body": {
+      "h": 0.38596,
+      "radius": 0.17
+    },
+    "badgeCy": 0.3897,
+    "cableCone": {
+      "rTop": 0.079,
+      "rBottom": 0.059,
+      "h": 0.384
+    },
+    "cableLead": {
+      "r": 0.029,
+      "h": 1.2
+    }
+  }
+}

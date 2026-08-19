@@ -1,0 +1,114 @@
+/*
+ * Palco da animação do VIREO AM.
+ *
+ * Fundo branco, produto protagonista, muito espaço negativo. As legendas ficam
+ * na margem e saem durante o giro, que é o momento em que nada deve competir.
+ */
+
+.section {
+  position: relative;
+  background: #ffffff;
+}
+
+.viewport {
+  position: relative;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+/* Caixa reservada por proporção: nada de layout shift ao montar o canvas. */
+.stage {
+  position: relative;
+  width: min(84vw, 460px);
+  aspect-ratio: 4 / 5;
+}
+
+@media (min-width: 900px) {
+  .stage {
+    width: min(46vw, 620px);
+  }
+}
+
+.caption {
+  position: absolute;
+  left: clamp(20px, 5vw, 64px);
+  bottom: clamp(28px, 8vh, 84px);
+  max-width: 30ch;
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.captionOn {
+  opacity: 1;
+}
+
+.captionTitle {
+  margin: 0;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.024em;
+  color: var(--cl-ink);
+}
+
+.captionBody {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--cl-mute);
+}
+
+.rail {
+  position: absolute;
+  right: clamp(20px, 5vw, 64px);
+  top: 50%;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 899px) {
+  .rail {
+    display: none;
+  }
+}
+
+.tick {
+  width: 1px;
+  height: 26px;
+  background: var(--cl-line);
+  transition: background 200ms ease;
+}
+
+.tickOn {
+  background: var(--cl-orange);
+}
+
+.loading {
+  position: absolute;
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+/* Sem movimento: a seção deixa de ser fixada e mostra o estado final. */
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    height: auto;
+    padding-block: 96px;
+  }
+
+  .caption {
+    position: static;
+    opacity: 1;
+    margin-top: 40px;
+  }
+
+  .rail {
+    display: none;
+  }
+}

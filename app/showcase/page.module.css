@@ -1,0 +1,44 @@
+.page {
+  background: #ffffff;
+  color: var(--cl-ink);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px clamp(20px, 5vw, 64px);
+  background: color-mix(in srgb, #ffffff 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  width: 124px;
+  height: auto;
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--cl-font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.footer {
+  padding: 56px clamp(20px, 5vw, 64px) 72px;
+  border-top: 1px solid var(--cl-line);
+}
+
+.note {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--cl-mute);
+}
