@@ -120,3 +120,33 @@ export function createScreenTexture(): THREE.CanvasTexture {
 
   return finish(el);
 }
+
+/**
+ * Fundo do encaixe: fileira de contatos dourados sobre plástico escuro, como no
+ * render explodido oficial. Só aparece nos poucos instantes em que o módulo está
+ * separado, e é justamente o que mostra que ali existe um conector.
+ */
+export function createDockTexture(): THREE.CanvasTexture {
+  const W = 512;
+  const H = 64;
+  const { el, ctx } = canvas(W, H);
+  ctx.fillStyle = "#15181b";
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = "#0b0d0f";
+  ctx.fillRect(W * 0.06, H * 0.16, W * 0.88, H * 0.68);
+
+  const pins = 12;
+  const span = W * 0.76;
+  const pw = (span / pins) * 0.52;
+  for (let i = 0; i < pins; i++) {
+    const x = W * 0.12 + (span / pins) * (i + 0.5) - pw / 2;
+    const g = ctx.createLinearGradient(0, H * 0.28, 0, H * 0.72);
+    g.addColorStop(0, "#f0c874");
+    g.addColorStop(0.5, "#c9973f");
+    g.addColorStop(1, "#8a6522");
+    ctx.fillStyle = g;
+    ctx.fillRect(x, H * 0.28, pw, H * 0.44);
+  }
+  return finish(el);
+}

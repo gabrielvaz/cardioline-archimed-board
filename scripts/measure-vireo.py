@@ -1,12 +1,25 @@
 """Mede o VIREO AM nos renders oficiais e recorta as faces para o modelo 3D.
 
-Existe para que a geometria não seja chutada: cada número sai de uma medição em
-assets/vireo-layers/ (recortes dos renders CAD oficiais), normalizado pela
-LARGURA DO CORPO, e vai para lib/v2/vireo-metrics.json. O modelo 3D lê de lá.
+Fonte: assets/device-source/renders/, extraídos do PDF CAD oficial por
+scripts/extract-vireo-renders.py. Saída: lib/v2/vireo-metrics.json e os recortes
+de face em public/device/model/.
 
-Também recorta a área de FACE de cada render — só a parte escura chapada, sem os
-trilhos metálicos. Os trilhos passam a ser geometria de verdade (é o que faz a
-rotação ler como objeto); as faces continuam sendo a arte oficial.
+QUATRO COISAS QUE ESTE SCRIPT CORRIGE em relação à primeira versão, e que só
+apareceram quando o PDF inteiro foi aberto em vez de seis recortes feitos à mão:
+
+  espessura   — a VISTA LATERAL existe (02-side). 158 px de perfil contra 554 px
+                de largura de corpo, na mesma escala ortográfica: 0,285. Estava em
+                0,33, chutado da espessura aparente do render em três quartos.
+  três blocos — o aparelho é módulo superior + corpo + módulo inferior. O que a
+                vista frontal isolada mostra como "abas cinzas" nas pontas são os
+                DOCKS VAZIOS. O corpo sozinho tem aspecto 1,478, não 1,556.
+  largura     — corpo e módulos têm a MESMA largura. O 0,989 anterior vinha de
+                comparar recortes de renders em escalas diferentes.
+  uma escala  — todas as faces do conjunto saem do MESMO render (16-assembly-air),
+                então enquadramento e escala são coerentes por construção.
+
+Unidade de tudo: LARGURA DO CORPO = 1. Y das medidas em unidade de corpo tem
+origem no centro do corpo e cresce para cima, como na cena 3D.
 
 Uso: python3 scripts/measure-vireo.py
 """
@@ -14,151 +27,161 @@ Uso: python3 scripts/measure-vireo.py
 from __future__ import annotations
 
 import json
+from collections import deque
+from dataclasses import dataclass
 from pathlib import Path
 
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-LAYERS = ROOT / "assets" / "vireo-layers"
+SRC = ROOT / "assets" / "device-source" / "renders"
 FACES = ROOT / "public" / "device" / "model"
 
-# Fronteiras da face, em fração da largura do corpo. Medido em três renders
-# independentes (corpo, módulo Air, módulo de cabo): o trilho claro termina em
-# 0,069..0,079 e a faixa escura começa em 0,081, o que confirma que trilho e face
-# são contínuos entre corpo e módulo — por isso um único par de números serve aos
-# três.
+# Fronteira da face escura em fração da largura. O trilho claro termina em 0,069 e
+# a faixa escura começa em 0,081 nos renders medidos; 0,0745 é a fronteira
+# geométrica entre os dois, com a linha de junção caindo em cima dela.
 FACE_X0 = 0.0745
 FACE_X1 = 0.9255
 
-# Profundidade do corpo em larguras de corpo. ESTIMATIVA, lida da espessura
-# aparente do render em três quartos; os renders oficiais não incluem vista
-# lateral a 90°, então a espessura exata precisaria do CAD da Cardioline.
-DEPTH = 0.33
+WHITE = 244
 
-# Largura do módulo em larguras de corpo: 544 px de módulo contra 550 do corpo,
-# no mesmo render do PDF.
-MODULE_W = 544 / 550
-
-# O render do módulo de cabo é mais alto (inclui o cabo pendurado), mas a peça é
-# a mesma: língua e bloco têm a mesma altura em pixels nos dois renders. Daí as
-# frações do bloco no render do cabo.
-CABLE_BODY = (153.7 / 650, 366.0 / 650)
-
-# Cabo abaixo do bloco, em unidades de corpo: cone de alívio e depois o cabo.
-CABLE_CONE = {"rTop": 0.079, "rBottom": 0.059, "h": 0.384}
-CABLE_LEAD = {"r": 0.029, "h": 1.2}
-
-# Fração da altura do render do módulo ocupada pela língua do conector, medida na
-# varredura de opacidade: até 0,42 a peça tem só a largura da língua.
+# Proporção língua/bloco na peça isolada do módulo, medida por varredura de
+# opacidade em 22-module-air: até 0,42 da altura a peça tem só a largura da língua.
 TONGUE_FRAC = 0.42
+TONGUE_W = 0.573
 
 
-def body_box(im: Image.Image) -> tuple[int, int, int, int]:
+# --------------------------------------------------------------------- imagem
+
+
+def load(stem: str) -> Image.Image:
+    """Abre um render e transforma o fundo branco em alpha.
+
+    Preenchimento a partir da borda, e não limiar global: o produto tem brancos
+    internos — a etiqueta da traseira, o alívio de tensão, o feixe de cabos — que
+    um limiar apagaria junto com o fundo.
+    """
+    im = Image.open(SRC / f"{stem}.png").convert("RGBA")
     w, h = im.size
     px = im.load()
 
-    def opaque(x: int, y: int) -> bool:
-        return px[x, y][3] > 200
+    def is_bg(x: int, y: int) -> bool:
+        r, g, b, _ = px[x, y]
+        return r >= WHITE and g >= WHITE and b >= WHITE
 
-    xs = [x for x in range(w) if any(opaque(x, y) for y in range(0, h, 3))]
-    ys = [y for y in range(h) if any(opaque(x, y) for x in range(0, w, 3))]
-    return min(xs), min(ys), max(xs) + 1, max(ys) + 1
+    seen = bytearray(w * h)
+    q: deque[tuple[int, int]] = deque()
+
+    def push(x: int, y: int) -> None:
+        if not seen[y * w + x] and is_bg(x, y):
+            seen[y * w + x] = 1
+            q.append((x, y))
+
+    for x in range(w):
+        push(x, 0)
+        push(x, h - 1)
+    for y in range(h):
+        push(0, y)
+        push(w - 1, y)
+    while q:
+        x, y = q.popleft()
+        px[x, y] = (255, 255, 255, 0)
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < w and 0 <= ny < h:
+                push(nx, ny)
+    return im
 
 
-def load(name: str) -> tuple[Image.Image, tuple[int, int, int, int]]:
-    im = Image.open(LAYERS / f"{name}.png").convert("RGBA")
-    return im, body_box(im)
+@dataclass(frozen=True)
+class Box:
+    x0: int
+    y0: int
+    x1: int
+    y1: int
+
+    @property
+    def w(self) -> int:
+        return self.x1 - self.x0
+
+    @property
+    def h(self) -> int:
+        return self.y1 - self.y0
 
 
-def crop_face(
-    name: str,
-    out: str,
-    width_in_body_units: float,
-    pad_top: int = 0,
-    y_from: float = 0.0,
-    y_to: float = 1.0,
-) -> dict[str, float]:
-    """Recorta a faixa de face e devolve seu tamanho em unidades de corpo.
+def bbox(im: Image.Image) -> Box:
+    px = im.load()
+    w, h = im.size
 
-    Cada render tem a própria escala em pixels — a traseira sai do PDF com 421 px
-    de largura de corpo e a frente com 550 —, então a normalização é sempre pelo
-    bbox DA PRÓPRIA imagem, multiplicado pela largura da peça em unidades de
-    corpo. Normalizar tudo pela largura da frente esticava a traseira em 30%.
+    def op(x: int, y: int) -> bool:
+        return px[x, y][3] > 160
 
-    pad_top acrescenta linhas transparentes no topo: o render da traseira está
-    4 px curto e, sem isso, frente e traseira não casam na rotação.
+    xs = [x for x in range(w) if any(op(x, y) for y in range(0, h, 2))]
+    ys = [y for y in range(h) if any(op(x, y) for x in range(0, w, 2))]
+    return Box(min(xs), min(ys), max(xs) + 1, max(ys) + 1)
 
-    y_from e y_to cortam o recorte na vertical. Nos módulos ele descarta a língua do conector,
-    que passa a ser geometria: ela entra dentro do corpo quando acoplada, então
-    não pode ser uma textura chapada no mesmo plano da face.
+
+def row_width(im: Image.Image, b: Box, y: int) -> int:
+    px = im.load()
+    r = [x for x in range(b.x0, b.x1) if px[x, y][3] > 160]
+    return (max(r) - min(r) + 1) if r else 0
+
+
+def full_width_span(im: Image.Image, b: Box) -> tuple[int, int]:
+    """Faixa vertical onde a peça está na largura cheia."""
+    ys = [y for y in range(b.y0, b.y1) if row_width(im, b, y) >= b.w - 2]
+    return min(ys), max(ys) + 1
+
+
+def part_span(im: Image.Image, b: Box) -> tuple[int, int]:
+    """Faixa vertical do CORPO da peça, incluindo as pontas arredondadas.
+
+    Cresce a partir da faixa de largura cheia até a largura cair abaixo de 55%.
+    É o que separa o aparelho do cabo que sai dele.
     """
-    im, (x0, y0, x1, y1) = load(name)
-    w = x1 - x0
-    fx0 = x0 + round(w * FACE_X0)
-    fx1 = x0 + round(w * FACE_X1)
-    ih = y1 - y0
-    face = im.crop((fx0, y0 + round(ih * y_from), fx1, y0 + round(ih * y_to)))
-    if pad_top:
-        padded = Image.new("RGBA", (face.width, face.height + pad_top), (0, 0, 0, 0))
-        padded.alpha_composite(face, (0, pad_top))
-        face = padded
-    FACES.mkdir(parents=True, exist_ok=True)
-    face.save(FACES / out)
-    unit = w / width_in_body_units
-    return {
-        "file": f"/device/model/{out}",
-        "w": round(face.width / unit, 5),
-        "h": round(face.height / unit, 5),
-    }
+    y0, y1 = full_width_span(im, b)
+    while y0 > b.y0 and row_width(im, b, y0 - 1) > b.w * 0.55:
+        y0 -= 1
+    while y1 < b.y1 and row_width(im, b, y1) > b.w * 0.55:
+        y1 += 1
+    return y0, y1
 
 
-body, (bx0, by0, bx1, by1) = load("front-off")
-BW = bx1 - bx0
-BH = by1 - by0
-px = body.load()
+def seams(im: Image.Image, b: Box, y_from: int, y_to: int) -> list[int]:
+    """Junções entre blocos: linhas escuras atravessando o trilho metálico."""
+    px = im.load()
+    band = range(b.x0 + int(b.w * 0.012), b.x0 + int(b.w * 0.055))
+    vals: list[tuple[int, float]] = []
+    for y in range(y_from, y_to):
+        lit = [sum(px[x, y][:3]) / 3 for x in band if px[x, y][3] > 160]
+        vals.append((y, sum(lit) / len(lit) if lit else 255.0))
+    ref = sorted(v for _, v in vals)[len(vals) // 2]
+    hits = [y for y, v in vals if v < ref - 26]
+    if not hits:
+        return []
+    out: list[int] = []
+    run = [hits[0]]
+    for y in hits[1:]:
+        if y - run[-1] <= 12:
+            run.append(y)
+        else:
+            out.append(sum(run) // len(run))
+            run = [y]
+    out.append(sum(run) // len(run))
+    return out
 
 
-def frac_x(x: int) -> float:
-    return (x - bx0) / BW
-
-
-def frac_y(y: int) -> float:
-    return (y - by0) / BH
-
-
-def grey(x: int, y: int) -> bool:
-    r, g, b, a = px[x, y]
-    return a > 200 and 70 < r < 140 and abs(r - g) < 10 and abs(g - b) < 14
-
-
-# --- tela apagada: cresce a partir de uma semente no terço superior da face.
-cx = (bx0 + bx1) // 2
-seed = by0 + int(BH * 0.35)
-if not grey(cx, seed):
-    raise SystemExit("não achei a tela na semente; o render mudou?")
-sy0 = seed
-while grey(cx, sy0 - 1):
-    sy0 -= 1
-sy1 = seed
-while grey(cx, sy1 + 1):
-    sy1 += 1
-mid = (sy0 + sy1) // 2
-sx0 = cx
-while grey(sx0 - 1, mid):
-    sx0 -= 1
-sx1 = cx
-while grey(sx1 + 1, mid):
-    sx1 += 1
-
-
-def arc(pred) -> tuple[int, int, int, int]:
+def region(im: Image.Image, b: Box, test) -> Box:
+    px = im.load()
     pts = [
         (x, y)
-        for y in range(by0, by1)
-        for x in range(bx0, bx1)
-        if px[x, y][3] > 200 and pred(*px[x, y][:3])
+        for y in range(b.y0, b.y1)
+        for x in range(b.x0, b.x1)
+        if px[x, y][3] > 160 and test(*px[x, y][:3])
     ]
-    return (
+    if not pts:
+        raise SystemExit("região não encontrada; o render mudou?")
+    return Box(
         min(p[0] for p in pts),
         min(p[1] for p in pts),
         max(p[0] for p in pts) + 1,
@@ -166,55 +189,218 @@ def arc(pred) -> tuple[int, int, int, int]:
     )
 
 
-gx0, gy0, gx1, gy1 = arc(lambda r, g, b: g > 150 and g - r > 60 and g - b > 60)
-bx0b, by0b, bx1b, by1b = arc(lambda r, g, b: b > 150 and b - r > 60 and b - g > 40)
-btn_x = (min(gx0, bx0b) + max(gx1, bx1b)) / 2
-btn_y = (min(gy0, by0b) + max(gy1, by1b)) / 2
+# ------------------------------------------------------- conjunto de referência
 
-ASPECT = BH / BW
+asm = load("16-assembly-air")
+A = bbox(asm)
+UNIT = A.w  # largura do conjunto = largura do corpo = 1 unidade
+ASM_TOP, ASM_BOTTOM = part_span(asm, A)
+ASM_H = ASM_BOTTOM - ASM_TOP
+
+found = seams(asm, A, ASM_TOP + int(ASM_H * 0.05), ASM_BOTTOM - int(ASM_H * 0.05))
+inner = [y for y in found if ASM_H * 0.12 < (y - ASM_TOP) < ASM_H * 0.88]
+if len(inner) < 2:
+    raise SystemExit(f"esperava 2 junções entre os blocos, achei {found}")
+SEAM_TOP, SEAM_BOTTOM = min(inner), max(inner)
+
+BODY_H = (SEAM_BOTTOM - SEAM_TOP) / UNIT
+TOP_H = (SEAM_TOP - ASM_TOP) / UNIT
+BOTTOM_H = (ASM_BOTTOM - SEAM_BOTTOM) / UNIT
+BODY_MID = (SEAM_TOP + SEAM_BOTTOM) / 2
+
+
+def body_y(y: float) -> float:
+    return round((BODY_MID - y) / UNIT, 5)
+
+
+# --------------------------------------------------------------- vista lateral
+#
+# As duas vistas ortográficas saem do PDF na mesma escala: a frontal tem 860 px de
+# altura de aparelho e a lateral 857. O perfil pode ser lido direto contra a
+# largura da frontal.
+front = load("01-front-with-docks")
+F = bbox(front)
+side = load("02-side")
+S = bbox(side)
+if abs(F.h - S.h) > F.h * 0.02:
+    raise SystemExit("frontal e lateral não estão na mesma escala")
+DEPTH = round(S.w / F.w, 5)
+
+
+# ------------------------------------------------------------- tela e botão
+#
+# A tela apagada é (61,68,61) e a face é (50,54,57): quase o mesmo cinza. O que
+# separa as duas é o VERDE — a tela puxa para o verde, a face para o azul. Um
+# limiar de luminância pega as duas e devolve a face inteira como tela.
+body_box = Box(A.x0 + int(UNIT * 0.16), SEAM_TOP, A.x1 - int(UNIT * 0.16), SEAM_BOTTOM)
+
+
+def is_screen(x: int, y: int) -> bool:
+    r, g, b, a = asm.load()[x, y]
+    return a > 160 and 45 < g < 95 and g - r >= 4 and g - b >= 4
+
+
+def grow_screen() -> Box:
+    """Cresce a tela a partir de uma semente, em vez de coletar por cor na face.
+
+    Coletar por cor devolvia a face inteira: ela é (50,54,57) e a tela apagada é
+    (61,68,61) — o único sinal é o desvio para o verde, e o antialiasing das
+    letras e do botão produz pixels isolados que passam no mesmo teste e esticam
+    a caixa. Crescimento contíguo ignora esses pixels soltos.
+    """
+    cx = (A.x0 + A.x1) // 2
+    seed = next(
+        (y for y in range(SEAM_TOP, SEAM_BOTTOM) if is_screen(cx, y)),
+        None,
+    )
+    if seed is None:
+        raise SystemExit("não achei a tela na coluna central")
+    y0 = seed
+    while y0 > SEAM_TOP and is_screen(cx, y0 - 1):
+        y0 -= 1
+    y1 = seed
+    while y1 + 1 < SEAM_BOTTOM and is_screen(cx, y1 + 1):
+        y1 += 1
+    mid = (y0 + y1) // 2
+    x0 = cx
+    while x0 > body_box.x0 and is_screen(x0 - 1, mid):
+        x0 -= 1
+    x1 = cx
+    while x1 + 1 < body_box.x1 and is_screen(x1 + 1, mid):
+        x1 += 1
+    return Box(x0, y0, x1 + 1, y1 + 1)
+
+
+screen = grow_screen()
+arcs = region(
+    asm,
+    body_box,
+    lambda r, g, b: (g > 140 and g - r > 55 and g - b > 55)
+    or (b > 140 and b - r > 55 and b - g > 35),
+)
+
+
+# ------------------------------------------------------------ recorte de faces
+
+faces: dict[str, dict[str, float]] = {}
+
+
+def crop(im: Image.Image, unit: int, b: Box, out: str, key: str) -> None:
+    piece = im.crop((b.x0, b.y0, b.x1, b.y1))
+    FACES.mkdir(parents=True, exist_ok=True)
+    piece.save(FACES / out)
+    faces[key] = {
+        "file": f"/device/model/{out}",
+        "w": round(piece.width / unit, 5),
+        "h": round(piece.height / unit, 5),
+    }
+
+
+def face_x(x_left: int, unit: int) -> tuple[int, int]:
+    return x_left + round(unit * FACE_X0), x_left + round(unit * FACE_X1)
+
+
+fx0, fx1 = face_x(A.x0, UNIT)
+crop(asm, UNIT, Box(fx0, SEAM_TOP, fx1, SEAM_BOTTOM), "face-body.png", "bodyFront")
+crop(asm, UNIT, Box(fx0, ASM_TOP, fx1, SEAM_TOP), "face-top.png", "moduleTop")
+
+# Módulos inferiores: dos renders ISOLADOS, que trazem o badge. O conjunto mostra
+# um módulo liso, sem marcação. A escala vem da largura própria de cada render —
+# módulo e corpo têm a mesma largura, então normalizar por ela basta.
+for stem, out, key in (
+    ("22-module-air", "face-air.png", "air"),
+    ("17-module-cable", "face-cable.png", "cable"),
+):
+    mod = load(stem)
+    M = bbox(mod)
+    m_top, _ = full_width_span(mod, M)
+    _, m_bottom = part_span(mod, M)
+    mfx0, mfx1 = face_x(M.x0, M.w)
+    crop(mod, M.w, Box(mfx0, m_top, mfx1, m_bottom), out, key)
+
+# Feixe de 12 derivações: só o trecho de largura constante, acima do alívio.
+harness = Box(A.x0, A.y0, A.x1, ASM_TOP)
+hw = [row_width(asm, A, y) for y in range(harness.y0, harness.y1)]
+strain_h = 0
+for i, v in enumerate(reversed(hw)):
+    if v < UNIT * 0.46:
+        strain_h = i
+        break
+CABLE_TOP = harness.y1 - strain_h
+cable_row = CABLE_TOP - 4
+cpx = asm.load()
+cxs = [x for x in range(A.x0, A.x1) if cpx[x, cable_row][3] > 160]
+crop(
+    asm,
+    UNIT,
+    Box(min(cxs), A.y0, max(cxs) + 1, CABLE_TOP),
+    "face-harness.png",
+    "harness",
+)
+
+# Módulo de cabo: do conjunto com cabo, na escala DELE.
+cable_asm = load("15-assembly-cable")
+C = bbox(cable_asm)
+C_TOP, C_BOTTOM = part_span(cable_asm, C)
+c_found = seams(
+    cable_asm, C, C_TOP + int((C_BOTTOM - C_TOP) * 0.05), C_BOTTOM - int((C_BOTTOM - C_TOP) * 0.05)
+)
+c_inner = [y for y in c_found if (C_BOTTOM - C_TOP) * 0.12 < (y - C_TOP) < (C_BOTTOM - C_TOP) * 0.88]
+# Cabo de paciente abaixo do módulo, medido no mesmo render.
+cpx2 = cable_asm.load()
+lead = []
+for y in range(C_BOTTOM, C.y1):
+    r = [x for x in range(C.x0, C.x1) if cpx2[x, y][3] > 160]
+    if r:
+        lead.append((y, (max(r) - min(r) + 1) / C.w))
+lead_top_w = lead[2][1] if len(lead) > 2 else 0.16
+lead_bottom_w = lead[-3][1] if len(lead) > 3 else 0.06
+
+back = load("05-back")
+B = bbox(back)
+B_TOP, B_BOTTOM = full_width_span(back, B)
+bfx0, bfx1 = face_x(B.x0, B.w)
+crop(back, B.w, Box(bfx0, B_TOP, bfx1, B_BOTTOM), "face-body-back.png", "bodyBack")
+
 
 metrics = {
-    "note": "Tudo em unidades de LARGURA DO CORPO. Y cresce para baixo nas frações de render.",
-    "source": "assets/vireo-layers/ (recortes dos renders CAD oficiais)",
-    "aspect": round(ASPECT, 5),
-    "depth": DEPTH,
+    "note": "Tudo em unidades de LARGURA DO CORPO. Medido nos renders CAD oficiais.",
+    "source": "assets/device-source/renders/ (extraídos do PDF oficial)",
+    "body": {"aspect": round(BODY_H, 5), "depth": DEPTH, "corner": 0.06},
+    "rail": {"w": FACE_X0},
     "face": {"x0": FACE_X0, "x1": FACE_X1, "w": round(FACE_X1 - FACE_X0, 5)},
-    # Tela em unidades de corpo, com origem no centro do corpo e Y para cima.
     "screen": {
-        "w": round((sx1 + 1 - sx0) / BW, 5),
-        "h": round((sy1 + 1 - sy0) / BW, 5),
-        "cy": round((0.5 - (frac_y(sy0) + frac_y(sy1 + 1)) / 2) * ASPECT, 5),
+        "w": round(screen.w / UNIT, 5),
+        "h": round(screen.h / UNIT, 5),
+        "cy": body_y((screen.y0 + screen.y1) / 2),
     },
     "button": {
-        "cy": round((0.5 - frac_y(int(btn_y))) * ASPECT, 5),
-        "r": round((max(gx1, bx1b) - min(gx0, bx0b)) / 2 / BW, 5),
+        "cy": body_y((arcs.y0 + arcs.y1) / 2),
+        "r": round(arcs.w / 2 / UNIT, 5),
     },
-    # Abas cinzas: uma faixa no topo e um ressalto no centro da base.
-    "tabTop": {"x0": 0.2436, "x1": 0.7564, "h": round(0.032 * ASPECT, 5)},
-    "tabBottom": {"x0": 0.4127, "x1": 0.5855, "h": round(0.022 * ASPECT, 5)},
-    "faces": {
-        "front": crop_face("front-off", "face-front.png", 1.0),
-        "back": crop_face("back", "face-back.png", 1.0, pad_top=4),
-        "air": crop_face("module-air", "face-air.png", MODULE_W, y_from=TONGUE_FRAC),
-        "cable": crop_face(
-            "module-cable",
-            "face-cable.png",
-            MODULE_W,
-            y_from=CABLE_BODY[0],
-            y_to=CABLE_BODY[1],
-        ),
-    },
-    # Módulo: a língua entra no corpo, o bloco fica visível abaixo dele.
     "module": {
-        "w": round(MODULE_W, 5),
-        "tongue": {"w": round(0.579 * MODULE_W, 5), "h": round(TONGUE_FRAC * 366 / 544 * MODULE_W, 5)},
-        "body": {"h": round((1 - TONGUE_FRAC) * 366 / 544 * MODULE_W, 5), "radius": 0.17},
-        # Centro do badge na altura do BLOCO (não do render inteiro), fração a partir
-        # do topo do bloco.
-        "badgeCy": round((0.646 - TONGUE_FRAC) / (1 - TONGUE_FRAC), 4),
-        "cableCone": CABLE_CONE,
-        "cableLead": CABLE_LEAD,
+        "topH": round(TOP_H, 5),
+        "bottomH": round(BOTTOM_H, 5),
+        # Raio da ponta externa: ajustado às larguras medidas a 0,04 e 0,08 da
+        # altura do conjunto. É o U metálico das extremidades.
+        "corner": 0.23,
+        "tongue": {
+            "w": TONGUE_W,
+            "h": round(BOTTOM_H / (1 - TONGUE_FRAC) * TONGUE_FRAC, 5),
+        },
     },
+    "harness": {
+        "strain": {"h": round(strain_h / UNIT, 5), "wTop": 0.453, "wBottom": 0.621},
+        "cableW": round((max(cxs) + 1 - min(cxs)) / UNIT, 5),
+        "cableH": round((CABLE_TOP - A.y0) / UNIT, 5),
+    },
+    "lead": {
+        "coneTop": round(lead_top_w / 2, 5),
+        "coneBottom": round(lead_bottom_w / 2, 5),
+        "h": round((C.y1 - C_BOTTOM) / C.w, 5),
+    },
+    "faces": faces,
+    "assembly": {"aspect": round(ASM_H / UNIT, 5)},
 }
 
 (ROOT / "lib" / "v2" / "vireo-metrics.json").write_text(

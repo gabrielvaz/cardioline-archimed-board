@@ -69,19 +69,32 @@ export const TURNS = 1;
 
 /**
  * Curso do módulo ao se separar, em unidades de largura do corpo. Limitado pelo
- * quadro: com o corpo em BODY_UNITS e o módulo abaixo dele, passar de ~0,40 joga
+ * quadro: o conjunto já ocupa quase toda a altura visível, e passar de ~0,34 joga
  * o módulo fora da câmera no ponto de separação máxima.
  */
-export const MODULE_TRAVEL = 0.4;
-
-/** Altura do CORPO na cena. É o que define o quanto o produto ocupa o quadro. */
-export const BODY_UNITS = 1.62;
+export const MODULE_TRAVEL = 0.3;
 
 /**
- * Deslocamento vertical do conjunto. O módulo pendura abaixo do corpo, então sem
- * este empurrão o produto lê baixo demais no quadro.
+ * Altura do CONJUNTO MONTADO na cena, em unidades de mundo. É o único número de
+ * enquadramento: a escala do modelo sai dele dividido pela proporção medida do
+ * conjunto, então mudar o tamanho do produto no quadro é mudar isto.
  */
-export const FRAME_LIFT = 0.18;
+export const ASSEMBLY_UNITS = 2.24;
+
+/**
+ * Deslocamento vertical do conjunto. O feixe de derivações sai por cima e o
+ * módulo se separa por baixo; este empurrão equilibra os dois no quadro.
+ */
+export const FRAME_LIFT = -0.06;
+
+/**
+ * Pose de repouso. O produto NÃO fica de frente chapado: um render de produto
+ * frontal puro perde a espessura e a linha dos trilhos, e lê como desenho. Vinte
+ * graus de guinada e sete de inclinação bastam para o volume aparecer sem que a
+ * arte da face deixe de ser legível.
+ */
+export const REST_YAW = (-20 * Math.PI) / 180;
+export const REST_TILT = (-7 * Math.PI) / 180;
 
 export function stageAt(progress: number): Stage {
   for (const s of STAGES) {

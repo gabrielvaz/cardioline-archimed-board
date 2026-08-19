@@ -1,7 +1,8 @@
 # Modelo 3D do VIREO AM
 
-`vireo-am.glb` — modelo glTF binário (13 malhas, 4 texturas embutidas). Abre em
-Blender, Keyshot, Preview do macOS ou qualquer visor glTF.
+`vireo-am.glb` — modelo glTF binário do conjunto montado (corpo, módulo superior
+de 12 derivações e módulo inferior). Abre em Blender, Keyshot, Preview do macOS ou
+qualquer visor glTF.
 
 ## Como foi construído
 
@@ -9,46 +10,64 @@ A divisão de trabalho é a decisão central do modelo:
 
 | parte | origem |
 | --- | --- |
-| casco, trilhos, encaixe, língua do conector, cabo | **geometria**, com proporções medidas nos renders oficiais |
+| casco, trilhos, língua do conector, alívio de tensão, feixe, cabo | **geometria**, com proporções medidas nos renders |
 | arte de cada face (wordmarks, botão, badge Air, etiqueta traseira) | **textura**, recortada dos renders oficiais |
-| tela acesa | canvas desenhado em código, paciente sintético |
+| tela acesa e contatos do conector | canvas desenhado em código, paciente sintético |
 
-1. `scripts/measure-vireo.py` mede os renders de `assets/vireo-layers/` (recortes
-   do PDF CAD oficial) e grava `lib/v2/vireo-metrics.json`: proporção do corpo,
-   largura dos trilhos, retângulo da tela, geometria do módulo e do cabo. O mesmo
-   script recorta as faces para `public/device/model/face-*.png`.
-2. `components/v2/vireo3d/model.ts` constrói a geometria a partir dessas medidas.
+Pipeline, reprodutível de ponta a ponta:
 
-Nada aqui é chute: cada número sai de uma varredura de pixels nos renders, e a
-normalização é sempre pela largura do corpo. Os renders têm escalas diferentes em
-pixels (frente 550 px de largura de corpo, traseira 421), então cada um é
-normalizado pelo próprio bbox — normalizar tudo pela frente esticava a traseira
-em 30%.
+```bash
+python3 scripts/extract-vireo-renders.py   # 85 renders JPEG embutidos no PDF oficial
+python3 scripts/measure-vireo.py           # mede tudo e recorta as faces
+```
 
-## A tentativa anterior, e por que foi trocada
+O measure grava `lib/v2/vireo-metrics.json`, que o modelo lê. Nada é chutado: cada
+número sai de uma varredura de pixels nos renders, normalizada pela largura do
+corpo. Renders diferentes saem do PDF em escalas diferentes (a frontal com 554 px
+de largura de corpo, a traseira com 421), então cada um é normalizado pelo próprio
+bbox.
 
-A primeira versão extrudava a silhueta traçada inteira e colava os renders na
-frente e na traseira. De frente convencia; girando, virava papelão. Os trilhos
-metálicos são o que dá volume ao produto e, como pintura numa face chata,
-desapareciam a 90°: o perfil ficava uma barra cinza sem gráfico nenhum.
+## O aparelho tem três blocos
 
-Com os trilhos em geometria e material anisotrópico, a luz faz o trabalho e a
-volta completa lê como um objeto só — que é o critério de qualidade que importa.
+Módulo superior (feixe de 12 derivações) + corpo + módulo inferior (Air ou cabo de
+paciente). A vista frontal isolada engana: o que ela mostra como abas cinzas nas
+pontas são os **encaixes vazios**. O corpo sozinho tem aspecto 1,478 — não 1,556,
+que é o que se mede incluindo os encaixes.
+
+## Três tentativas, e o que cada uma ensinou
+
+1. **Extrusão da silhueta com o render colado nas duas faces.** De frente
+   convencia; girando, virava papelão. Os trilhos metálicos são volume, não
+   pintura, e a 90° desapareciam.
+2. **Geometria com metal muito espelhado e anisotrópico.** Lia como brinquedo
+   cromado. O produto real é alumínio claro **fosco**, com reflexo largo e uma
+   linha de junção no meio do perfil — que existe e aparece na vista lateral
+   oficial.
+3. **Esta.** Alumínio fosco calibrado contra o render, três blocos, e espessura
+   medida em vez de estimada.
+
+## Duas armadilhas geométricas que custaram uma rodada cada
+
+- **Raio de canto maior que a meia-altura da caixa.** O raio de ponta do módulo é
+  0,23 medido no render, contra 0,199 de meia-altura de bloco. Os dois filetes do
+  mesmo lado se cruzavam, o contorno passava a ter autointerseção e a extrusão
+  devolvia faces enormes atravessando o produto. Daí a função `fitRadius`.
+- **Origem do módulo na borda errada.** O deslocamento tem de ser `+dir·h/2`, e a
+  língua aponta para `-dir`: com os sinais trocados os módulos invadiam o corpo e a
+  língua ficava pendurada para fora, com os contatos à mostra o tempo todo.
 
 ## Limites conhecidos
 
-- **Profundidade estimada.** `metrics.depth` (0,33 largura de corpo) vem da
-  espessura aparente no render em três quartos. Os renders oficiais não incluem
-  vista lateral a 90°, então a espessura exata precisaria do CAD da Cardioline.
-- **Sem filetes compostos nem portas laterais.** O CAD tem detalhes de lateral que
-  nenhum render disponível mostra.
-- **Traseira do módulo espelhada da frente.** Não existe render da traseira do
-  módulo; espelhar é mais honesto que inventar uma face.
+- **Sem os conectores em leque do módulo de 12 derivações.** O render explodido
+  mostra dez conectores individuais com terminais; o feixe aqui é o bloco estriado
+  que a vista frontal oficial mostra.
+- **Sem os filetes compostos e as portas laterais do CAD.**
+- **Traseira dos módulos espelhada da frente.** Não existe render dela; espelhar é
+  mais honesto que inventar uma face.
 
-## Como regerar
+## Como regerar o .glb
 
 ```bash
-python3 scripts/measure-vireo.py     # mede e recorta as faces
 # abra /lab/vireo e no console:
-await window.exportVireoGlb()        # devolve o .glb em base64
+await window.exportVireoGlb()   # devolve o .glb em base64
 ```
