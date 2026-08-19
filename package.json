@@ -12,25 +12,27 @@
     "verify": "node scripts/verify-slides.mjs"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "gsap": "^3.13.0",
+    "motion": "^13.1.0",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "gsap": "^3.13.0",
-    "motion": "^13.1.0",
-    "@phosphor-icons/react": "^2.1.10"
+    "three": "^0.185.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.185.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "prettier": "^3.9.6",
     "puppeteer": "^25.8.0",
-    "typescript": "^5",
-    "vitest": "^4.1.11",
-    "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
-    "prettier": "^3.9.6"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   },
   "packageManager": "pnpm@10.32.1"
 }

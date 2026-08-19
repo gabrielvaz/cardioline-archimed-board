@@ -124,6 +124,29 @@ Só a amostragem de pixel na captura revelou o problema: os seletores do probe d
 DOM erravam o elemento, e a inspeção visual não distingue "token não resolveu" de
 "outra regra ganhou".
 
+## Modelo 3D do VIREO AM
+
+`assets/vireo-model/vireo-am.glb` (256 KB, glTF binário com texturas embutidas) e
+o modelo como código em `components/v2/vireo3d/model.ts`. Visualização em doze
+ângulos em `/lab/vireo`.
+
+Construído por **extrusão da silhueta real**, não com primitivas:
+`scripts/trace-outline.py` traça o contorno do render ortográfico oficial e
+`model.ts` extruda esse contorno aplicando os renders oficiais de frente e
+traseira como textura. Perfil e faces são o produto real; a lateral é a única
+parte inventada. Detalhes e limites em `assets/vireo-model/README.md`.
+
+Dois aprendizados que valem registro:
+
+**Não re-ilumine um render.** As texturas são renders de estúdio com key, fill e
+especular já embutidos. Com PBR e luzes por cima, o preto do vidro lavava e
+apareciam estouros especulares sobre a arte. As faces usam material não iluminado;
+a luz da cena serve só à lateral extrudada.
+
+**Um renderer WebGL por instância esgota os contextos do navegador.** O limite
+fica por volta de 8 a 16. A folha de contato usa um renderer só, renderizando em
+sequência e copiando cada quadro para um canvas 2D.
+
 ## Showcase do VIREO AM (revertido)
 
 Uma seção de showcase controlada por rolagem foi construída e **revertida** em
@@ -138,10 +161,9 @@ Os assets ficaram preservados em `assets/vireo-showcase-frames/`, fora de
 recortadas continuam em `assets/vireo-layers/` e os scripts
 (`cutout-device.py`, `build-vireo-frames.py`) continuam versionados.
 
-Para retomar: é preciso um **export de turntable do CAD** vindo da Cardioline, ou
-o próprio modelo. Gerar os ângulos faltantes por IA não resolve, porque um gerador
-texto-para-imagem devolve um aparelho diferente por chamada e a sequência deixa de
-parecer um único produto.
+O caminho de retomada deixou de depender da Cardioline: o modelo 3D acima dá o
+turntable de 360 graus que faltava, com ângulos infinitos e sem sequência de
+frames. Falta ligá-lo à rolagem.
 
 ### Pendente
 
