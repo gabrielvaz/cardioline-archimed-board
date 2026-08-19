@@ -30,11 +30,12 @@ METRICS = json.loads((ROOT / "lib" / "v2" / "vireo-metrics.json").read_text())
 # Cantos da área da tela na foto, em ordem: topo-esq, topo-dir, base-dir, base-esq.
 CORNERS = [(383, 757), (859, 707), (861, 1061), (385, 1111)]
 
-# O vidro reflete o ambiente, então o preto da tela na foto não é preto: fica por
-# volta de 20. Subtrair esse piso e ganhar o resto devolve o traçado sobre preto
-# de verdade, que é o que o produto mostra.
-BLACK_FLOOR = 48
-GAIN = 1.8
+# O vidro reflete o ambiente, então o preto da tela na foto não é preto. O piso é
+# agressivo de propósito: a textura é aplicada em mistura ADITIVA, então tudo que
+# não for preto de verdade soma brilho e desenha um retângulo sobre o vidro. Com o
+# piso alto e o ganho compensando, o fundo não soma nada e o traçado fica forte.
+BLACK_FLOOR = 62
+GAIN = 2.4
 
 
 def perspective_coeffs(src, dst):

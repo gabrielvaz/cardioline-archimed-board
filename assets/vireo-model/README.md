@@ -101,6 +101,29 @@ que é o que se mede incluindo os encaixes.
   língua aponta para `-dir`: com os sinais trocados os módulos invadiam o corpo e a
   língua ficava pendurada para fora, com os contatos à mostra o tempo todo.
 
+## Superfície: por que não basta uma rugosidade por peça
+
+Um valor único de rugosidade em toda a peça é o que dá o aspecto de plástico de CG:
+superfície perfeita demais. O modelo usa mapas procedurais, gerados em código com
+semente fixa (são padrões de ruído, não fotografia):
+
+- **casco branco** — grão de injeção, desvio de poucos por cento na rugosidade;
+- **trilho** — normal de escovado, estrias finíssimas numa direção só, que é o que
+  dá DIREÇÃO ao metal; sem elas o reflexo é uniforme e a peça lê como cinza pintado;
+- **face** — variação larga e fraca na rugosidade do verniz, para o reflexo deixar
+  de ser espelho perfeito.
+
+Há também **sombra própria** (mapa de sombra na luz principal, câmera ortográfica
+apertada no produto). Era o que faltava para as peças parecerem encostadas umas nas
+outras: sem ela o módulo acoplado e o feixe flutuavam sobre o corpo.
+
+## O que é luz vai em mistura ADITIVA
+
+Tela e LED somam brilho, não cobrem. Na tela isso resolveu um problema concreto: o
+preto da foto nunca é preto perfeito, e com mistura normal ele desenhava um
+retângulo mais claro sobre o vidro. Somando, o fundo não soma nada e só o traçado
+aparece — daí o piso de preto agressivo no `extract-screen.py`.
+
 ## Limites conhecidos
 
 - **Sem os conectores em leque do módulo de 12 derivações.** O render explodido

@@ -48,6 +48,8 @@ export function VireoSheet({
     renderer.setPixelRatio(2);
     renderer.setSize(tile, th, false);
     renderer.setClearColor(0xffffff, 1);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.98;
 

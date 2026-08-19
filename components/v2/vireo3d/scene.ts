@@ -81,6 +81,24 @@ export function createVireoScene(
        */
       const key = new THREE.DirectionalLight(0xffffff, 2.1);
       key.position.set(-2.6, 3.4, 4);
+      /*
+       * Sombra própria. É o que faltava para as peças parecerem encostadas umas nas
+       * outras: sem ela, o módulo acoplado e o feixe de cabos flutuavam sobre o
+       * corpo em vez de se apoiarem nele. A câmera de sombra é ortográfica e
+       * apertada no produto, senão a resolução se dilui no vazio em volta.
+       */
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      key.shadow.camera.left = -1.7;
+      key.shadow.camera.right = 1.7;
+      key.shadow.camera.top = 2.1;
+      key.shadow.camera.bottom = -2.1;
+      key.shadow.camera.near = 0.5;
+      key.shadow.camera.far = 12;
+      // Peças finas e encostadas: sem o bias a própria superfície se sombreia em
+      // faixas (acne), e sem o normalBias as arestas ganham um contorno escuro.
+      key.shadow.bias = -0.0004;
+      key.shadow.normalBias = 0.012;
       scene.add(key);
       const fill = new THREE.DirectionalLight(0xf2f5f8, 0.85);
       fill.position.set(3.2, -0.4, 2.6);
@@ -126,6 +144,15 @@ export function createVireoScene(
       air.group.position.y = dockedY;
       cable.group.position.y = dockedY;
       base.add(air.group, cable.group);
+
+      // Todo mesh do conjunto projeta e recebe sombra. Percorrer a cena no fim é
+      // mais seguro que marcar peça por peça na construção: nenhuma passa batida.
+      tilt.traverse((o) => {
+        if (o instanceof THREE.Mesh) {
+          o.castShadow = true;
+          o.receiveShadow = true;
+        }
+      });
 
       const spin = (radians: number) => {
         base.rotation.y = REST_YAW + radians;

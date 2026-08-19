@@ -1,5 +1,10 @@
 import * as THREE from "three";
 import metrics from "@/lib/v2/vireo-metrics.json";
+import {
+  createBrushedNormal,
+  createGlassRoughness,
+  createPlasticRoughness,
+} from "./textures";
 
 /**
  * Modelo 3D do VIREO AM.
@@ -127,7 +132,7 @@ function slab(
     bevelThickness: bevel,
     bevelSize: bevel,
     bevelOffset: 0,
-    bevelSegments: 4,
+    bevelSegments: 6,
     curveSegments: 28,
   });
   g.translate(0, 0, -depth / 2 + bevel);
@@ -164,12 +169,39 @@ function decal(shape: THREE.Shape, w: number, h: number): THREE.ShapeGeometry {
  *   face              VIDRO PRETO, com reflexo especular nítido (albedo em ~14)
  */
 
+/*
+ * Mapas de superfície criados uma vez e compartilhados. Um por material seria
+ * desperdício de memória de GPU sem nenhum ganho: são padrões repetidos.
+ */
+let surfaceMaps: {
+  plastic: THREE.Texture;
+  brushed: THREE.Texture;
+  glass: THREE.Texture;
+} | null = null;
+
+function maps() {
+  if (!surfaceMaps) {
+    surfaceMaps = {
+      plastic: createPlasticRoughness(),
+      brushed: createBrushedNormal(),
+      glass: createGlassRoughness(),
+    };
+  }
+  return surfaceMaps;
+}
+
 /** Trilho lateral do corpo: cinza médio, levemente metálico. */
 function railMaterial() {
+  const m = maps();
   return new THREE.MeshPhysicalMaterial({
     color: 0x74787c,
     metalness: 0.3,
     roughness: 0.33,
+    roughnessMap: m.plastic,
+    // Estrias de usinagem, muito fracas. É o que dá direção ao metal: sem elas o
+    // reflexo é uniforme e a peça lê como cinza pintado.
+    normalMap: m.brushed,
+    normalScale: new THREE.Vector2(0.13, 0.13),
     clearcoat: 0.3,
     clearcoatRoughness: 0.22,
     envMapIntensity: 1.05,
@@ -178,10 +210,14 @@ function railMaterial() {
 
 /** Casco dos módulos e do cabo: plástico branco fosco. */
 function shellMaterial() {
+  const m = maps();
   return new THREE.MeshPhysicalMaterial({
     color: 0xeceeeb,
     metalness: 0,
     roughness: 0.42,
+    // Grão de injeção. Um valor único de rugosidade em toda a peça é o que dá o
+    // aspecto de plástico de CG: superfície perfeita demais.
+    roughnessMap: m.plastic,
     clearcoat: 0.22,
     clearcoatRoughness: 0.3,
     envMapIntensity: 0.95,
@@ -206,6 +242,7 @@ function cableMaterial() {
     color: 0xeae8e4,
     metalness: 0.02,
     roughness: 0.5,
+    roughnessMap: maps().plastic,
     envMapIntensity: 0.85,
   });
 }
@@ -227,6 +264,9 @@ function decalMaterial(map: THREE.Texture) {
     metalness: 0.02,
     clearcoat: 1,
     clearcoatRoughness: 0.05,
+    // Verniz com variação larga e fraca: o reflexo deixa de ser espelho perfeito,
+    // que é o que denunciava a face como superfície matemática.
+    clearcoatRoughnessMap: maps().glass,
     envMapIntensity: 0.72,
     polygonOffset: true,
     polygonOffsetFactor: -2,
@@ -296,7 +336,7 @@ export function createStudioEnvironment(
   softbox(14, 10, [0, 0, 9], 0.12); // preenchimento amplo, só para não afundar
   softbox(7, 7, [0.4, 1.4, -6.8], 0.7); // contraluz, separa do fundo branco
 
-  const env = pmrem.fromScene(scene, 0.05).texture;
+  const env = pmrem.fromScene(scene, 0.035).texture;
   pmrem.dispose();
   return env;
 }
@@ -325,7 +365,7 @@ export function createVireoDevice(tex: DeviceTextures): VireoDevice {
 
   // Trilhos: seção arredondada no plano XZ, extrudada ao longo de Y. É a peça que
   // define a silhueta em qualquer ângulo, por isso vai à profundidade cheia.
-  const railGeo = slab(railSection(RAIL_W, DEPTH, 0.028, 0.011), H, 0.016);
+  const railGeo = slab(railSection(RAIL_W, DEPTH, 0.028, 0.011), H, 0.011);
   railGeo.rotateX(-Math.PI / 2);
   for (const sign of [-1, 1]) {
     const rail = new THREE.Mesh(railGeo, railMaterial());
@@ -367,6 +407,11 @@ export function createVireoDevice(tex: DeviceTextures): VireoDevice {
     new THREE.MeshBasicMaterial({
       map: tex.screen,
       transparent: true,
+      // ADITIVA, como o LED: a tela é luz. Com mistura normal, o preto da textura
+      // — que vem de foto e nunca é preto perfeito — desenhava um retângulo mais
+      // claro sobre o vidro. Somando, o fundo da tela simplesmente não soma nada e
+      // só o traçado aparece.
+      blending: THREE.AdditiveBlending,
       opacity: 0,
       toneMapped: false,
       depthWrite: false,
@@ -461,7 +506,7 @@ export function createVireoModule(
     dir === 1 ? rNear : rEnd * 0.72,
   );
   shell.holes.push(new THREE.Path(hole.getPoints(48).reverse()));
-  add(new THREE.Mesh(slab(shell, DEPTH, 0.008), shellMaterial()));
+  add(new THREE.Mesh(slab(shell, DEPTH, 0.006), shellMaterial()));
 
   const coreShape = roundedRect(
     FACE_W - 0.004,

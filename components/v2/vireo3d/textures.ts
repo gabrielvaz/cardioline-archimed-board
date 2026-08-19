@@ -96,3 +96,103 @@ export function createDockTexture(): THREE.CanvasTexture {
   }
   return finish(el);
 }
+
+/**
+ * Mapas de superfície procedurais.
+ *
+ * Sem eles, cada material tem UM valor de rugosidade para toda a peça, e é isso
+ * que dá o aspecto de plástico de CG: superfície perfeita demais. O produto real
+ * tem micro-textura de injeção no casco branco, direção de usinagem no trilho e
+ * vidro com pequenas variações — nenhuma delas visível de perto, todas visíveis no
+ * conjunto.
+ *
+ * Gerados em código e não baixados: são padrões de ruído, não fotografia.
+ */
+
+/** Ruído com semente fixa. Mesma superfície em todo carregamento. */
+function noise(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    return s / 0x7fffffff;
+  };
+}
+
+function tile(
+  t: THREE.CanvasTexture,
+  x: number,
+  y: number,
+): THREE.CanvasTexture {
+  t.wrapS = THREE.RepeatWrapping;
+  t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(x, y);
+  t.colorSpace = THREE.NoColorSpace;
+  return t;
+}
+
+/** Rugosidade do plástico injetado: grão fino, variação de poucos por cento. */
+export function createPlasticRoughness(): THREE.CanvasTexture {
+  const S = 256;
+  const { el, ctx } = canvas(S, S);
+  const rnd = noise(20260819);
+  const img = ctx.createImageData(S, S);
+  for (let i = 0; i < S * S; i++) {
+    // Média alta e desvio pequeno: é micro-textura, não superfície corroída.
+    const v = 176 + Math.round((rnd() - 0.5) * 30);
+    img.data[i * 4] = v;
+    img.data[i * 4 + 1] = v;
+    img.data[i * 4 + 2] = v;
+    img.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  return tile(finish(el), 7, 11);
+}
+
+/**
+ * Normal do alumínio escovado: estrias finíssimas numa direção só. Codifica a
+ * inclinação em X, com Y neutro — as linhas correm ao longo da peça.
+ */
+export function createBrushedNormal(): THREE.CanvasTexture {
+  const W = 256;
+  const H = 8;
+  const { el, ctx } = canvas(W, H);
+  const rnd = noise(77712);
+  const img = ctx.createImageData(W, H);
+  const lane = new Float32Array(W);
+  for (let x = 0; x < W; x++) lane[x] = rnd() - 0.5;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      // Derivada da faixa: a estria é a MUDANÇA de altura entre vizinhos.
+      const d = lane[(x + 1) % W] - lane[x];
+      const i = (y * W + x) * 4;
+      img.data[i] = Math.max(0, Math.min(255, 128 + d * 90));
+      img.data[i + 1] = 128;
+      img.data[i + 2] = 255;
+      img.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  return tile(finish(el), 1, 1);
+}
+
+/** Rugosidade do verniz: manchas largas e fracas, para o reflexo não ser espelho. */
+export function createGlassRoughness(): THREE.CanvasTexture {
+  const S = 128;
+  const { el, ctx } = canvas(S, S);
+  const rnd = noise(4242);
+  ctx.fillStyle = "#0f0f0f";
+  ctx.fillRect(0, 0, S, S);
+  for (let i = 0; i < 90; i++) {
+    const r = S * (0.06 + rnd() * 0.18);
+    const cx = rnd() * S;
+    const cy = rnd() * S;
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, "rgba(90,90,90,0.32)");
+    g.addColorStop(1, "rgba(90,90,90,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  return tile(finish(el), 3, 4);
+}
