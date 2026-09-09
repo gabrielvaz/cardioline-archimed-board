@@ -1,0 +1,115 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.claim {
+  max-width: 30ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 40px 0 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+}
+
+.cell + .cell {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 40px;
+}
+
+.num {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  color: var(--cl-orange-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.head {
+  font-size: 27px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
+.text {
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--cl-mute);
+}
+
+/* ---- rodapé do pedido ---------------------------------------------------- */
+
+.foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.askRow {
+  display: grid;
+  grid-template-columns: 300px 300px 1fr;
+  gap: 40px;
+  background: var(--cl-paper);
+  border-top: 3px solid var(--cl-orange);
+  padding: 24px 28px;
+}
+
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.askLabel {
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.askValue {
+  font-size: 40px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.024em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Marcador do valor ainda não definido. Feio de propósito: tem que incomodar
+   quem abrir o deck sem ter preenchido. */
+.askBlank {
+  font-size: 22px;
+  font-weight: var(--cl-weight-semibold);
+  line-height: 1.2;
+  color: var(--cl-orange-ink);
+  border: 2px dashed var(--cl-orange);
+  padding: 8px 12px;
+  align-self: flex-start;
+}
+
+.askNote {
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--cl-mute);
+}
+
+.askPlain {
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--cl-ink);
+  max-width: 62ch;
+}

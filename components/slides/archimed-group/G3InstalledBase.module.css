@@ -1,0 +1,111 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.claim {
+  max-width: 30ch;
+}
+
+/* Duas colunas com hairline entre elas, e nada de card: o agrupamento é feito
+   por vazio, como no resto do sistema. */
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cols > .col + .col {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 56px;
+}
+
+.colHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.016em;
+  color: var(--cl-ink);
+}
+
+.mark {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+
+.br {
+  background: var(--cl-orange);
+}
+
+.it {
+  border: 2px solid var(--cl-orange);
+}
+
+.colSub {
+  font-size: 17px;
+  color: var(--cl-mute);
+  margin-bottom: 10px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.rows > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 11px 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+}
+
+.rows dt {
+  font-size: 18px;
+  color: var(--cl-mute);
+}
+
+.rows dd {
+  margin: 0;
+  font-size: 26px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A linha de exames é a que se compara entre as duas colunas. */
+.hl dd {
+  font-size: 34px;
+  color: var(--cl-orange-ui);
+}
+
+.hl dt {
+  color: var(--cl-ink);
+}
+
+.colNote {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--cl-mute);
+  padding-top: 14px;
+}
+
+/* Com space-between a legenda encostava na nota das colunas: o corpo preenche a
+   altura e os dois blocos ficam colados sem folga nenhuma. */
+.caption {
+  padding-top: 24px;
+}

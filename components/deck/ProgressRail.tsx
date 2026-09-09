@@ -1,15 +1,19 @@
 "use client";
 
-import { SLIDES } from "@/lib/slides";
+import { SLIDES, type SlideMeta } from "@/lib/slides";
 import styles from "./Deck.module.css";
 
-type Props = { active: number; onPick: (n: number) => void };
+type Props = {
+  active: number;
+  onPick: (n: number) => void;
+  slides?: readonly SlideMeta[];
+};
 
-/** 22 tracinhos à direita. Clicáveis, mas discretos: somem quando o mouse para. */
-export function ProgressRail({ active, onPick }: Props) {
+/** Um tracinho por slide, à direita. Clicáveis, mas discretos: somem quando o mouse para. */
+export function ProgressRail({ active, onPick, slides = SLIDES }: Props) {
   return (
     <nav className={styles.rail} aria-label="Slides">
-      {SLIDES.map((s) => (
+      {slides.map((s) => (
         <button
           key={s.id}
           type="button"

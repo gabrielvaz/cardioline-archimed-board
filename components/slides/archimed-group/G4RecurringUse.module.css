@@ -1,0 +1,125 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.claim {
+  max-width: 32ch;
+}
+
+/* Tabela de comparação em grade e não em <table>: são três colunas, duas delas
+   com valor grande e uma legenda embaixo, e o <td> não empilha isso bem. */
+.grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.rowHead,
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+  align-items: baseline;
+}
+
+.rowHead {
+  padding-bottom: 12px;
+}
+
+.opHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.014em;
+  color: var(--cl-ink);
+}
+
+.mark {
+  width: 10px;
+  height: 10px;
+  flex: none;
+}
+
+.br {
+  background: var(--cl-orange);
+}
+
+.it {
+  border: 2px solid var(--cl-orange);
+}
+
+/* 10px e não 13px: com a linha de exames o slide passou a ter quatro linhas de
+   comparação e estourava a stage em 34px. */
+.row {
+  padding: 10px 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+}
+
+.label {
+  font-size: 18px;
+  color: var(--cl-mute);
+}
+
+.val,
+.valBig {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.018em;
+  font-variant-numeric: tabular-nums;
+}
+
+.val {
+  font-size: 22px;
+}
+
+.valBig {
+  font-size: 40px;
+  letter-spacing: -0.024em;
+  color: var(--cl-orange-ui);
+}
+
+.val em,
+.valBig em {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: var(--cl-weight-regular);
+  letter-spacing: 0;
+  color: var(--cl-mute);
+}
+
+/* A linha da coorte é a que carrega o slide. */
+.rowKey {
+  border-top-color: var(--cl-orange);
+  border-top-width: 2px;
+  padding: 13px 0;
+}
+
+.foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.honest {
+  background: var(--cl-paper);
+  border-top: 3px solid var(--cl-orange);
+  padding: 20px 26px;
+}
+
+.honestText {
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--cl-mute);
+  max-width: 100ch;
+}
+
+.honestText strong {
+  font-weight: var(--cl-weight-semibold);
+  color: var(--cl-ink);
+}

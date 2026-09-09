@@ -1,0 +1,101 @@
+/* Oito colunas em três grupos. O que faz caber é o cabeçalho de dois níveis:
+   sem ele cada coluna precisaria repetir a operação no próprio rótulo. */
+.wrap {
+  gap: 30px;
+}
+
+.claim {
+  max-width: 36ch;
+}
+
+.tableWrap {
+  min-width: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th {
+  text-align: left;
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+  padding: 0 10px 10px 0;
+  vertical-align: bottom;
+}
+
+.table thead tr:last-child th {
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+}
+
+/* Faixa de grupo: identifica a operação uma vez, não em cada coluna. */
+.groupBr,
+.groupIt,
+.groupPrice {
+  padding-bottom: 8px !important;
+  border-bottom: 2px solid var(--cl-line);
+  color: var(--cl-ink) !important;
+  text-transform: none !important;
+  letter-spacing: -0.005em !important;
+  font-size: 16px !important;
+}
+
+.groupBr {
+  border-bottom-color: var(--cl-orange);
+}
+
+/* Filete pontilhado laranja: mesma leitura do quadrado vazado no marcador de
+   procedência, sem inventar uma segunda cor de marca. */
+.groupIt {
+  border-bottom-style: dotted;
+  border-bottom-color: var(--cl-orange);
+}
+
+/* Sem filete: não é operação, é proposta. */
+.groupPrice {
+  color: var(--cl-mute) !important;
+  border-bottom-color: transparent;
+}
+
+.table td {
+  padding: 14px 10px 14px 0;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+  font-size: 18px;
+  color: var(--cl-mute);
+  vertical-align: middle;
+}
+
+.table td:first-child {
+  font-weight: var(--cl-weight-medium);
+  color: var(--cl-ink);
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.table th.num {
+  text-align: right;
+}
+
+.table th:first-child,
+.table td:first-child {
+  width: 14%;
+}
+
+.rowKey td {
+  background: var(--cl-tint);
+  color: var(--cl-ink);
+}
+
+.rowKey td:first-child {
+  box-shadow: inset 3px 0 0 var(--cl-orange);
+  padding-left: 10px;
+}

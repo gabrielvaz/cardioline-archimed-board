@@ -1,0 +1,71 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.claim {
+  max-width: 26ch;
+}
+
+.lead {
+  font-size: var(--cl-fs-lede);
+  line-height: 1.35;
+  letter-spacing: var(--cl-tracking-lede);
+  color: rgb(255 255 255 / 0.72);
+  max-width: 46ch;
+}
+
+.foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 32px;
+}
+
+.cell + .cell {
+  border-left: var(--cl-hairline) solid rgb(255 255 255 / 0.18);
+  padding-left: 32px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.value {
+  font-size: 46px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.026em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Sobre navy o laranja puro reprova; #ff9052 é o único legível, e aqui está em
+   46px, bem acima do piso de 32px para laranja em texto. */
+.accent {
+  color: #ff9052;
+}
+
+.note {
+  font-size: 16px;
+  line-height: 1.4;
+  color: rgb(255 255 255 / 0.55);
+  max-width: 22ch;
+}

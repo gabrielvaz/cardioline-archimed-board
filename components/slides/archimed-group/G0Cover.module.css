@@ -1,0 +1,15 @@
+/* Sem rodapé, o corpo fica com o palco todo e o título vai para o centro
+   vertical. Com space-between e só dois filhos, o título caía no pé. */
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  min-height: 0;
+}
+
+.title {
+  max-width: 24ch;
+}

@@ -1,0 +1,108 @@
+/* Nove colunas é o limite do palco. O que permite chegar a nove é a coluna de
+   barra, que carrega a distorção sem gastar largura de texto, e o corpo de 18px
+   em vez de 20px. Abaixo de 16px o harness reprova, e com razão: é um projetor. */
+.wrap {
+  gap: 32px;
+}
+
+.claim {
+  max-width: 34ch;
+}
+
+.tableWrap {
+  min-width: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th {
+  text-align: left;
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cl-mute);
+  padding: 0 10px 12px 0;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+  vertical-align: bottom;
+}
+
+.table td {
+  padding: 15px 10px 15px 0;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+  font-size: 18px;
+  color: var(--cl-mute);
+  vertical-align: middle;
+}
+
+.table td:first-child {
+  font-weight: var(--cl-weight-medium);
+  color: var(--cl-ink);
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.table th.num {
+  text-align: right;
+}
+
+/* Larguras: a primeira coluna é rótulo, a de barra precisa de espaço para a
+   trilha, e as sete numéricas dividem o resto. */
+.table th:first-child,
+.table td:first-child {
+  width: 13%;
+}
+
+/* A largura mora no <col>-equivalente; o flex mora num wrapper DENTRO da
+   célula. Flex no próprio <td> destrói o layout de tabela: a barra fica sem
+   largura, a célula sai do fluxo e o fundo da linha destacada não cobre a
+   coluna. Foi o que aconteceu na primeira versão deste slide. */
+.share {
+  width: 16%;
+}
+
+.shareInner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--cl-line);
+  min-width: 0;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: var(--cl-orange);
+}
+
+.barNum {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  min-width: 4.4ch;
+  text-align: right;
+}
+
+/* Os dois buckets de cima carregam 58% do MRR: é a lista de cobertura. */
+.rowKey td {
+  background: var(--cl-tint);
+  color: var(--cl-ink);
+}
+
+.rowKey td:first-child {
+  box-shadow: inset 3px 0 0 var(--cl-orange);
+  padding-left: 10px;
+}

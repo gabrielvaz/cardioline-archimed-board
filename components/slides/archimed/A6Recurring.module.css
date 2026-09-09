@@ -1,0 +1,163 @@
+/* O título de 56px encostava na primeira linha da tabela: com space-between o
+   vão inteiro caía embaixo da tabela e nada sobrava entre os dois. Coluna com
+   gap explícito resolve, e a legenda segue no fluxo: empurrá-la com margin-top
+   auto a jogava por cima da coluna de cenários, que é mais alta que a tabela. */
+.wrap {
+  gap: 40px;
+}
+
+.claim {
+  max-width: 30ch;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 372px;
+  gap: 56px;
+  align-items: start;
+  min-height: 0;
+}
+
+/* A legenda vive DENTRO da coluna da tabela, não como irmã da grade: com
+   largura cheia ela passava por baixo da coluna de cenários, que é mais alta. */
+.tableWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* ---- tabela ------------------------------------------------------------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th:first-child,
+.table td:first-child {
+  width: 30%;
+}
+
+.table th:last-child,
+.table td:last-child {
+  width: 20%;
+}
+
+.table th {
+  text-align: left;
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+  padding: 0 14px 12px 0;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+}
+
+.table td {
+  padding: 16px 14px 16px 0;
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+  font-size: 20px;
+  color: var(--cl-mute);
+  vertical-align: baseline;
+}
+
+.table td:first-child {
+  font-weight: var(--cl-weight-medium);
+  color: var(--cl-ink);
+}
+
+/* A moeda é longa: sem tabular-nums e sem nowrap ela enrola e a linha dobra
+   de altura, o que estoura a stage. */
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.table th.num {
+  text-align: right;
+}
+
+.rowKey td {
+  background: var(--cl-tint);
+  color: var(--cl-ink);
+}
+
+.rowKey td:first-child {
+  box-shadow: inset 3px 0 0 var(--cl-orange);
+  padding-left: 14px;
+}
+
+/* ---- cenários ----------------------------------------------------------- */
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.scenarios {
+  display: flex;
+  flex-direction: column;
+}
+
+.scenario {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+}
+
+.scenario:last-child {
+  border-bottom: var(--cl-hairline) solid var(--cl-line);
+}
+
+.scLabel {
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+.scArr {
+  font-size: 40px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.024em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scenarioKey .scArr {
+  color: var(--cl-orange-ui);
+}
+
+.scenarioKey .scLabel {
+  color: var(--cl-orange-ink);
+}
+
+.scNote {
+  font-size: 16px;
+  color: var(--cl-mute);
+}
+
+.sideFoot {
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--cl-mute);
+  padding-top: 14px;
+}
+
+.sideLabel {
+  font-size: 16px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}

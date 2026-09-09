@@ -1,0 +1,61 @@
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 44px;
+  min-height: 0;
+}
+
+.claim {
+  max-width: 26ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 26px 30px 0 0;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+}
+
+.cell + .cell {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 30px;
+}
+
+.num {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  color: var(--cl-orange-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.head {
+  font-size: 25px;
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: -0.018em;
+  line-height: 1.14;
+}
+
+.what {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--cl-mute);
+}
+
+/* A resposta, não o risco: fica em ink para que o olho pare nela. */
+.cost {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--cl-ink);
+  padding-top: 12px;
+  border-top: var(--cl-hairline) solid var(--cl-line);
+  margin-top: auto;
+}

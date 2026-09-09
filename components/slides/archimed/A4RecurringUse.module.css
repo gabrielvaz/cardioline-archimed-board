@@ -1,0 +1,35 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* 26ch quebrava em três linhas e comprimia os números contra o título. */
+.claim {
+  max-width: 34ch;
+}
+
+.foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.honest {
+  background: var(--cl-paper);
+  border-top: 3px solid var(--cl-orange);
+  padding: 24px 28px;
+}
+
+.honestText {
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--cl-mute);
+  max-width: 76ch;
+}
+
+.honestText strong {
+  font-weight: var(--cl-weight-semibold);
+  color: var(--cl-ink);
+}

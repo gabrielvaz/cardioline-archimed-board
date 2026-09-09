@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { SLIDES, TOTAL_SLIDES, slideHash } from "@/lib/slides";
+import { SLIDES, slideHash, type SlideMeta } from "@/lib/slides";
 import { DeckContext } from "./DeckContext";
 import { GridOverview } from "./GridOverview";
 import { ProgressRail } from "./ProgressRail";
@@ -10,7 +10,19 @@ import styles from "./Deck.module.css";
 
 const IDLE_MS = 2000;
 
-export function Deck({ children }: { children: ReactNode }) {
+type Props = {
+  children: ReactNode;
+  /**
+   * Registry a apresentar. O padrão é o deck de 22 slides, para que nenhuma
+   * chamada existente mude de comportamento; a versão da Archimed passa o seu.
+   */
+  slides?: readonly SlideMeta[];
+  /** Rótulo do mapa (G). O padrão é o do deck de visão. */
+  label?: string;
+};
+
+export function Deck({ children, slides = SLIDES, label }: Props) {
+  const total = slides.length;
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(1);
   const [overview, setOverview] = useState(false);
@@ -70,14 +82,14 @@ export function Deck({ children }: { children: ReactNode }) {
 
   const goTo = useCallback(
     (n: number) => {
-      const clamped = Math.min(TOTAL_SLIDES, Math.max(1, n));
+      const clamped = Math.min(total, Math.max(1, n));
       target.current = clamped;
       userScrolled.current = false;
       setActive(clamped);
       scrollToSlide(clamped);
       setOverview(false);
     },
-    [scrollToSlide],
+    [scrollToSlide, total],
   );
 
   useEffect(() => () => cancelAnimationFrame(anim.current), []);
@@ -94,7 +106,7 @@ export function Deck({ children }: { children: ReactNode }) {
     let frame = 0;
     let settle: ReturnType<typeof setTimeout>;
     const current = () =>
-      Math.min(TOTAL_SLIDES, Math.max(1, Math.round(el.scrollTop / el.clientHeight) + 1));
+      Math.min(total, Math.max(1, Math.round(el.scrollTop / el.clientHeight) + 1));
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => setActive(current()));
@@ -121,7 +133,7 @@ export function Deck({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame);
       clearTimeout(settle);
     };
-  }, []);
+  }, [total]);
 
   // Deep-link. Roda num rAF para o contêiner já ter altura, e levanta uma
   // trava: enquanto ele não terminar, a sincronização de hash fica quieta —
@@ -132,7 +144,7 @@ export function Deck({ children }: { children: ReactNode }) {
     if (!el) return;
     const raf = requestAnimationFrame(() => {
       const n = Number(window.location.hash.replace("#", ""));
-      if (Number.isInteger(n) && n >= 1 && n <= TOTAL_SLIDES) {
+      if (Number.isInteger(n) && n >= 1 && n <= total) {
         target.current = n;
         setActive(n);
         el.scrollTop = (n - 1) * el.clientHeight;
@@ -140,18 +152,18 @@ export function Deck({ children }: { children: ReactNode }) {
       linked.current = true;
     });
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [total]);
 
   useEffect(() => {
     const onHash = () => {
       const n = Number(window.location.hash.replace("#", ""));
-      if (Number.isInteger(n) && n >= 1 && n <= TOTAL_SLIDES && n !== target.current) {
+      if (Number.isInteger(n) && n >= 1 && n <= total && n !== target.current) {
         goTo(n);
       }
     };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
-  }, [goTo]);
+  }, [goTo, total]);
 
   useEffect(() => {
     if (!linked.current) return;
@@ -207,7 +219,7 @@ export function Deck({ children }: { children: ReactNode }) {
           break;
         case "End":
           e.preventDefault();
-          goTo(TOTAL_SLIDES);
+          goTo(total);
           break;
         case "f":
         case "F":
@@ -233,7 +245,7 @@ export function Deck({ children }: { children: ReactNode }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goTo, next, prev]);
+  }, [goTo, next, prev, total]);
 
   // Chrome some depois de 2s parado.
   useEffect(() => {
@@ -253,11 +265,11 @@ export function Deck({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const theme = SLIDES[active - 1]?.theme ?? "white";
+  const theme = slides[active - 1]?.theme ?? "white";
 
   const value = useMemo(
-    () => ({ active, total: TOTAL_SLIDES, goTo, next, prev, overview, setOverview }),
-    [active, goTo, next, prev, overview],
+    () => ({ active, total, goTo, next, prev, overview, setOverview }),
+    [active, total, goTo, next, prev, overview],
   );
 
   return (
@@ -270,15 +282,21 @@ export function Deck({ children }: { children: ReactNode }) {
         className={`${styles.chrome} ${idle && !overview ? styles.chromeIdle : ""}`}
         data-theme={theme}
       >
-        <ProgressRail active={active} onPick={goTo} />
+        <ProgressRail slides={slides} active={active} onPick={goTo} />
         <span className={styles.hint}>← → navigate · F fullscreen · G overview · R restart</span>
         <span className={styles.counter} data-numeric data-testid="counter">
-          {String(active).padStart(2, "0")} / {TOTAL_SLIDES}
+          {String(active).padStart(2, "0")} / {total}
         </span>
       </div>
 
       {overview && (
-        <GridOverview active={active} onPick={goTo} onClose={() => setOverview(false)} />
+        <GridOverview
+          slides={slides}
+          label={label}
+          active={active}
+          onPick={goTo}
+          onClose={() => setOverview(false)}
+        />
       )}
     </DeckContext.Provider>
   );

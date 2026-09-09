@@ -1,0 +1,43 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.claim {
+  max-width: 24ch;
+}
+
+.foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.punch {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.bar {
+  width: 56px;
+  height: 3px;
+  background: var(--cl-orange);
+  flex: none;
+  margin-top: 14px;
+}
+
+.punchText {
+  font-size: 26px;
+  line-height: 1.4;
+  letter-spacing: -0.008em;
+  max-width: 58ch;
+  color: var(--cl-mute);
+}
+
+.punchText strong {
+  font-weight: var(--cl-weight-semibold);
+  color: var(--cl-ink);
+}

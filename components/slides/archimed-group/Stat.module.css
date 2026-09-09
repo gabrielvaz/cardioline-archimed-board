@@ -1,0 +1,83 @@
+.row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.row > .stat + .stat {
+  border-left: var(--cl-hairline) solid var(--cl-line);
+  padding-left: 40px;
+}
+
+[data-theme="ink"] .row > .stat + .stat {
+  border-left-color: rgb(255 255 255 / 0.18);
+}
+
+.row > .stat {
+  padding-right: 40px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .label {
+  color: rgb(255 255 255 / 0.62);
+}
+
+.value {
+  font-weight: var(--cl-weight-semibold);
+  line-height: var(--cl-lh-tight);
+  letter-spacing: var(--cl-tracking-subhead);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.md {
+  font-size: 56px;
+}
+
+.lg {
+  font-size: 80px;
+  letter-spacing: var(--cl-tracking-headline);
+}
+
+/* Laranja como texto só acima de 32px, e sobre fundo claro é o -ui, que é o
+   --primary_color do tema. Em fundo navy o puro não passa, então clareia. */
+.accent {
+  color: var(--cl-orange-ui);
+}
+
+[data-theme="ink"] .accent {
+  color: #ff9052;
+}
+
+.mute {
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .mute {
+  color: rgb(255 255 255 / 0.55);
+}
+
+.note {
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--cl-mute);
+  max-width: 26ch;
+}
+
+[data-theme="ink"] .note {
+  color: rgb(255 255 255 / 0.62);
+}

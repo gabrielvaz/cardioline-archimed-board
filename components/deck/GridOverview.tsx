@@ -1,19 +1,34 @@
 "use client";
 
 import { useEffect } from "react";
-import { SLIDES } from "@/lib/slides";
+import { SLIDES, type SlideMeta } from "@/lib/slides";
 import styles from "./GridOverview.module.css";
 
-type Props = { active: number; onPick: (n: number) => void; onClose: () => void };
+type Props = {
+  active: number;
+  onPick: (n: number) => void;
+  onClose: () => void;
+  slides?: readonly SlideMeta[];
+  /** Nome do deck no cabeçalho do mapa. */
+  label?: string;
+};
 
 /**
- * Mapa dos 22 slides.
+ * Mapa dos slides.
  *
  * Numa reunião executiva alguém sempre pede "volta no slide dos três layers".
  * Título e número são o que torna isso resolvível em um segundo — miniaturas
- * renderizadas seriam mais bonitas e menos legíveis nesse tamanho.
+ * renderizadas seriam mais bonitas e menos legíveis nesse tamanho. Na versão da
+ * Archimed este mapa deixa de ser conveniência e passa a ser o modo normal de
+ * navegar: a reunião é curta e a ordem dos slides não vai ser respeitada.
  */
-export function GridOverview({ active, onPick, onClose }: Props) {
+export function GridOverview({
+  active,
+  onPick,
+  onClose,
+  slides = SLIDES,
+  label = "Cardioline 2028",
+}: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -25,11 +40,13 @@ export function GridOverview({ active, onPick, onClose }: Props) {
   return (
     <div className={styles.overlay} role="dialog" aria-label="All slides">
       <div className={styles.head}>
-        <span className={styles.title}>Cardioline 2028 — 22 slides</span>
+        <span className={styles.title}>
+          {label} — {slides.length} slides
+        </span>
         <span className={styles.title}>G or Esc to close</span>
       </div>
       <div className={styles.grid}>
-        {SLIDES.map((s) => (
+        {slides.map((s) => (
           <button
             key={s.id}
             type="button"

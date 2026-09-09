@@ -1,12 +1,5 @@
 # Cardioline Vision 2028
 
-> **Procedência.** Também existe como repositório próprio em
-> [gabrielvaz/cardioline-vision-2028](https://github.com/gabrielvaz/cardioline-vision-2028);
-> a cópia aqui não tem o histórico. É uma das **duas linhas** do mesmo deck: esta
-> manteve os 22 slides e investiu nas landings e no VIREO AM em 3D, enquanto
-> [`../cardioline-vision-deck-35/`](../cardioline-vision-deck-35/) seguiu crescendo
-> no argumento até 35 slides.
-
 Materiais de visão de produto sobre uma única tese:
 
 > O dispositivo é a **porta de entrada** de uma relação contínua com o software,
@@ -24,9 +17,7 @@ pnpm dev        # http://localhost:3000
 pnpm build
 pnpm lint
 pnpm test       # vitest
-pnpm verify             # harness Puppeteer do deck de 22 slides
-pnpm verify:archimed        # harness da versão só-Brasil
-pnpm verify:archimed-group  # harness da versão de grupo
+pnpm verify     # harness Puppeteer do deck
 ```
 
 ## Rotas
@@ -38,8 +29,6 @@ vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 | Rota         | O que é                                                                     |
 | ------------ | --------------------------------------------------------------------------- |
 | `/`          | Home: escolher o fluxo — apresentação, site, mockup do dispositivo, produto |
-| `/archimed-group` | O deck de 10 slides para o board da Archimed, com Cardios e Cardioline   |
-| `/archimed`  | A versão anterior do mesmo deck, só com dados da Cardios                     |
 | `/vision`    | O deck de 22 slides                                                         |
 | `/anchor`    | Tela do workspace usada como apoio no deck                                  |
 | `/v2`        | Landing atual: o VIREO AM em 3D se desmonta e remonta com a rolagem         |
@@ -50,222 +39,6 @@ vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 
 A home agrupa por **fluxo** e não por lista corrida, porque é assim que a escolha se
 apresenta numa reunião: primeiro se decide o que mostrar, e só depois qual versão.
-
-## As duas versões Archimed
-
-`/archimed-group` é a atual e `/archimed` é a anterior, guardada como base de
-comparação. As duas têm o mesmo arco de dez slides, id por id, e um teste garante
-isso. O que muda é a evidência.
-
-### Cardios não é Cardioline, e o slide tem que dizer qual
-
-Cardioline é o grupo, sede na Itália, alcance mundial. Cardios é a operação
-brasileira, comprada em 2025. Os dois conjuntos de dados medem coisas diferentes:
-
-| | Cardios · Brasil | Cardioline · mundial |
-| --- | --- | --- |
-| Fonte | Portal CardioNet, exame por exame; Protheus para o parque | WebApp em nuvem, exame por exame |
-| Arquivo | `csv_export/`, `Clientese base.xlsx` | `SpazioCloudAruba_08.09.2026.xlsx` |
-| Clientes | 12.101 contas no portal, 4.214 ativas/mês | 49 tenants, 33 com exame (ClickSalute somado ao PharmaRoom) |
-| Exames/mês | 268.358, **medido** | 9.942, **medido**, só o período que o arquivo declara |
-| Retenção | 87%/ano, 6 pares de anos | 89% em 11 meses |
-
-**Nunca somados sem dizer.** Todo slide com dado carrega um marcador de
-procedência no alto, com três estados: quadrado cheio para Cardios, vazado para
-Cardioline, meio a meio quando o slide usa as duas. Há um teste que abre cada
-componente da versão de grupo e falha se algum não renderizar o marcador, porque
-um marcador que aparece só às vezes não é lido como regra.
-
-O limite da nuvem está escrito na legenda dos slides que a usam: são os clientes
-já conectados, não a base instalada mundial. Quem roda o software local não
-aparece, então o número é piso de uso e não tamanho de mercado.
-
-### O que a Cardioline acrescentou ao argumento
-
-**Slide 4** ganhou a metade que faltava. O Brasil tem trinta vezes o volume e
-nenhum produto em nuvem; a Itália já opera uma nuvem multi-tenant com laudo em
-mediana de meia hora e 66% dentro de 24h. Um lado tem escala, o outro prova que o
-modelo roda. É a tese de sandbox do plano de três anos, agora com número dos dois
-lados.
-
-**Slide 5** deixou de depender de uma amostra só. A retenção aparece duas vezes,
-em dois continentes, com métodos diferentes: 87% de retenção de logo ao ano no
-Brasil, em seis pares de anos consecutivos sobre cerca de cinco mil contas, e 89%
-em onze meses na nuvem, numa coorte de 27 tenants. Anualizadas dão 13% e 12% de
-churn, e os 15% que o modelo assume ficam **acima** das duas. O churn deixou de
-ser premissa e passou a ser medição, e há um teste que falha se alguém puser a
-premissa abaixo de qualquer uma das duas.
-
-**Slide 6** ganhou a comparação de forma. Os dois lados são medidos, e as formas
-não são iguais: o Brasil carrega o volume no meio da base, 2.017 contas entre 21
-e 400 exames/mês com 63,5% do total; a nuvem carrega num único cliente, o
-PharmaRoom com o ClickSalute somado, como a nota do arquivo manda, que faz 62%
-dela sozinho. Preço e conversão continuam propostos **só** para o Brasil: inventar
-preço para a nuvem italiana seria inventar o preço e o direito de propô-lo.
-
-## A versão Archimed
-
-`/archimed` é o mesmo argumento de `/vision` cortado para uma reunião de quinze
-minutos, para um público que decide investimento e interrompe muito. Não
-substitui os 22 slides: as duas rotas convivem, e a evolução do argumento é parte
-do material.
-
-Três decisões que vêm dessa restrição e não de gosto:
-
-- **O pedido abre o deck, não fecha.** Guardar o pedido para o fim é apostar que
-  se chega ao fim. Ele está no slide 2, logo depois da capa, e volta com detalhe
-  no 10.
-- **Cada slide sobrevive fora de ordem.** A navegação real vai ser o mapa (`G`),
-  porque alguém vai pedir "volta na tabela". Nenhum slide depende do anterior
-  para fazer sentido.
-- **Um único slide navy**, o 8, que é onde a narrativa sobe: o que a receita
-  recorrente muda no valor da empresa.
-
-O que é apurado, o que é derivado e o que é premissa está separado em
-[`lib/archimed.ts`](lib/archimed.ts), e o comentário de cada valor diz qual.
-Clientes, parque e comportamento de recompra saem da base de vendas da Cardios;
-o volume de exame por cliente é **derivado** do parque e calibrado contra os
-14.000 exames/dia nacionais; preço, teto de conversão e churn são premissa. A
-análise vive em `_estrategia/2026-09-08-mrr-arr-base-instalada/`, junto com a
-versão do slide da tabela que tem sliders para mexer nas premissas ao vivo.
-
-### Por que o argumento é uso recorrente e não recompra
-
-O slide 5 argumentava por recompra de hardware: mediana de 280 dias entre
-compras, 61% das entidades voltando, crescimento de volume vindo da base. Foi
-substituído, e por dois motivos. O primeiro é que comprar aparelho de novo não
-diz nada sobre disposição a assinar software. O segundo é que o número de
-crescimento estava errado: reproduzia 7.936 para 15.880 com as quatro revendas
-dentro da conta, e elas estão fora de todo o resto do deck.
-
-O que entrou é medido no `_dados/Dinamica2026.xlsx`: 74% dos clientes usaram o
-software em seis ou sete dos sete meses, metade usou em todos, e a coorte de
-janeiro manteve 91% em julho. Essa última é a que faz o slide valer o tempo:
-anualizada dá cerca de 17% de churn de logo, que é a âncora medida sob os 15% que
-o modelo assume. O churn deixou de ser premissa, e o slide diz que o modelo é
-levemente otimista em vez de deixar a sala descobrir.
-
-O achado de aquisição que morava naquele slide — cerca de 500 entidades novas por
-ano desde 2010, com o crescimento vindo da base e não do funil — continua
-registrado em `_estrategia/2026-09-08-mrr-arr-base-instalada/README.md`, mas não
-está em slide nenhum.
-
-### A revisão de 09/09/2026: nada mais é derivado
-
-Os rollups do portal CardioNet em `_dados/csv_export/` chegaram depois da
-primeira versão deste deck e mudaram o piso da evidência. Antes, o volume por
-cliente era **derivado** do tamanho do parque e calibrado contra "14.000 exames
-por dia" que vinham de uma transcrição de reunião. Agora são **19,03 milhões de
-exames** contados um a um, com cliente, central de análise, mês e turnaround.
-
-A medição desmentiu o modelo derivado em dois pontos que mudam a estratégia:
-
-| | Derivado (antes) | Medido (agora) |
-| --- | --- | --- |
-| Exames/mês | 308.000 | 268.358 |
-| Contas acima de 1.500 exames/mês | 32, com 44% do volume | **9, com 8,8%** |
-| Contas de 21 a 400 exames/mês | 1.003 | **2.017, com 63,5% do volume** |
-| Churn anual | 17%, coorte de 7 meses | **13%, seis pares de anos** |
-| ARR base no mês 24 | R$ 1,60 M | **R$ 1,97 M** |
-
-O erro do modelo derivado era inflar o topo e esvaziar o meio. Isso trocava a
-operação comercial que o pedido financia: não é cobrir trinta contas gigantes por
-telefone, é cobrir dois mil clientes de porte médio, o que exige máquina e não
-lista. O slide 10 pede isso com o número certo.
-
-Duas coisas ficaram melhores do que se supunha. O churn medido em seis pares de
-anos consecutivos é 13%, então os 15% do modelo passaram a ser **conservadores**;
-antes eram levemente otimistas, e o slide dizia isso. E o volume por cliente,
-sendo maior no miolo, dá um ARR base 23% acima do anterior.
-
-Duas ressalvas que vieram com os dados e valem para qualquer leitura:
-
-- **A série confiável começa em 2019-01.** O histórico de 2006 a 2018 foi perdido
-  numa migração de MySQL. O salto de 2018 para 2019 não é adoção nem lançamento,
-  é o ponto onde o dado sobrevivente começa. Nenhum crescimento é calculado
-  contra 2009-2017.
-- **A unidade do portal é a conta, não o cliente comercial.** 11.579 das 12.101
-  contas trazem o `customer_id` do ERP, e ele vem em dois formatos (`8120` e
-  `008120`). Normalizado com zeros à esquerda, são 5.437 códigos distintos; o
-  6.311 que este README trazia era a contagem sem normalizar.
-
-O `Dinamica2026.xlsx` cobria um único centro de telemedicina e está superado.
-Segue no diretório como registro, mas não alimenta mais nenhum número.
-
-### A auditoria de 09/09/2026: o que é das planilhas e o que não é
-
-Todo número marcado como apurado em `lib/archimed.ts` e `lib/cardioline.ts` foi
-reproduzido a partir de `_dados/` nesta data: os 19.032.503 exames, os 268.358 por
-mês, as 4.214 contas ativas por mês, os seis pares de retenção (84,1% a 88,8%), o
-turnaround de 2025, o mix por modalidade, as seis faixas de volume (corte pela
-parte inteira da média de 2025 por conta), o modelo de MRR ao real, e os cinco
-cortes do Protheus (161.586 registros, 11.925 entidades, 87.354 aparelhos, 3.257
-ativas, 29.619 no parque). Na nuvem, os números passaram a seguir o período
-declarado no arquivo e a somar o ClickSalute ao PharmaRoom, que é o que a nota do
-próprio arquivo diz: 33 tenants com exame, 119.306 exames, e o maior cliente com
-62% do volume em vez de 41%.
-
-Cinco números do deck **não estão em nenhuma planilha**, e o slide agora diz isso:
-os ~R$ 40 M de hardware, os R$ 2,7 M de software, a fatia de 6%, os R$ 1.200 e
-R$ 670 da licença CardioNet Client, e os R$ 30 por laudo terceirizado. Vêm de
-`_estrategia/2026-08-19-empacotamento-e-monetizacao/cardios_modelo_negocio_software.html`
-e da reunião de 19/08/2026, como informação da gestão. Confirmar com o financeiro
-antes do board. O "piloto de 60 clientes" e os "15 dias de uso" são plano da
-mesma reunião, não medição. A referência italiana de preço, citada na reunião, é
-7,20 € por exame ou 108 € por aparelho por mês.
-
-O que a auditoria corrigiu nos slides: o título da faixa de volume ainda dizia
-"1% faz 44%", do modelo derivado (medido: a metade de baixo faz 4,2% e o meio
-63,5%); a decisão falava em "113 contas a cobrir" (são as 2.017 do meio); a base
-ativa "batia com ~3.000 enviando exame" (não bate: são 4.214 contas por mês, e
-quem compra e quem transmite são grupos diferentes); a versão de grupo ainda
-citava 91% de retenção da amostra superada e R$ 1,06 M no estresse de churn (são
-87% e R$ 1,30 M); e a coluna de participação dividia a soma de 2025 pela média da
-janela, somando 100,4%.
-
-### Por que os buckets são de exame e não de aparelho
-
-A primeira versão segmentava por número de aparelhos e chamava de central toda
-entidade com 50+ aparelhos ou software de análise. Isso dava 498 clientes de alto
-volume e um ARR de R$ 5,39 M. Por volume de exame existem **32**, e o ARR base cai
-para R$ 1,60 M. A segmentação por aparelho estava inflando o topo, e uma
-assinatura por cliente só se sustenta se o preço acompanhar o volume.
-
-A escada de preço é ancorada no que o cliente já gasta: a mediana de exames do
-bucket vezes os R$ 30 do laudo terceirizado. Nos dois buckets pequenos a
-assinatura tem que sair **abaixo** disso, e há um teste que garante. Foi o
-`_dados/Dinamica2026.xlsx` que impôs esse piso: ele mede exames por cliente por
-mês de janeiro a julho de 2026 e mostra que 42% dos clientes que terceirizam
-laudo fazem de 1 a 5 exames por mês. A R$ 129, a assinatura sairia mais caro que
-o laudo que eles já compram.
-
-Esse arquivo cobre 66 clientes, os que terceirizam laudo, e não a base instalada:
-as centrais grandes laudam por conta própria e não aparecem nele. Ele serve para
-validar o pé da distribuição e fixar o piso de preço, não para dimensionar o
-mercado.
-
-**O valor do pedido está em branco de propósito.** `ASK.amountBrl` é `null` e o
-último slide renderiza um marcador tracejado no lugar do número, porque o valor não
-saiu de nenhuma conta deste trabalho. Existe um teste que falha no dia em que
-alguém puser um número lá, para lembrar de registrar a origem dele.
-
-A capa é branca com o wordmark laranja em 168px, igual à dos 22 slides, e tem
-dois elementos: marca e título. *Stop selling boxes. Sell recurring value.*, em
-72px, com "recurring" em laranja. **Toma posição sem entregar número nenhum** —
-a tese aparece no slide 2 e os dados do 4 em diante, onde há argumento por baixo
-deles.
-
-### O harness voltou a rodar
-
-`pnpm verify` estava morto: `next start` não funciona com `output: "export"` e
-recusava com *"does not work with output: export"*. Os dois harnesses agora
-servem o `out/` com [`scripts/lib/serve-out.mjs`](scripts/lib/serve-out.mjs), sem
-dependência nova, e compartilham o auditor em
-[`scripts/lib/audit-page.mjs`](scripts/lib/audit-page.mjs) — duplicar as
-checagens é como as duas versões passariam a ter padrões diferentes.
-
-Se o Chrome do puppeteer não estiver baixado, os dois usam o Chrome do sistema;
-`CHROME_PATH` aponta para outro lugar.
 
 ## A v2
 

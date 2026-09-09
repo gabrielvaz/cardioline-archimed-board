@@ -1,0 +1,54 @@
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Quadrado e não círculo: o círculo laranja já é o marcador de nó do Flow, e
+   dois significados na mesma forma confundem. */
+.dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+}
+
+.cardios {
+  background: var(--cl-orange);
+}
+
+/* Vazado para Cardioline: distingue sem inventar uma segunda cor de marca. */
+.cardioline {
+  border: 2px solid var(--cl-orange);
+}
+
+/* Metade e metade quando o slide soma as duas operações. */
+.both {
+  background: linear-gradient(
+    90deg,
+    var(--cl-orange) 0 50%,
+    transparent 50% 100%
+  );
+  border: 2px solid var(--cl-orange);
+}
+
+.text {
+  font-size: var(--cl-fs-kicker);
+  font-weight: var(--cl-weight-semibold);
+  letter-spacing: var(--cl-tracking-kicker);
+  text-transform: uppercase;
+  color: var(--cl-mute);
+}
+
+[data-theme="ink"] .text {
+  color: rgb(255 255 255 / 0.62);
+}
+
+[data-theme="ink"] .cardioline,
+[data-theme="ink"] .both {
+  border-color: #ff9052;
+}
+
+[data-theme="ink"] .cardios,
+[data-theme="ink"] .both {
+  background-color: #ff9052;
+}

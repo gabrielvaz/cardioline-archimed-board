@@ -1,0 +1,5 @@
+# As rotas do board da Archimed trazem projeção de ARR, múltiplo de EV e pedido
+# de investimento. O resto do site é indexável e continua sendo.
+User-agent: *
+Disallow: /archimed/
+Disallow: /archimed-group/

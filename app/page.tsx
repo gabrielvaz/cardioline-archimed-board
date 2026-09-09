@@ -36,8 +36,21 @@ const GROUPS: Group[] = [
   {
     id: "apresentacao",
     title: "Apresentação",
-    lede: "Para conduzir a reunião.",
+    lede: "Para conduzir a reunião. Três versões do mesmo argumento, para públicos e bases de dados diferentes.",
     entries: [
+      {
+        href: "/archimed-group",
+        kicker: "Deck · 10 slides",
+        name: "Archimed board · grupo",
+        body: "A versão melhor embasada: o mesmo argumento sustentado pelos dados da Cardios e da Cardioline, com marcador de procedência em cada slide dizendo se o número é do Brasil, do mundo, ou dos dois.",
+        current: true,
+      },
+      {
+        href: "/archimed",
+        kicker: "Deck · 10 slides",
+        name: "Archimed board · só Brasil",
+        body: "A versão anterior, com dados apenas da Cardios. Guardada como base de comparação: é onde o argumento foi construído antes de a nuvem italiana entrar na conta.",
+      },
       {
         href: "/vision",
         kicker: "Deck · 22 slides",
