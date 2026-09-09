@@ -1,5 +1,5 @@
-# As rotas do board da Archimed trazem projeção de ARR, múltiplo de EV e pedido
-# de investimento. O resto do site é indexável e continua sendo.
+# Peça de board. Fora de buscador por decisão, não por acidente: traz projeção
+# de ARR, múltiplo de EV e pedido de investimento. As duas rotas do board também
+# carregam noindex no metadata da própria rota.
 User-agent: *
-Disallow: /archimed/
-Disallow: /archimed-group/
+Disallow: /
