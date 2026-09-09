@@ -51,6 +51,32 @@ vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 A home agrupa por **fluxo** e não por lista corrida, porque é assim que a escolha se
 apresenta numa reunião: primeiro se decide o que mostrar, e só depois qual versão.
 
+## Publicado
+
+| URL | O que é |
+| --- | --- |
+| [gabrielvaz.github.io/cardioline-archimed-board/archimed-group/](https://gabrielvaz.github.io/cardioline-archimed-board/archimed-group/) | A versão de grupo, com Cardios e Cardioline |
+| [gabrielvaz.github.io/cardioline-archimed-board/archimed/](https://gabrielvaz.github.io/cardioline-archimed-board/archimed/) | A versão só-Brasil, guardada como comparação |
+
+Repo `cardioline-archimed-board`, público, **nada indexado**: as rotas do board
+declaram `robots: { index: false }` no `metadata` e o `robots.txt` barra o repo
+inteiro. Publica no push da main pelo workflow de Pages.
+
+**Esta pasta não publica em `cardioline-product-vision`.** Aquele repo descende de
+`../deck-35/` e está muito à frente, com outra estrutura de app. Empurrar isto para
+lá derrubaria um site que está no ar.
+
+## Valores em dólar
+
+Toda fonte é em BRL, porque a operação é brasileira, e a conversão acontece na
+exibição. A taxa é uma constante única em `lib/archimed.ts` (`FX`), hoje em
+**R$ 5,50 por US$ 1**, e o rodapé de cada slide com valor declara qual taxa foi
+usada. Trocar a taxa é editar uma linha; guardar dólar convertido seria perder a
+fonte e ter que reconverter na próxima vez.
+
+Abaixo de um milhão o valor sai em mil e não em milhão: "US$ 358 k" se lê num
+board, "US$ 0.36 M" faz o número parecer menor do que é.
+
 ## As duas versões Archimed
 
 `/archimed-group` é a atual e `/archimed` é a anterior, guardada como base de
