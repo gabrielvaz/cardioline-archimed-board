@@ -1,18 +1,17 @@
 # Publicação no GitHub Pages.
 #
-# DISPARO MANUAL DE PROPÓSITO. Não há gatilho em push: enquanto o protótipo não
-# deve ficar público, um push na main não pode publicar sozinho. Para ligar a
-# publicação automática, acrescente:
+# Publica no push da main, mais disparo manual.
 #
-#   push:
-#     branches: [main]
-#
-# E lembre que só o workflow não põe nada no ar: é preciso, uma vez, ir em
-# Settings > Pages e escolher "GitHub Actions" como Source. Sem isso o job termina
-# em verde e o site continua indisponível.
+# Só o workflow não põe nada no ar: é preciso, uma vez, apontar o Pages para
+# "GitHub Actions" como Source. Sem isso o job termina em verde e o site continua
+# indisponível. E a ordem importa: mudar o Pages de legacy para workflow DEPOIS
+# que o workflow já rodou faz o build antigo sobrescrever o novo, e tudo responde
+# 404 com o deploy verde.
 name: Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
