@@ -51,16 +51,23 @@ vez de ser sobrescrita, para que a evolução do argumento seja demonstrável.
 A home agrupa por **fluxo** e não por lista corrida, porque é assim que a escolha se
 apresenta numa reunião: primeiro se decide o que mostrar, e só depois qual versão.
 
-## Publicado
+## Onde isto vive
 
-| URL | O que é |
-| --- | --- |
-| [gabrielvaz.github.io/cardioline-archimed-board/archimed-group/](https://gabrielvaz.github.io/cardioline-archimed-board/archimed-group/) | A versão de grupo, com Cardios e Cardioline |
-| [gabrielvaz.github.io/cardioline-archimed-board/archimed/](https://gabrielvaz.github.io/cardioline-archimed-board/archimed/) | A versão só-Brasil, guardada como comparação |
+Versionado em `cardioline-archimed-board`, e **não publicado na web**. O Pages foi
+desligado em 09/09/2026: o deck roda local com `pnpm dev` e o repo serve de
+histórico.
 
-Repo `cardioline-archimed-board`, público, **nada indexado**: as rotas do board
-declaram `robots: { index: false }` no `metadata` e o `robots.txt` barra o repo
-inteiro. Publica no push da main pelo workflow de Pages.
+Para pôr no ar de novo, dois passos e nesta ordem:
+
+```sh
+gh api -X POST repos/gabrielvaz/cardioline-archimed-board/pages -f build_type=workflow
+gh workflow run pages.yml -R gabrielvaz/cardioline-archimed-board
+```
+
+Inverter a ordem faz o build antigo sobrescrever o novo e tudo responde 404 com o
+deploy verde. As rotas do board já carregam `robots: { index: false }` no
+`metadata` e o `robots.txt` barra o repo inteiro, então uma republicação não entra
+em buscador por acidente.
 
 **Esta pasta não publica em `cardioline-product-vision`.** Aquele repo descende de
 `../deck-35/` e está muito à frente, com outra estrutura de app. Empurrar isto para
